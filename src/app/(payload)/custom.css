@@ -1,29 +1,29 @@
 /* ============================================================
-   FlyMacro Admin — Minimal Tech Dark Theme
-   Inspired by Linear / Vercel dashboard aesthetics
+   FlyMacro Admin — Bright Light-Blue Tech Theme
+   Clean, readable, modern SaaS dashboard aesthetic
    ============================================================ */
 
-/* ── Base theme overrides ── */
 :root {
-  --tech-bg: #0f172a;
-  --tech-bg-elevated: #1e293b;
-  --tech-bg-sunken: #0b1221;
-  --tech-border: #334155;
-  --tech-border-subtle: rgba(51, 65, 85, 0.5);
-  --tech-text: #f8fafc;
-  --tech-text-secondary: #94a3b8;
-  --tech-text-muted: #64748b;
-  --tech-accent: #6366f1;
-  --tech-accent-hover: #818cf8;
-  --tech-accent-subtle: rgba(99, 102, 241, 0.1);
-  --tech-success: #22c55e;
-  --tech-error: #ef4444;
-  --tech-warning: #f59e0b;
+  --tech-bg: #ffffff;
+  --tech-bg-elevated: #f8fafc;
+  --tech-bg-sunken: #f1f5f9;
+  --tech-border: #e2e8f0;
+  --tech-border-subtle: rgba(226, 232, 240, 0.6);
+  --tech-text: #0f172a;
+  --tech-text-secondary: #475569;
+  --tech-text-muted: #94a3b8;
+  --tech-accent: #0ea5e9;
+  --tech-accent-hover: #0284c7;
+  --tech-accent-subtle: rgba(14, 165, 233, 0.08);
+  --tech-accent-light: #e0f2fe;
+  --tech-success: #16a34a;
+  --tech-error: #dc2626;
+  --tech-warning: #d97706;
   --tech-radius-sm: 6px;
   --tech-radius-md: 8px;
   --tech-radius-lg: 12px;
-  --tech-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --tech-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --tech-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --tech-shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Global background ── */
@@ -35,7 +35,7 @@
 
 /* ── Sidebar / Nav ── */
 .nav {
-  background-color: var(--tech-bg-sunken) !important;
+  background-color: var(--tech-bg) !important;
   border-right: 1px solid var(--tech-border) !important;
 }
 
@@ -51,14 +51,14 @@
 }
 
 .nav__link:hover {
-  background-color: rgba(99, 102, 241, 0.08) !important;
-  color: var(--tech-text) !important;
+  background-color: var(--tech-accent-light) !important;
+  color: var(--tech-accent-hover) !important;
 }
 
 .nav__link--active {
   background-color: var(--tech-accent-subtle) !important;
   color: var(--tech-accent) !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
 }
 
 .nav__link-icon {
@@ -88,10 +88,10 @@
   background-color: var(--tech-bg-sunken) !important;
   border-bottom: 1px solid var(--tech-border) !important;
   color: var(--tech-text-secondary) !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   font-size: 12px !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.04em !important;
   padding: 12px 16px !important;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .table tbody tr:hover td {
-  background-color: rgba(99, 102, 241, 0.04) !important;
+  background-color: var(--tech-accent-light) !important;
 }
 
 .table tbody tr:last-child td {
@@ -125,7 +125,7 @@
 
 .btn--style-primary:hover {
   background-color: var(--tech-accent-hover) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
 }
 
 .btn--style-secondary {
@@ -135,8 +135,8 @@
 }
 
 .btn--style-secondary:hover {
-  background-color: var(--tech-border) !important;
-  border-color: var(--tech-text-secondary) !important;
+  background-color: var(--tech-bg-sunken) !important;
+  border-color: var(--tech-text-muted) !important;
 }
 
 .btn--style-icon {
@@ -145,7 +145,7 @@
 
 .btn--style-icon:hover {
   color: var(--tech-text) !important;
-  background-color: var(--tech-border) !important;
+  background-color: var(--tech-bg-sunken) !important;
 }
 
 /* ── Form inputs ── */
@@ -156,7 +156,7 @@ input[type="number"],
 textarea,
 .select select,
 .react-select__control {
-  background-color: var(--tech-bg-sunken) !important;
+  background-color: var(--tech-bg) !important;
   border: 1px solid var(--tech-border) !important;
   border-radius: var(--tech-radius-sm) !important;
   color: var(--tech-text) !important;
@@ -169,14 +169,14 @@ textarea:focus,
 .select select:focus,
 .react-select__control--is-focused {
   border-color: var(--tech-accent) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
   outline: none !important;
 }
 
 /* ── Labels ── */
 .field-label {
   color: var(--tech-text-secondary) !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   font-size: 13px !important;
 }
 
@@ -190,6 +190,7 @@ textarea:focus,
 .tab--active {
   color: var(--tech-accent) !important;
   border-bottom-color: var(--tech-accent) !important;
+  font-weight: 600 !important;
 }
 
 .tab:hover:not(.tab--active) {
@@ -205,17 +206,17 @@ textarea:focus,
 }
 
 .pill--style-success {
-  background-color: rgba(34, 197, 94, 0.12) !important;
+  background-color: rgba(22, 163, 74, 0.1) !important;
   color: var(--tech-success) !important;
 }
 
 .pill--style-error {
-  background-color: rgba(239, 68, 68, 0.12) !important;
+  background-color: rgba(220, 38, 38, 0.1) !important;
   color: var(--tech-error) !important;
 }
 
 .pill--style-warning {
-  background-color: rgba(245, 158, 11, 0.12) !important;
+  background-color: rgba(217, 119, 6, 0.1) !important;
   color: var(--tech-warning) !important;
 }
 
@@ -247,7 +248,7 @@ textarea:focus,
 }
 
 .popup__item:hover {
-  background-color: rgba(99, 102, 241, 0.08) !important;
+  background-color: var(--tech-accent-light) !important;
 }
 
 /* ── Search / Filter bar ── */
@@ -278,12 +279,12 @@ textarea:focus,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--tech-border);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--tech-text-muted);
+  background: #94a3b8;
 }
 
 /* ── Toast notifications ── */
@@ -310,7 +311,7 @@ textarea:focus,
 
 /* ── Collection list count badge ── */
 .nav__link-count {
-  background-color: var(--tech-accent-subtle) !important;
+  background-color: var(--tech-accent-light) !important;
   color: var(--tech-accent) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
@@ -329,5 +330,5 @@ textarea:focus,
 
 .account__menu-item:hover {
   color: var(--tech-text) !important;
-  background-color: rgba(99, 102, 241, 0.08) !important;
+  background-color: var(--tech-accent-light) !important;
 }

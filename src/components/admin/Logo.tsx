@@ -11,7 +11,7 @@ export const Logo: React.FC = () => (
     }}
   >
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="28" height="28" rx="7" fill="#6366f1" />
+      <rect width="28" height="28" rx="7" fill="#0ea5e9" />
       <path
         d="M8 14L12 10L16 14L20 10"
         stroke="white"
@@ -32,7 +32,7 @@ export const Logo: React.FC = () => (
       style={{
         fontSize: 17,
         fontWeight: 600,
-        color: '#f8fafc',
+        color: '#0f172a',
         letterSpacing: '-0.01em',
       }}
     >
@@ -43,7 +43,7 @@ export const Logo: React.FC = () => (
 
 export const Icon: React.FC = () => (
   <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="28" height="28" rx="7" fill="#6366f1" />
+    <rect width="28" height="28" rx="7" fill="#0ea5e9" />
     <path
       d="M8 14L12 10L16 14L20 10"
       stroke="white"
