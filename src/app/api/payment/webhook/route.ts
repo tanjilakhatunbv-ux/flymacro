@@ -24,15 +24,19 @@ export async function POST(req: Request) {
     const signature = req.headers.get('x-dodo-signature')
       || req.headers.get('x-webhook-signature')
       || req.headers.get('stripe-signature')
+      || req.headers.get('x-webhook-signature-256')
     if (!signature) {
-      console.warn('[Webhook] Missing signature header')
-      return NextResponse.json({ error: 'missing-signature' }, { status: 401 })
-    }
-
-    const isValid = verifySignature(payloadText, signature, secret)
-    if (!isValid) {
-      console.warn('[Webhook] Invalid signature')
-      return NextResponse.json({ error: 'invalid-signature' }, { status: 401 })
+      console.warn('[Webhook] Missing signature header — processing anyway in test mode')
+      // In test_mode DodoPayments may not send signatures; trust the payload if URL is secret
+      if (process.env.DODO_MODE !== 'test_mode') {
+        return NextResponse.json({ error: 'missing-signature' }, { status: 401 })
+      }
+    } else {
+      const isValid = verifySignature(payloadText, signature, secret)
+      if (!isValid) {
+        console.warn('[Webhook] Invalid signature')
+        return NextResponse.json({ error: 'invalid-signature' }, { status: 401 })
+      }
     }
   }
 
