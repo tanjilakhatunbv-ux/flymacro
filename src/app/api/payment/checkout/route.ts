@@ -52,8 +52,8 @@ export async function POST(req: Request) {
     )
   }
 
-  const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/account/credits?paid=success`
-  const cancelUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/account/credits?paid=cancel`
+  const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`
+  const cancelUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=cancel`
 
   try {
     const session = await dodoFetch<DodoCheckoutSession>('/checkouts', {
