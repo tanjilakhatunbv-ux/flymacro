@@ -88,7 +88,17 @@ export default buildConfig({
     ...(useS3
       ? [
           s3Storage({
-            collections: { media: { prefix: 'media' } },
+            collections: {
+              media: {
+                prefix: 'media',
+                disablePayloadAccessControl: true,
+                generateFileURL: ({ filename, prefix }) => {
+                  const publicUrl = process.env.S3_PUBLIC_URL || ''
+                  const path = prefix ? `${prefix}/${filename}` : filename
+                  return `${publicUrl}/${path}`
+                },
+              },
+            },
             bucket: process.env.S3_BUCKET || '',
             config: {
               endpoint: process.env.S3_ENDPOINT,
