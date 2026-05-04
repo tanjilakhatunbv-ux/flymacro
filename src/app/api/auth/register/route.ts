@@ -71,8 +71,9 @@ export async function POST(req: Request) {
     )
   }
 
+  let user: any
   try {
-    const user = await payload.create({
+    user = await payload.create({
       collection: 'users',
       data: {
         email,
@@ -83,30 +84,68 @@ export async function POST(req: Request) {
       },
       overrideAccess: true,
     })
-
-    // Create register bonus transaction
-    await payload.create({
-      collection: 'credit-transactions',
-      data: {
-        user: user.id,
-        amount: 20,
-        balanceAfter: 20,
-        type: 'register_bonus',
-        reason: '新用户注册奖励',
-      } as any,
-      overrideAccess: true,
-    })
   } catch (err) {
     const msg = err instanceof Error ? err.message : '注册失败'
-    // Gracefully handle Resend domain-not-verified error
-    if (msg.includes('domain is not verified') || msg.includes('validation_error')) {
+    const errName = (err as any)?.name || ''
+    const isResendDomainError =
+      msg.includes('domain is not verified') ||
+      msg.includes('validation_error') ||
+      errName === 'validation_error'
+
+    if (isResendDomainError) {
+      // Email domain not verified: create user as pre-verified so they can log in immediately
+      try {
+        user = await payload.create({
+          collection: 'users',
+          data: {
+            email,
+            password,
+            name: name || undefined,
+            role: 'user',
+            credits: 20,
+            _verified: true,
+          } as any,
+          overrideAccess: true,
+        })
+      } catch (innerErr) {
+        const innerMsg = innerErr instanceof Error ? innerErr.message : '注册失败'
+        return NextResponse.json({ errors: [{ message: innerMsg }] }, { status: 500 })
+      }
+
+      // Create register bonus transaction
+      await payload.create({
+        collection: 'credit-transactions',
+        data: {
+          user: user.id,
+          amount: 20,
+          balanceAfter: 20,
+          type: 'register_bonus',
+          reason: '新用户注册奖励',
+        } as any,
+        overrideAccess: true,
+      })
+
       return NextResponse.json({
         ok: true,
-        warning: '账号已创建，但验证邮件发送失败（发件域名未验证）。请稍后再试或联系客服手动激活账号。',
+        warning: '账号已创建（邮箱验证暂时跳过，发件域名配置中）。请直接登录。',
       })
     }
+
     return NextResponse.json({ errors: [{ message: msg }] }, { status: 500 })
   }
+
+  // Create register bonus transaction
+  await payload.create({
+    collection: 'credit-transactions',
+    data: {
+      user: user.id,
+      amount: 20,
+      balanceAfter: 20,
+      type: 'register_bonus',
+      reason: '新用户注册奖励',
+    } as any,
+    overrideAccess: true,
+  })
 
   return NextResponse.json({ ok: true })
 }
