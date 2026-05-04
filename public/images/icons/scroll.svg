@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#ffd76b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="羊皮卷轴">
+  <ellipse cx="32" cy="14" rx="20" ry="3" fill="#ffd76b" fill-opacity="0.18"/>
+  <ellipse cx="32" cy="14" rx="20" ry="3"/>
+  <path d="M12 14v36M52 14v36"/>
+  <path d="M14 14c0 8-2 16-2 22 0 8 4 14 10 14h20c6 0 10-6 10-14 0-6-2-14-2-22"/>
+  <ellipse cx="32" cy="50" rx="20" ry="3" fill="#ffd76b" fill-opacity="0.18"/>
+  <ellipse cx="32" cy="50" rx="20" ry="3"/>
+  <path d="M20 24h24M20 30h24M20 36h18" stroke-opacity="0.55"/>
+  <circle cx="44" cy="40" r="4" fill="#c8431a" fill-opacity="0.7" stroke="#7a2c14"/>
+  <path d="M42 40l2 2 3-3" stroke="#fff" stroke-opacity="0.7"/>
+</svg>
+

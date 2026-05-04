@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="死亡骑士">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Skull -->
+  <path d="M22 30c0-6 4.5-11 10-11s10 5 10 11c0 4-2 6-2 9v3l-3 2h-10l-3-2v-3c0-3-2-5-2-9Z"/>
+  <circle cx="28" cy="32" r="2.4" fill="currentColor"/>
+  <circle cx="36" cy="32" r="2.4" fill="currentColor"/>
+  <path d="M30 39h4M28 42h8" stroke-width="1.6"/>
+  <!-- Runeblade -->
+  <path d="M16 16l8 8M48 16l-8 8" stroke-opacity="0.55"/>
+  <!-- Frost wisps -->
+  <path d="M14 50l4-2M50 50l-4-2M32 56v-4" stroke-opacity="0.6"/>
+</svg>

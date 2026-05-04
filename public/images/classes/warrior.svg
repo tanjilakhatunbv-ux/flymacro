@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="战士">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Crossed swords -->
+  <path d="M16 16l32 32M48 16L16 48"/>
+  <!-- Hilts and pommels -->
+  <path d="M14 14l4 4M50 14l-4 4M14 50l4-4M50 50l-4-4" stroke-width="2.5"/>
+  <circle cx="13" cy="13" r="1.6" fill="currentColor"/>
+  <circle cx="51" cy="13" r="1.6" fill="currentColor"/>
+  <!-- Center shield -->
+  <path d="M32 22c4 0 6 2 6 4 0 6-3 10-6 12-3-2-6-6-6-12 0-2 2-4 6-4Z" fill="currentColor" fill-opacity="0.18"/>
+</svg>

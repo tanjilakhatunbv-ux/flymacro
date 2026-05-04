@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="法师">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Magical 8-point star -->
+  <path d="M32 12 L34 26 L48 28 L36 32 L48 36 L34 38 L32 52 L30 38 L16 36 L28 32 L16 28 L30 26 Z" fill="currentColor" fill-opacity="0.15"/>
+  <!-- Inner sigil -->
+  <circle cx="32" cy="32" r="6"/>
+  <path d="M32 26v12M26 32h12" stroke-opacity="0.7"/>
+  <!-- Sparkles -->
+  <circle cx="18" cy="20" r="1" fill="currentColor"/>
+  <circle cx="46" cy="46" r="1" fill="currentColor"/>
+</svg>

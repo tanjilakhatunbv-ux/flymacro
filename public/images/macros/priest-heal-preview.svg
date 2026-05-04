@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" role="img" aria-label="牧师治疗宏 预览图">
+  <defs>
+    <radialGradient id="bg-holy" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#5a4a2a"/>
+      <stop offset="50%" stop-color="#2a2010"/>
+      <stop offset="100%" stop-color="#0a0805"/>
+    </radialGradient>
+    <radialGradient id="orb-holy" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff4c8" stop-opacity="0.98"/>
+      <stop offset="40%" stop-color="#ffd97a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#a26a14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="frame-holy" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e9c66a"/>
+      <stop offset="100%" stop-color="#8e6418"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bg-holy)"/>
+  <!-- Light rays -->
+  <g stroke="#ffe9a8" stroke-width="1" opacity="0.4">
+    <path d="M400 240 L200 60"/>
+    <path d="M400 240 L600 60"/>
+    <path d="M400 240 L100 240"/>
+    <path d="M400 240 L700 240"/>
+    <path d="M400 240 L200 420"/>
+    <path d="M400 240 L600 420"/>
+    <path d="M400 240 L300 30"/>
+    <path d="M400 240 L500 30"/>
+    <path d="M400 240 L300 440"/>
+    <path d="M400 240 L500 440"/>
+  </g>
+  <!-- Runic ring -->
+  <g transform="translate(400 240)" opacity="0.55" fill="none" stroke="#ffd97a">
+    <circle r="180" stroke-width="1.2" stroke-dasharray="3 8"/>
+    <circle r="150" stroke-width="0.6" stroke-dasharray="2 6"/>
+  </g>
+  <!-- Central orb -->
+  <circle cx="400" cy="240" r="100" fill="url(#orb-holy)"/>
+  <!-- Holy sigil cross -->
+  <g transform="translate(400 240)" stroke="#fff" stroke-width="3" fill="none" opacity="0.95">
+    <path d="M0 -36 L0 36 M-26 0 L26 0"/>
+    <circle r="22" stroke-width="1.6"/>
+    <circle r="6" fill="#fff" fill-opacity="0.6"/>
+  </g>
+  <!-- Wings -->
+  <g stroke="#ffe9a8" stroke-width="1.4" fill="none" opacity="0.6">
+    <path d="M280 220c-20-12-40-10-50 0M280 250c-20 12-40 10-50 0M280 235c-30 0-50-2-60 0"/>
+    <path d="M520 220c20-12 40-10 50 0M520 250c20 12 40 10 50 0M520 235c30 0 50-2 60 0"/>
+  </g>
+  <!-- Title text -->
+  <g font-family="serif" text-anchor="middle">
+    <text x="400" y="380" fill="#e9c66a" font-size="34" font-weight="700" letter-spacing="4">神圣 · 戒律</text>
+    <text x="400" y="412" fill="#ffe9a8" font-size="16" letter-spacing="6">HOLY · DISCIPLINE · v10.2</text>
+  </g>
+  <!-- Frame -->
+  <rect x="6" y="6" width="788" height="438" fill="none" stroke="url(#frame-holy)" stroke-width="2"/>
+  <rect x="14" y="14" width="772" height="422" fill="none" stroke="#3a2a14" stroke-width="0.6"/>
+</svg>

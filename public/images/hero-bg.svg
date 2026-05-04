@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="魔兽世界风格远景">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#3a2a16"/>
+      <stop offset="35%" stop-color="#1c1108"/>
+      <stop offset="100%" stop-color="#080605"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="50%" cy="55%" r="35%">
+      <stop offset="0%" stop-color="#ffd97a" stop-opacity="0.85"/>
+      <stop offset="35%" stop-color="#d68a2c" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#5a2c0c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mtnFar" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1d1812"/>
+      <stop offset="100%" stop-color="#0c0907"/>
+    </linearGradient>
+    <linearGradient id="mtnMid" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#15110b"/>
+      <stop offset="100%" stop-color="#070504"/>
+    </linearGradient>
+    <linearGradient id="mtnNear" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b0805"/>
+      <stop offset="100%" stop-color="#000"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe9a8" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#ffb84a" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffb84a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="noise" width="160" height="160" patternUnits="userSpaceOnUse">
+      <rect width="160" height="160" fill="#000" opacity="0"/>
+      <circle cx="20" cy="35" r="0.6" fill="#fff" opacity="0.08"/>
+      <circle cx="78" cy="12" r="0.5" fill="#fff" opacity="0.06"/>
+      <circle cx="120" cy="55" r="0.6" fill="#fff" opacity="0.07"/>
+      <circle cx="44" cy="98" r="0.5" fill="#fff" opacity="0.05"/>
+      <circle cx="140" cy="120" r="0.7" fill="#fff" opacity="0.08"/>
+      <circle cx="92" cy="140" r="0.5" fill="#fff" opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1600" height="800" fill="url(#sky)"/>
+  <rect width="1600" height="800" fill="url(#sun)"/>
+
+  <!-- Distant stars -->
+  <g fill="#fff" opacity="0.6">
+    <circle cx="120" cy="80" r="0.8"/>
+    <circle cx="240" cy="40" r="0.6"/>
+    <circle cx="360" cy="110" r="0.7"/>
+    <circle cx="500" cy="60" r="0.5"/>
+    <circle cx="680" cy="90" r="0.7"/>
+    <circle cx="940" cy="50" r="0.6"/>
+    <circle cx="1080" cy="120" r="0.8"/>
+    <circle cx="1240" cy="70" r="0.5"/>
+    <circle cx="1400" cy="100" r="0.6"/>
+    <circle cx="1520" cy="40" r="0.7"/>
+  </g>
+
+  <!-- Runic ring on horizon -->
+  <g transform="translate(800 460)" opacity="0.55">
+    <circle r="220" fill="none" stroke="#d8a64a" stroke-width="1.2" stroke-dasharray="2 8"/>
+    <circle r="180" fill="none" stroke="#d8a64a" stroke-width="0.6" stroke-dasharray="1 6"/>
+    <g stroke="#d8a64a" stroke-width="1" fill="none">
+      <path d="M -200 0 L -150 0 M 150 0 L 200 0 M 0 -200 L 0 -150 M 0 150 L 0 200"/>
+      <path d="M -141 -141 L -106 -106 M 106 -106 L 141 -141 M 141 141 L 106 106 M -106 106 L -141 141"/>
+    </g>
+    <text font-family="serif" font-size="14" fill="#d8a64a" text-anchor="middle" opacity="0.7">
+      <textPath href="#runeArc">
+        ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ
+      </textPath>
+    </text>
+    <defs>
+      <path id="runeArc" d="M -210 0 A 210 210 0 1 1 209 -1"/>
+    </defs>
+  </g>
+
+  <!-- Far mountains -->
+  <path fill="url(#mtnFar)" d="M0,560 L120,420 L220,500 L320,380 L420,470 L520,350 L640,440 L760,360 L880,420 L1000,330 L1120,440 L1240,360 L1380,440 L1500,380 L1600,460 L1600,800 L0,800 Z" opacity="0.85"/>
+
+  <!-- Mid mountains -->
+  <path fill="url(#mtnMid)" d="M0,640 L100,540 L200,610 L320,500 L460,580 L580,470 L720,560 L860,490 L1000,580 L1140,500 L1280,580 L1420,510 L1540,580 L1600,540 L1600,800 L0,800 Z"/>
+
+  <!-- Near mountains -->
+  <path fill="url(#mtnNear)" d="M0,740 L140,640 L260,720 L380,620 L520,710 L660,640 L800,720 L940,650 L1080,720 L1220,640 L1360,720 L1500,640 L1600,700 L1600,800 L0,800 Z"/>
+
+  <!-- Glowing orbs -->
+  <circle cx="320" cy="600" r="38" fill="url(#orb)" opacity="0.7"/>
+  <circle cx="1280" cy="580" r="44" fill="url(#orb)" opacity="0.65"/>
+  <circle cx="780" cy="650" r="28" fill="url(#orb)" opacity="0.55"/>
+
+  <!-- Banner silhouettes -->
+  <g opacity="0.55" fill="#0a0705" stroke="#3a2a14" stroke-width="0.8">
+    <path d="M 240 720 L 240 600 L 280 600 L 280 720 L 260 740 Z"/>
+    <path d="M 1340 720 L 1340 600 L 1380 600 L 1380 720 L 1360 740 Z"/>
+  </g>
+
+  <!-- Noise overlay -->
+  <rect width="1600" height="800" fill="url(#noise)"/>
+  <!-- Vignette -->
+  <rect width="1600" height="800" fill="url(#vig)"/>
+  <defs>
+    <radialGradient id="vig" cx="50%" cy="50%" r="75%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
+    </radialGradient>
+  </defs>
+</svg>

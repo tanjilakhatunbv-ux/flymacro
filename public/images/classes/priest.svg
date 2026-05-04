@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="牧师">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Wings -->
+  <path d="M16 28c4-4 10-6 16-6s12 2 16 6c-2 4-6 6-10 6h-12c-4 0-8-2-10-6Z" fill="currentColor" fill-opacity="0.15"/>
+  <path d="M16 28c4-4 10-6 16-6s12 2 16 6"/>
+  <path d="M20 30c2 2 4 3 6 3M44 30c-2 2-4 3-6 3M24 32c1 1 2 2 3 2M40 32c-1 1-2 2-3 2"/>
+  <!-- Holy emblem -->
+  <circle cx="32" cy="40" r="6"/>
+  <path d="M32 36v8M28 40h8"/>
+</svg>

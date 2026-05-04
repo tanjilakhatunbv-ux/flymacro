@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="萨满">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Totem head -->
+  <path d="M22 16h20v8H22z"/>
+  <path d="M26 12c1 2 1 4 0 6M32 12c1 2 1 4 0 6M38 12c1 2 1 4 0 6"/>
+  <!-- Eyes -->
+  <circle cx="28" cy="20" r="1.2" fill="currentColor"/>
+  <circle cx="36" cy="20" r="1.2" fill="currentColor"/>
+  <!-- Body bands -->
+  <path d="M22 28h20M22 36h20" />
+  <!-- Lightning -->
+  <path d="M30 40l-4 8h6l-4 6" stroke-width="2.5" fill="currentColor" fill-opacity="0.2"/>
+  <!-- Element marks -->
+  <path d="M16 32c-2-1-2-3 0-4M48 32c2-1 2-3 0-4" stroke-opacity="0.5"/>
+</svg>

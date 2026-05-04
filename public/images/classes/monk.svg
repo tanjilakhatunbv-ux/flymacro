@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="武僧">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Yin-yang -->
+  <circle cx="32" cy="32" r="16"/>
+  <path d="M32 16a8 8 0 0 1 0 16 8 8 0 0 0 0 16 16 16 0 0 1 0-32Z" fill="currentColor"/>
+  <circle cx="32" cy="24" r="2" fill="currentColor"/>
+  <circle cx="32" cy="40" r="2" stroke="currentColor" fill="none"/>
+  <!-- Lotus leaves -->
+  <path d="M14 32c-2-3-2-6 0-8M50 32c2-3 2-6 0-8" stroke-opacity="0.5"/>
+</svg>

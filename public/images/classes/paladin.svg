@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="圣骑士">
+  <circle cx="32" cy="32" r="28" stroke-opacity="0.35" stroke-width="1"/>
+  <circle cx="32" cy="32" r="24" stroke-opacity="0.6"/>
+  <!-- Hammer head -->
+  <path d="M22 16h20v10H22z" fill="currentColor" fill-opacity="0.18"/>
+  <path d="M22 16h20v10H22z"/>
+  <path d="M26 12v4M32 12v4M38 12v4"/>
+  <!-- Handle -->
+  <path d="M32 26v22" stroke-width="2.5"/>
+  <path d="M28 48h8"/>
+  <!-- Light rays -->
+  <path d="M14 14l4 4M50 14l-4 4M14 36h4M46 36h4" stroke-opacity="0.5"/>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" role="img" aria-label="暗影牧师宏 预览图">
+  <defs>
+    <radialGradient id="bg-shadow" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#3a1a4a"/>
+      <stop offset="50%" stop-color="#1a0a28"/>
+      <stop offset="100%" stop-color="#080410"/>
+    </radialGradient>
+    <radialGradient id="orb-shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a4ff" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#8a4cd6" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#3a0a4a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="frame-shadow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e9c66a"/>
+      <stop offset="100%" stop-color="#8e6418"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bg-shadow)"/>
+  <!-- Stars -->
+  <g fill="#fff" opacity="0.6">
+    <circle cx="100" cy="60" r="1"/>
+    <circle cx="220" cy="40" r="0.8"/>
+    <circle cx="340" cy="80" r="1"/>
+    <circle cx="500" cy="50" r="0.8"/>
+    <circle cx="640" cy="90" r="1"/>
+    <circle cx="720" cy="40" r="0.8"/>
+    <circle cx="80" cy="160" r="0.6"/>
+    <circle cx="700" cy="180" r="0.8"/>
+  </g>
+  <!-- Runic ring -->
+  <g transform="translate(400 240)" opacity="0.5" fill="none" stroke="#c9a4ff">
+    <circle r="180" stroke-width="1.2" stroke-dasharray="3 8"/>
+    <circle r="150" stroke-width="0.6" stroke-dasharray="2 6"/>
+    <circle r="120" stroke-width="0.4" stroke-dasharray="1 5"/>
+  </g>
+  <!-- Central orb -->
+  <circle cx="400" cy="240" r="100" fill="url(#orb-shadow)"/>
+  <!-- Smoky tendrils -->
+  <g stroke="#c9a4ff" stroke-width="1.2" fill="none" opacity="0.6">
+    <path d="M340 180 Q360 160 380 170"/>
+    <path d="M460 180 Q440 160 420 170"/>
+    <path d="M340 300 Q360 320 380 310"/>
+    <path d="M460 300 Q440 320 420 310"/>
+  </g>
+  <!-- Shadow priest sigil at center -->
+  <g transform="translate(400 240)" stroke="#fff" stroke-width="2" fill="none" opacity="0.85">
+    <path d="M-30 -30 L30 30 M30 -30 L-30 30"/>
+    <circle r="20"/>
+    <circle r="6" fill="#fff" fill-opacity="0.4"/>
+  </g>
+  <!-- Title text -->
+  <g font-family="serif" text-anchor="middle">
+    <text x="400" y="380" fill="#e9c66a" font-size="34" font-weight="700" letter-spacing="4">暗影牧师</text>
+    <text x="400" y="412" fill="#c9a4ff" font-size="16" letter-spacing="6">SHADOW PRIEST · v10.2</text>
+  </g>
+  <!-- Frame -->
+  <rect x="6" y="6" width="788" height="438" fill="none" stroke="url(#frame-shadow)" stroke-width="2"/>
+  <rect x="14" y="14" width="772" height="422" fill="none" stroke="#3a2a14" stroke-width="0.6"/>
+</svg>

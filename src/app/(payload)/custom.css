@@ -1,0 +1,5 @@
+/* Custom Payload admin theme overrides — keep minimal to avoid clashing with
+   future Payload UI updates. */
+.template-default .btn--style-primary {
+  --theme-elevation-800: #d4af37;
+}
