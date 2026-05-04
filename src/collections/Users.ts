@@ -11,7 +11,7 @@ export const Users: CollectionConfig = {
   auth: {
     tokenExpiration: 60 * 60 * 24 * 7,
     cookies: {
-      sameSite: 'Lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       secure: process.env.NODE_ENV === 'production',
     },
     verify: {
