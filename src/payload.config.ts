@@ -6,7 +6,6 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { zh } from '@payloadcms/translations/languages/zh'
-import { en } from '@payloadcms/translations/languages/en'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
@@ -45,7 +44,7 @@ export default buildConfig({
     components: {},
   },
   i18n: {
-    supportedLanguages: { zh, en },
+    supportedLanguages: { zh },
     fallbackLanguage: 'zh',
   },
   collections: [
