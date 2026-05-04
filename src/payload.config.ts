@@ -47,7 +47,7 @@ export default buildConfig({
         Icon: '/components/admin/Logo#Icon',
       },
       views: {
-        Dashboard: '/components/admin/Dashboard#default',
+        Dashboard: '/components/admin/Dashboard#Dashboard',
       },
     },
   },

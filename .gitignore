@@ -34,7 +34,6 @@ next-env.d.ts
 
 # payload
 src/payload-types.ts
-src/app/(payload)/admin/importMap.js
 
 # media uploads (if using local adapter for dev)
 media/

@@ -132,7 +132,7 @@ const QuickLink: React.FC<{
   </a>
 )
 
-export default function Dashboard() {
+export function Dashboard() {
   const [stats, setStats] = useState<Stats>({
     users: 0,
     orders: 0,
