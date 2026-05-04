@@ -7,12 +7,18 @@ import { getPayload } from '../../../../lib/payload'
  * Renews macro-exchanges where autoRenew=true and expires within 24h.
  */
 export async function GET(req: Request) {
-  // Simple auth: check for a secret query param or header
+  // Auth: if CRON_SECRET is set, require it via query param or header.
+  // Vercel Cron does not support custom headers/query params, so if you
+  // set CRON_SECRET you should call this endpoint from an external cron
+  // service (e.g. cron-job.org) with ?secret=xxx in the URL.
   const secret = process.env.CRON_SECRET
   const url = new URL(req.url)
   const provided = url.searchParams.get('secret') || req.headers.get('x-cron-secret')
   if (secret && provided !== secret) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+  if (!secret) {
+    console.warn('[AutoRenew] CRON_SECRET is not set. Cron endpoint is publicly accessible.')
   }
 
   const payload = await getPayload()
