@@ -1,5 +1,333 @@
-/* Custom Payload admin theme overrides — keep minimal to avoid clashing with
-   future Payload UI updates. */
-.template-default .btn--style-primary {
-  --theme-elevation-800: #d4af37;
+/* ============================================================
+   FlyMacro Admin — Minimal Tech Dark Theme
+   Inspired by Linear / Vercel dashboard aesthetics
+   ============================================================ */
+
+/* ── Base theme overrides ── */
+:root {
+  --tech-bg: #0f172a;
+  --tech-bg-elevated: #1e293b;
+  --tech-bg-sunken: #0b1221;
+  --tech-border: #334155;
+  --tech-border-subtle: rgba(51, 65, 85, 0.5);
+  --tech-text: #f8fafc;
+  --tech-text-secondary: #94a3b8;
+  --tech-text-muted: #64748b;
+  --tech-accent: #6366f1;
+  --tech-accent-hover: #818cf8;
+  --tech-accent-subtle: rgba(99, 102, 241, 0.1);
+  --tech-success: #22c55e;
+  --tech-error: #ef4444;
+  --tech-warning: #f59e0b;
+  --tech-radius-sm: 6px;
+  --tech-radius-md: 8px;
+  --tech-radius-lg: 12px;
+  --tech-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --tech-shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Global background ── */
+.payload__admin,
+.template-default {
+  background-color: var(--tech-bg) !important;
+  color: var(--tech-text) !important;
+}
+
+/* ── Sidebar / Nav ── */
+.nav {
+  background-color: var(--tech-bg-sunken) !important;
+  border-right: 1px solid var(--tech-border) !important;
+}
+
+.nav__brand {
+  border-bottom: 1px solid var(--tech-border) !important;
+}
+
+.nav__link {
+  color: var(--tech-text-secondary) !important;
+  border-radius: var(--tech-radius-sm) !important;
+  margin: 2px 8px !important;
+  transition: all 0.15s ease !important;
+}
+
+.nav__link:hover {
+  background-color: rgba(99, 102, 241, 0.08) !important;
+  color: var(--tech-text) !important;
+}
+
+.nav__link--active {
+  background-color: var(--tech-accent-subtle) !important;
+  color: var(--tech-accent) !important;
+  font-weight: 500 !important;
+}
+
+.nav__link-icon {
+  color: inherit !important;
+}
+
+/* ── Cards / Panels ── */
+.card,
+.panel,
+.collapsible__content,
+.field-type.group-field,
+.section {
+  background-color: var(--tech-bg-elevated) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-md) !important;
+  box-shadow: var(--tech-shadow) !important;
+}
+
+/* ── Table styling ── */
+.table {
+  background-color: transparent !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.table thead th {
+  background-color: var(--tech-bg-sunken) !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+  color: var(--tech-text-secondary) !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 12px 16px !important;
+}
+
+.table tbody td {
+  border-bottom: 1px solid var(--tech-border-subtle) !important;
+  color: var(--tech-text) !important;
+  padding: 14px 16px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.table tbody tr:hover td {
+  background-color: rgba(99, 102, 241, 0.04) !important;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ── Buttons ── */
+.btn {
+  border-radius: var(--tech-radius-sm) !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn--style-primary {
+  background-color: var(--tech-accent) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.btn--style-primary:hover {
+  background-color: var(--tech-accent-hover) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+.btn--style-secondary {
+  background-color: var(--tech-bg-elevated) !important;
+  color: var(--tech-text) !important;
+  border: 1px solid var(--tech-border) !important;
+}
+
+.btn--style-secondary:hover {
+  background-color: var(--tech-border) !important;
+  border-color: var(--tech-text-secondary) !important;
+}
+
+.btn--style-icon {
+  color: var(--tech-text-secondary) !important;
+}
+
+.btn--style-icon:hover {
+  color: var(--tech-text) !important;
+  background-color: var(--tech-border) !important;
+}
+
+/* ── Form inputs ── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+.select select,
+.react-select__control {
+  background-color: var(--tech-bg-sunken) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-sm) !important;
+  color: var(--tech-text) !important;
+  padding: 10px 12px !important;
+  transition: all 0.15s ease !important;
+}
+
+input:focus,
+textarea:focus,
+.select select:focus,
+.react-select__control--is-focused {
+  border-color: var(--tech-accent) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  outline: none !important;
+}
+
+/* ── Labels ── */
+.field-label {
+  color: var(--tech-text-secondary) !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+}
+
+/* ── Tabs ── */
+.tab {
+  color: var(--tech-text-secondary) !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.15s ease !important;
+}
+
+.tab--active {
+  color: var(--tech-accent) !important;
+  border-bottom-color: var(--tech-accent) !important;
+}
+
+.tab:hover:not(.tab--active) {
+  color: var(--tech-text) !important;
+}
+
+/* ── Pills / Tags ── */
+.pill {
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 2px 10px !important;
+}
+
+.pill--style-success {
+  background-color: rgba(34, 197, 94, 0.12) !important;
+  color: var(--tech-success) !important;
+}
+
+.pill--style-error {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: var(--tech-error) !important;
+}
+
+.pill--style-warning {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  color: var(--tech-warning) !important;
+}
+
+/* ── Document header ── */
+.doc-header {
+  background-color: var(--tech-bg-elevated) !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+}
+
+/* ── Drawers / Modals ── */
+.drawer,
+.modal {
+  background-color: var(--tech-bg-elevated) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-lg) !important;
+  box-shadow: var(--tech-shadow-lg) !important;
+}
+
+/* ── Dropdown menus ── */
+.popup {
+  background-color: var(--tech-bg-elevated) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-md) !important;
+  box-shadow: var(--tech-shadow-lg) !important;
+}
+
+.popup__item {
+  color: var(--tech-text) !important;
+}
+
+.popup__item:hover {
+  background-color: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* ── Search / Filter bar ── */
+.list-controls {
+  background-color: var(--tech-bg-elevated) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-md) !important;
+}
+
+/* ── Pagination ── */
+.paginator {
+  color: var(--tech-text-secondary) !important;
+}
+
+.paginator__page--active {
+  background-color: var(--tech-accent-subtle) !important;
+  color: var(--tech-accent) !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tech-bg-sunken);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tech-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tech-text-muted);
+}
+
+/* ── Toast notifications ── */
+.toast-container .toast {
+  background-color: var(--tech-bg-elevated) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius-md) !important;
+  box-shadow: var(--tech-shadow-lg) !important;
+  color: var(--tech-text) !important;
+}
+
+/* ── Status colors ── */
+.status--success {
+  color: var(--tech-success) !important;
+}
+
+.status--error {
+  color: var(--tech-error) !important;
+}
+
+.status--warning {
+  color: var(--tech-warning) !important;
+}
+
+/* ── Collection list count badge ── */
+.nav__link-count {
+  background-color: var(--tech-accent-subtle) !important;
+  color: var(--tech-accent) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 1px 6px !important;
+  border-radius: 9999px !important;
+}
+
+/* ── Account menu (bottom-left avatar) ── */
+.account {
+  border-top: 1px solid var(--tech-border) !important;
+}
+
+.account__menu-item {
+  color: var(--tech-text-secondary) !important;
+}
+
+.account__menu-item:hover {
+  color: var(--tech-text) !important;
+  background-color: rgba(99, 102, 241, 0.08) !important;
 }

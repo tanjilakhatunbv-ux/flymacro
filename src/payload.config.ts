@@ -41,7 +41,15 @@ export default buildConfig({
       titleSuffix: ' — FlyMacro 后台',
       icons: [],
     },
-    components: {},
+    components: {
+      graphics: {
+        Logo: '/components/admin/Logo#Logo',
+        Icon: '/components/admin/Logo#Icon',
+      },
+      views: {
+        Dashboard: '/components/admin/Dashboard#default',
+      },
+    },
   },
   i18n: {
     supportedLanguages: { zh },
