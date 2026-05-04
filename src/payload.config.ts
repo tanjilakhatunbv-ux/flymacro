@@ -46,9 +46,6 @@ export default buildConfig({
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Logo#Icon',
       },
-      views: {
-        Dashboard: '/components/admin/Dashboard#Dashboard',
-      },
     },
   },
   i18n: {
