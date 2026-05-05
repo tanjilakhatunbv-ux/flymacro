@@ -45,6 +45,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       return
     }
 
+    console.log('[AuthForm] submitting login...')
     startTransition(async () => {
       try {
         const resp = await runAuth(mode, {
@@ -55,6 +56,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           token: resetToken,
           turnstileToken,
         })
+        console.log('[AuthForm] runAuth result:', resp)
         if (!resp.ok) {
           setErrors(resp.errors)
           return
@@ -75,6 +77,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           setTimeout(() => router.push('/login'), 1500)
         }
       } catch (err) {
+        console.error('[AuthForm] submit error:', err)
         setErrors([{ message: err instanceof Error ? err.message : '请求失败，请稍后再试' }])
       }
     })
@@ -262,18 +265,21 @@ async function runAuth(mode: Mode, input: AuthInput): Promise<AuthResult> {
 }
 
 async function postJson(url: string, body: Record<string, unknown>): Promise<AuthResult> {
+  console.log('[postJson] fetching', url, 'body:', body)
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'same-origin',
     body: JSON.stringify(body),
   })
+  console.log('[postJson] response status:', resp.status, 'ok:', resp.ok)
   if (resp.ok) return { ok: true }
   let data: unknown = null
   try {
     data = await resp.json()
+    console.log('[postJson] error data:', data)
   } catch {
-    /* noop */
+    console.log('[postJson] failed to parse error JSON')
   }
   return { ok: false, errors: extractErrors(data, resp.status) }
 }
