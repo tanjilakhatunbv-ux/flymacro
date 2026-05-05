@@ -85,6 +85,7 @@ export default async function MacroDetailPage({
   const now = new Date()
   const expired = exchange?.expiresAt ? new Date(exchange.expiresAt) <= now : false
   const canSeeCode = staff || (exchange && !expired)
+  const hasExchanged = !!exchange
 
   const img = previewUrl(macro)
 
@@ -106,6 +107,26 @@ export default async function MacroDetailPage({
             <TierTag tier={macro.tier ?? 'regular'} />
           </div>
         </header>
+
+        {hasExchanged && !expired && (
+          <div className="ownership-banner">
+            <span className="ownership-icon">✓</span>
+            <span>
+              你已兑换此宏
+              {exchange?.expiresAt
+                ? ` · 有效期至 ${exchange.expiresAt.slice(0, 10)}`
+                : ' · 永久有效'}
+              {exchange?.autoRenew && ' · 自动续费已开启'}
+            </span>
+          </div>
+        )}
+
+        {hasExchanged && expired && (
+          <div className="ownership-banner expired">
+            <span className="ownership-icon">!</span>
+            <span>有效期已过期，请续费后继续使用。</span>
+          </div>
+        )}
 
         {img && (
           <div className="detail-preview">

@@ -13,14 +13,22 @@ function previewUrl(macro: Macro): string | null {
   return card ?? img.url ?? null
 }
 
-export function MacroCard({ macro }: { macro: Macro }) {
+export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: boolean }) {
   const img = previewUrl(macro)
+  const durationText = (macro.durationDays ?? 0) === 0 ? '永久' : `${macro.durationDays}天`
+
   return (
-    <article className="macro-card" data-tier={macro.tier}>
-      {img && (
+    <article className="macro-card" data-tier={macro.tier} data-exchanged={isExchanged}>
+      {img ? (
         <Link href={`/macros/${macro.slug}`} className="card-img" aria-label={macro.title}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={img} alt={macro.title} loading="lazy" />
+          {isExchanged && <span className="card-badge owned">已兑换</span>}
+        </Link>
+      ) : (
+        <Link href={`/macros/${macro.slug}`} className="card-img card-img--empty" aria-label={macro.title}>
+          <span className="card-img-placeholder">{macro.title.charAt(0)}</span>
+          {isExchanged && <span className="card-badge owned">已兑换</span>}
         </Link>
       )}
       <div className="card-body">
@@ -40,6 +48,11 @@ export function MacroCard({ macro }: { macro: Macro }) {
           <Link href={`/macros/${macro.slug}`}>{macro.title}</Link>
         </h3>
         {macro.summary && <p className="summary">{macro.summary}</p>}
+        <div className="card-footer">
+          <span className="card-price">{macro.price ?? 0} 积分</span>
+          <span className="card-duration">{durationText}</span>
+          {isExchanged && <span className="card-status">已拥有</span>}
+        </div>
       </div>
     </article>
   )

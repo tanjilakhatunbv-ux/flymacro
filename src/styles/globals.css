@@ -759,6 +759,69 @@ main { min-height: calc(100vh - 200px); }
   overflow: hidden;
 }
 
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-caps);
+  font-size: 0.8rem;
+}
+
+.card-price {
+  color: var(--gold-bright);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.card-duration {
+  color: var(--text-muted);
+}
+
+.card-status {
+  color: #6dff42;
+  font-weight: 600;
+}
+
+.card-img--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(31,24,18,0.9), rgba(15,11,8,0.95));
+}
+
+.card-img-placeholder {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--gold-dim);
+  opacity: 0.3;
+}
+
+.card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-caps);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border-radius: 2px;
+}
+
+.card-badge.owned {
+  background: rgba(109, 255, 66, 0.15);
+  color: #6dff42;
+  border: 1px solid rgba(109, 255, 66, 0.35);
+}
+
+.macro-card[data-exchanged="true"] {
+  border-color: rgba(109, 255, 66, 0.25);
+}
+
 /* ============================================================
    Tags - quality marks
    ============================================================ */
@@ -1120,6 +1183,46 @@ main { min-height: calc(100vh - 200px); }
   background: var(--bg-parchment);
   border-color: var(--gold);
   box-shadow: 0 0 12px rgba(255, 209, 0, 0.3);
+}
+
+/* ============================================================
+   Ownership Banner
+   ============================================================ */
+.ownership-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(90deg, rgba(109, 255, 66, 0.08), rgba(109, 255, 66, 0.03));
+  border: 1px solid rgba(109, 255, 66, 0.25);
+  border-radius: 2px;
+  color: #6dff42;
+  font-family: var(--font-caps);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.ownership-banner.expired {
+  background: linear-gradient(90deg, rgba(255, 80, 80, 0.08), rgba(255, 80, 80, 0.03));
+  border-color: rgba(255, 80, 80, 0.25);
+  color: #ff5050;
+}
+
+.ownership-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(109, 255, 66, 0.15);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.ownership-banner.expired .ownership-icon {
+  background: rgba(255, 80, 80, 0.15);
 }
 
 /* ============================================================

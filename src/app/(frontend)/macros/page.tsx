@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getPayload } from '../../../lib/payload'
+import { getCurrentUser } from '../../../lib/auth'
 import { MacroCard } from '../../../components/MacroCard'
 import { MacroFilters, ClearFiltersLink } from '../../../components/MacroFilters'
 import type { Macro, Class } from '../../../payload-types'
@@ -19,6 +20,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
   const classSlug = sp.class || null
 
   const payload = await getPayload()
+  const user = await getCurrentUser()
 
   const classes = (await payload.find({
     collection: 'classes',
@@ -46,6 +48,32 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
 
   const macros = result.docs as Macro[]
 
+  // Query user's exchanges to show ownership status on cards
+  let exchangedMacroIds = new Set<number | string>()
+  if (user) {
+    const exchanges = await payload.find({
+      collection: 'macro-exchanges',
+      where: {
+        and: [
+          { user: { equals: user.id } },
+          {
+            or: [
+              { expiresAt: { exists: false } },
+              { expiresAt: { greater_than_equal: new Date().toISOString() } },
+            ],
+          },
+        ],
+      },
+      limit: 200,
+      depth: 0,
+      overrideAccess: true,
+    })
+    exchanges.docs.forEach((e: any) => {
+      const macroId = typeof e.macro === 'object' ? e.macro.id : e.macro
+      if (macroId) exchangedMacroIds.add(macroId)
+    })
+  }
+
   const tierLabel = tier === 'all' ? '全部' : tier === 'regular' ? '普通宏' : '高级宏'
 
   return (
@@ -70,7 +98,11 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
       ) : (
         <div className="macro-grid">
           {macros.map((m) => (
-            <MacroCard key={m.id} macro={m} />
+            <MacroCard
+              key={m.id}
+              macro={m}
+              isExchanged={exchangedMacroIds.has(m.id)}
+            />
           ))}
         </div>
       )}
