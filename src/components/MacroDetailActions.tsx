@@ -71,6 +71,7 @@ export function MacroDetailActions({
 }) {
   const [status, setStatus] = useState<ExchangeStatus | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fetchedCode, setFetchedCode] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -146,6 +147,22 @@ export function MacroDetailActions({
     }
   }, [macroId])
 
+  // Fetch code content client-side when user has access but SSR didn't provide it
+  useEffect(() => {
+    if (!status) return
+    const hasAccess = status.isStaff || (!!status.exchange && !status.exchange.expired)
+    if (hasAccess && !codeContent && !fetchedCode) {
+      fetch(`/api/macro/code?macroId=${macroId}`, { credentials: 'same-origin' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          if (d && !d.error && d.code) {
+            setFetchedCode(d.code)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [status, codeContent, fetchedCode, macroId])
+
   // Default state: not logged in, no exchange
   const effectiveStatus: ExchangeStatus = status ?? {
     loggedIn: false,
@@ -180,12 +197,16 @@ export function MacroDetailActions({
         </div>
       )}
 
-      {canSeeCode && codeContent && (
+      {canSeeCode && (
         <div className="download-area">
           <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-bright)', marginBottom: '1.25rem' }}>
             宏命令
           </h3>
-          <CodeBlock code={codeContent} language="lua" />
+          {(codeContent || fetchedCode) ? (
+            <CodeBlock code={codeContent || fetchedCode || ''} language="lua" />
+          ) : (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>加载中…</p>
+          )}
           {effectiveStatus?.exchange?.expiresAt && (
             <p className="hint" style={{ color: expired ? 'var(--text-muted)' : 'var(--gold)' }}>
               {expired
