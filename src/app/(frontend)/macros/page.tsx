@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: '浏览全部魔兽世界宏，按职业、专精、版本筛选。',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 type SearchParams = Promise<{ tier?: string; class?: string }>
 

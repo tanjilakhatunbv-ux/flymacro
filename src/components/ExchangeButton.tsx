@@ -77,9 +77,9 @@ export function ExchangeButton({
               : `兑换 ${price} 积分`}
       </button>
       {error && (
-        <p className="auth-field-err" style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+        <div style={{ marginTop: '0.75rem', padding: '0.6rem 0.8rem', background: 'rgba(220, 50, 50, 0.12)', border: '1px solid rgba(220, 50, 50, 0.35)', borderRadius: '4px', color: '#ff6b6b', fontSize: '0.85rem', textAlign: 'center' }}>
           {error}
-        </p>
+        </div>
       )}
     </div>
   )

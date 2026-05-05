@@ -76,6 +76,7 @@ export default buildConfig({
     },
     push: false,
   }),
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   sharp,
   ...(useResend && {
     email: resendAdapter({

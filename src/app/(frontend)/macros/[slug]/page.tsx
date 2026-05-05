@@ -12,7 +12,7 @@ import type { Macro, Class, Spec, Version, Media } from '../../../../payload-typ
 
 type Params = Promise<{ slug: string }>
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 function isMedia(v: unknown): v is Media {
   return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
@@ -76,6 +76,7 @@ export default async function MacroDetailPage({
 
   const user = await getCurrentUser()
   const staff = isStaffRole(user)
+  console.log('[macro-detail] user:', user ? { id: user.id, email: user.email, role: user.role, credits: user.credits } : null)
 
   let exchange: any = null
   if (user) {
@@ -86,6 +87,7 @@ export default async function MacroDetailPage({
   const expired = exchange?.expiresAt ? new Date(exchange.expiresAt) <= now : false
   const canSeeCode = staff || (exchange && !expired)
   const hasExchanged = !!exchange
+  console.log('[macro-detail] canSeeCode:', canSeeCode, 'hasExchanged:', hasExchanged, 'expired:', expired, 'staff:', staff)
 
   const img = previewUrl(macro)
 
