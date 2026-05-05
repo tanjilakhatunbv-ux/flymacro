@@ -1,27 +1,34 @@
-import { headers as nextHeaders, cookies } from 'next/headers'
+import { cookies } from 'next/headers'
 import { getPayload } from './payload'
 import type { User } from '../payload-types'
 
 /**
- * Resolves the currently authenticated user from the Next.js request headers
- * (which carry the Payload auth cookie). Returns null if not logged in.
+ * Resolves the currently authenticated user from the Payload auth cookie.
+ * Uses the Next.js cookies() API (more reliable than headers() in Server Components
+ * on Vercel) and constructs a minimal Headers object for payload.auth().
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const payload = await getPayload()
-    const h = await nextHeaders()
-
-    // Diagnostic logging: always log in production for now
-    const cookieHeader = h.get('cookie')
     const cookieStore = await cookies()
     const tokenCookie = cookieStore.get('payload-token')
-    console.log('[getCurrentUser] cookie header present:', !!cookieHeader)
+
     console.log('[getCurrentUser] payload-token cookie present:', !!tokenCookie)
     if (tokenCookie) {
       console.log('[getCurrentUser] token preview:', tokenCookie.value.slice(0, 20) + '...')
     }
 
-    const auth = await payload.auth({ headers: h })
+    if (!tokenCookie?.value) {
+      console.log('[getCurrentUser] no token cookie — returning null')
+      return null
+    }
+
+    // Construct a clean Headers object with only the auth cookie.
+    // This avoids any issues with ReadonlyHeaders from nextHeaders().
+    const headers = new Headers()
+    headers.set('cookie', `payload-token=${tokenCookie.value}`)
+
+    const auth = await payload.auth({ headers })
     const user = auth.user as User | undefined
     console.log('[getCurrentUser] auth result:', user ? { id: user.id, email: user.email, role: user.role } : null)
     return user ?? null
