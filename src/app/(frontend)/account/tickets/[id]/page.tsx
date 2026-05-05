@@ -7,6 +7,8 @@ import { RichText } from '../../../../../components/RichText'
 import { TicketReplyForm } from '../../../../../components/TicketForms'
 import type { Ticket, TicketMessage } from '../../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 type Params = Promise<{ id: string }>
 
 export const metadata: Metadata = {

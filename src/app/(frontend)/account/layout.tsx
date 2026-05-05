@@ -3,6 +3,8 @@ import { getCurrentUser } from '../../../lib/auth'
 import { getPayload } from '../../../lib/payload'
 import { AccountSideNav } from '../../../components/AccountSideNav'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
   if (!user) redirect('/login?return=/account')

@@ -62,8 +62,9 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           return
         }
         if (mode === 'login') {
-          router.push(returnUrl)
-          router.refresh()
+          // Hard navigate to ensure full page reload so Server Components
+          // re-run with the fresh cookie.
+          window.location.href = returnUrl
         } else if (mode === 'register') {
           if ('warning' in resp && resp.warning) {
             setSuccess(resp.warning)

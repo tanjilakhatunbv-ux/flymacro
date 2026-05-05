@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { getCurrentUser } from '../../../lib/auth'
 import { getPayload } from '../../../lib/payload'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '个人中心 — FlyMacro',
 }

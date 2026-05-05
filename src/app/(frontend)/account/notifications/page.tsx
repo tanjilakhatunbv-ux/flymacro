@@ -6,6 +6,8 @@ import { MarkAllReadButton } from '../../../../components/NotificationButtons'
 import { MarkNotificationReadForm } from '../../../../components/MarkNotificationReadForm'
 import type { Notification } from '../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '通知中心 — FlyMacro',
 }

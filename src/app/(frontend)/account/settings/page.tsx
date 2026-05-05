@@ -4,6 +4,8 @@ import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { updateProfileAction, changePasswordAction, type ProfileActionState } from '../../../../lib/user-actions'
 
+export const dynamic = 'force-dynamic'
+
 const profileInitial: ProfileActionState = {}
 const passwordInitial: ProfileActionState = {}
 

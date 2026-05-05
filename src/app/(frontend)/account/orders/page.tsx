@@ -4,6 +4,8 @@ import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import type { CreditOrder } from '../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '充值记录 — FlyMacro',
 }

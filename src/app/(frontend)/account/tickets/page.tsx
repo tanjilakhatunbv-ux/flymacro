@@ -4,6 +4,8 @@ import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import type { Ticket } from '../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '我的工单 — FlyMacro',
 }

@@ -4,6 +4,8 @@ import { getPayload } from '../../../lib/payload'
 import { CreditPackages } from '../../../components/CreditPackages'
 import type { CreditPackage } from '../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '充值积分 — FlyMacro',
 }

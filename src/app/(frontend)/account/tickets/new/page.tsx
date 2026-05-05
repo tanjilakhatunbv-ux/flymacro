@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { TicketCreateForm } from '../../../../../components/TicketForms'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '提交工单 — FlyMacro',
 }

@@ -5,6 +5,8 @@ import { getPayload } from '../../../../lib/payload'
 import { ExchangeRenewButton } from '../../../../components/ExchangeRenewButton'
 import type { MacroExchange } from '../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '我的兑换 — FlyMacro',
 }

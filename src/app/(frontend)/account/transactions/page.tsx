@@ -3,6 +3,8 @@ import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import type { CreditTransaction } from '../../../../payload-types'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '积分明细 — FlyMacro',
 }
