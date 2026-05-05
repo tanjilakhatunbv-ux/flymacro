@@ -65,7 +65,7 @@ export default async function ExchangesPage() {
                 </div>
                 <div className="row">
                   <span className="ticket-meta">
-                    {e.modelName ?? '默认版本'} · 花费 {e.creditsSpent} 积分
+                    花费 {e.creditsSpent} 积分
                   </span>
                   <span className="ticket-meta">
                     {daysLeft !== null

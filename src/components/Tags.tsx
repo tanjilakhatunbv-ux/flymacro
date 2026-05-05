@@ -26,6 +26,6 @@ export function VersionTag({ value }: { value: MaybeRef<Version> }) {
   return <span className="tag version">v{value.label}</span>
 }
 
-export function TypeTag({ type }: { type: 'free' | 'premium' }) {
-  return <span className={`tag type-${type}`}>{type === 'free' ? '免费' : '付费'}</span>
+export function TierTag({ tier }: { tier: 'regular' | 'premium' }) {
+  return <span className={`tag tier-${tier}`}>{tier === 'regular' ? '普通宏' : '高级宏'}</span>
 }

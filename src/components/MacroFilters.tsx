@@ -6,11 +6,11 @@ import { useTransition } from 'react'
 
 type MacroFiltersProps = {
   classes: { slug: string; nameZh: string }[]
-  type: 'all' | 'free' | 'premium'
+  tier: 'all' | 'regular' | 'premium'
   classSlug: string | null
 }
 
-export function MacroFilters({ classes, type, classSlug }: MacroFiltersProps) {
+export function MacroFilters({ classes, tier, classSlug }: MacroFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -28,27 +28,27 @@ export function MacroFilters({ classes, type, classSlug }: MacroFiltersProps) {
 
   return (
     <div aria-busy={isPending}>
-      <div className="filters" role="tablist" aria-label="按品质筛选">
+      <div className="filters" role="tablist" aria-label="按档次筛选">
         <button
           type="button"
-          className={`filter-btn ${type === 'all' ? 'active' : ''}`}
-          onClick={() => setParam('type', null)}
+          className={`filter-btn ${tier === 'all' ? 'active' : ''}`}
+          onClick={() => setParam('tier', null)}
         >
           全部宏包
         </button>
         <button
           type="button"
-          className={`filter-btn ${type === 'free' ? 'active' : ''}`}
-          onClick={() => setParam('type', 'free')}
+          className={`filter-btn ${tier === 'regular' ? 'active' : ''}`}
+          onClick={() => setParam('tier', 'regular')}
         >
-          免费
+          普通宏
         </button>
         <button
           type="button"
-          className={`filter-btn ${type === 'premium' ? 'active' : ''}`}
-          onClick={() => setParam('type', 'premium')}
+          className={`filter-btn ${tier === 'premium' ? 'active' : ''}`}
+          onClick={() => setParam('tier', 'premium')}
         >
-          付费
+          高级宏
         </button>
       </div>
 

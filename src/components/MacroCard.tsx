@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Macro, Class, Spec, Version, Media } from '../payload-types'
-import { ClassTag, SpecTag, VersionTag, TypeTag } from './Tags'
+import { ClassTag, SpecTag, VersionTag, TierTag } from './Tags'
 
 function isMedia(v: unknown): v is Media {
   return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
@@ -16,7 +16,7 @@ function previewUrl(macro: Macro): string | null {
 export function MacroCard({ macro }: { macro: Macro }) {
   const img = previewUrl(macro)
   return (
-    <article className="macro-card" data-type={macro.type}>
+    <article className="macro-card" data-tier={macro.tier}>
       {img && (
         <Link href={`/macros/${macro.slug}`} className="card-img" aria-label={macro.title}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -34,7 +34,7 @@ export function MacroCard({ macro }: { macro: Macro }) {
           {(macro.versions ?? []).map((v, i) => (
             <VersionTag key={`v-${i}`} value={v as number | Version} />
           ))}
-          <TypeTag type={macro.type} />
+          <TierTag tier={macro.tier ?? 'regular'} />
         </div>
         <h3>
           <Link href={`/macros/${macro.slug}`}>{macro.title}</Link>

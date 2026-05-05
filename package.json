@@ -12,6 +12,7 @@
     "generate:importmap": "node --env-file=.env node_modules/payload/bin.js generate:importmap",
     "payload": "node --env-file=.env node_modules/payload/bin.js",
     "seed": "tsx --env-file=.env src/scripts/seed.ts",
+    "seed:demos": "tsx --env-file=.env src/scripts/seed-demos.ts",
     "migrate:content": "tsx --env-file=.env src/scripts/migrate-content.ts"
   },
   "dependencies": {

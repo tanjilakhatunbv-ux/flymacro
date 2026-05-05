@@ -285,10 +285,19 @@ export interface Macro {
   id: number;
   title: string;
   /**
-   * 留空将根据标题自动生成
+   * 留空将根据名称自动生成
    */
   slug: string;
-  type: 'free' | 'premium';
+  /**
+   * 普通宏建议 5 积分，高级宏建议 50 积分
+   */
+  tier: 'regular' | 'premium';
+  price: number;
+  /**
+   * 0 = 永久有效
+   */
+  durationDays: number;
+  autoRenewable?: boolean | null;
   summary?: string | null;
   previewImg?: (number | null) | Media;
   demoVideoUrl?: string | null;
@@ -317,32 +326,9 @@ export interface Macro {
     [k: string]: unknown;
   } | null;
   /**
-   * 此字段对未购买的付费宏将自动返回 null
+   * 此字段对未兑换用户将自动返回 null
    */
   codeContent?: string | null;
-  /**
-   * 积分兑换配置：价格=积分、有效期、是否支持自动续费
-   */
-  models?:
-    | {
-        name: string;
-        price: number;
-        tier: 'regular' | 'premium';
-        /**
-         * 0 = 永久有效
-         */
-        durationDays: number;
-        autoRenewable?: boolean | null;
-        features?:
-          | {
-              value?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        sort?: number | null;
-        id?: string | null;
-      }[]
-    | null;
   publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -510,7 +496,6 @@ export interface MacroExchange {
   id: number;
   user: number | User;
   macro: number | Macro;
-  modelName?: string | null;
   creditsSpent: number;
   grantedAt?: string | null;
   /**
@@ -876,7 +861,10 @@ export interface VersionsSelect<T extends boolean = true> {
 export interface MacrosSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  type?: T;
+  tier?: T;
+  price?: T;
+  durationDays?: T;
+  autoRenewable?: T;
   summary?: T;
   previewImg?: T;
   demoVideoUrl?: T;
@@ -891,23 +879,6 @@ export interface MacrosSelect<T extends boolean = true> {
       };
   body?: T;
   codeContent?: T;
-  models?:
-    | T
-    | {
-        name?: T;
-        price?: T;
-        tier?: T;
-        durationDays?: T;
-        autoRenewable?: T;
-        features?:
-          | T
-          | {
-              value?: T;
-              id?: T;
-            };
-        sort?: T;
-        id?: T;
-      };
   publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -998,7 +969,6 @@ export interface CreditOrdersSelect<T extends boolean = true> {
 export interface MacroExchangesSelect<T extends boolean = true> {
   user?: T;
   macro?: T;
-  modelName?: T;
   creditsSpent?: T;
   grantedAt?: T;
   expiresAt?: T;

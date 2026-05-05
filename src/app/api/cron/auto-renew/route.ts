@@ -7,10 +7,6 @@ import { getPayload } from '../../../../lib/payload'
  * Renews macro-exchanges where autoRenew=true and expires within 24h.
  */
 export async function GET(req: Request) {
-  // Auth: if CRON_SECRET is set, require it via query param or header.
-  // Vercel Cron does not support custom headers/query params, so if you
-  // set CRON_SECRET you should call this endpoint from an external cron
-  // service (e.g. cron-job.org) with ?secret=xxx in the URL.
   const secret = process.env.CRON_SECRET
   const url = new URL(req.url)
   const provided = url.searchParams.get('secret') || req.headers.get('x-cron-secret')
@@ -25,7 +21,6 @@ export async function GET(req: Request) {
   const now = new Date()
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
-  // Find exchanges expiring within 24h that have autoRenew enabled
   const exchanges = await payload.find({
     collection: 'macro-exchanges',
     where: {
@@ -55,14 +50,8 @@ export async function GET(req: Request) {
       continue
     }
 
-    const model = (macro.models ?? []).find((m: any) => m.name === ex.modelName)
-    if (!model) {
-      console.warn(`[AutoRenew] Model not found for exchange ${ex.id}`)
-      failed++
-      continue
-    }
-
-    const price = model.price
+    const price = macro.price ?? 0
+    const durationDays = macro.durationDays ?? 0
     const userId = typeof ex.user === 'number' ? ex.user : ex.user?.id
     if (!userId) {
       failed++
@@ -78,7 +67,6 @@ export async function GET(req: Request) {
     const currentCredits = user.credits ?? 0
 
     if (currentCredits < price) {
-      // Insufficient credits: disable auto-renew and notify user
       await payload.update({
         collection: 'macro-exchanges',
         id: ex.id,
@@ -91,7 +79,7 @@ export async function GET(req: Request) {
         data: {
           recipient: userId,
           title: '自动续费失败',
-          body: `「${macro.title}」${ex.modelName} 自动续费失败：积分不足（当前 ${currentCredits}，需要 ${price}）。请充值后手动续费。`,
+          body: `「${macro.title}」自动续费失败：积分不足（当前 ${currentCredits}，需要 ${price}）。请充值后手动续费。`,
           link: `/macros/${macro.slug}`,
           category: 'order',
           read: false,
@@ -104,11 +92,10 @@ export async function GET(req: Request) {
       continue
     }
 
-    // Successful renewal
     const newCredits = currentCredits - price
     const baseTime = ex.expiresAt ? new Date(ex.expiresAt) : now
-    const newExpiresAt = model.durationDays > 0
-      ? new Date(baseTime.getTime() + model.durationDays * 24 * 60 * 60 * 1000).toISOString()
+    const newExpiresAt = durationDays > 0
+      ? new Date(baseTime.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
       : null
 
     await payload.update({
@@ -133,7 +120,7 @@ export async function GET(req: Request) {
         balanceAfter: newCredits,
         type: 'renew',
         relatedExchange: ex.id,
-        reason: `自动续费「${macro.title}」${ex.modelName}`,
+        reason: `自动续费「${macro.title}」`,
       } as any,
       overrideAccess: true,
     })
@@ -143,7 +130,7 @@ export async function GET(req: Request) {
       data: {
         recipient: userId,
         title: '自动续费成功',
-        body: `「${macro.title}」${ex.modelName} 已自动续费，扣除 ${price} 积分。有效期延至 ${newExpiresAt ? newExpiresAt.slice(0, 10) : '永久'}。`,
+        body: `「${macro.title}」已自动续费，扣除 ${price} 积分。有效期延至 ${newExpiresAt ? newExpiresAt.slice(0, 10) : '永久'}。`,
         link: `/macros/${macro.slug}`,
         category: 'order',
         read: false,

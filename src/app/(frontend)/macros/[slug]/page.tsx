@@ -4,14 +4,13 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPayload } from '../../../../lib/payload'
 import { getCurrentUser, isStaffRole } from '../../../../lib/auth'
-import { ClassTag, SpecTag, VersionTag, TypeTag } from '../../../../components/Tags'
+import { ClassTag, SpecTag, VersionTag, TierTag } from '../../../../components/Tags'
 import { RichText } from '../../../../components/RichText'
 import { CodeBlock } from '../../../../components/CodeBlock'
 import { ExchangeButton } from '../../../../components/ExchangeButton'
 import type { Macro, Class, Spec, Version, Media } from '../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
-type SearchParams = Promise<{ paid?: string }>
 
 export const revalidate = 30
 
@@ -68,13 +67,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function MacroDetailPage({
   params,
-  searchParams,
 }: {
   params: Params
-  searchParams: SearchParams
 }) {
   const { slug } = await params
-  const sp = await searchParams
   const macro = await findMacroBySlug(slug)
   if (!macro) notFound()
 
@@ -82,30 +78,19 @@ export default async function MacroDetailPage({
   const staff = isStaffRole(user)
 
   let exchange: any = null
-  if (user && macro.type === 'premium') {
+  if (user) {
     exchange = await findUserExchange(user.id, macro.id)
   }
 
   const now = new Date()
   const expired = exchange?.expiresAt ? new Date(exchange.expiresAt) <= now : false
-  const canSeeCode = macro.type === 'free' || staff || (exchange && !expired)
+  const canSeeCode = staff || (exchange && !expired)
 
   const img = previewUrl(macro)
-  const paidStatus = sp.paid
 
   return (
     <div className="container-page page-single">
-      <article className="macro-detail" data-type={macro.type}>
-        {paidStatus === 'success' && (
-          <div className="auth-success" role="status" style={{ margin: '1rem 1.5rem 0' }}>
-            充值成功！积分已到账，现在可以兑换宏了。
-          </div>
-        )}
-        {paidStatus === 'cancel' && (
-          <div className="auth-error" role="alert" style={{ margin: '1rem 1.5rem 0' }}>
-            充值已取消。如有问题请联系客服。
-          </div>
-        )}
+      <article className="macro-detail" data-tier={macro.tier}>
         <header className="detail-header">
           <h1>{macro.title}</h1>
           <div className="detail-meta">
@@ -118,7 +103,7 @@ export default async function MacroDetailPage({
             {(macro.versions ?? []).map((v, i) => (
               <VersionTag key={`v-${i}`} value={v as number | Version} />
             ))}
-            <TypeTag type={macro.type} />
+            <TierTag tier={macro.tier ?? 'regular'} />
           </div>
         </header>
 
@@ -155,121 +140,65 @@ export default async function MacroDetailPage({
           </div>
         )}
 
-        {macro.type === 'premium' && !canSeeCode && (
-          <ExchangeSection macro={macro} user={user} />
-        )}
-
-        {macro.type === 'premium' && canSeeCode && exchange?.expiresAt && (
-          <RenewSection macro={macro} exchange={exchange} user={user} />
-        )}
-      </article>
-    </div>
-  )
-}
-
-function ExchangeSection({ macro, user }: { macro: Macro; user: any }) {
-  const models = (macro.models ?? []).slice().sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
-  if (models.length === 0) {
-    return (
-      <div className="purchase-area">
-        <h3>兑换</h3>
-        <p style={{ color: 'var(--text-muted)' }}>暂无可兑换型号。</p>
-      </div>
-    )
-  }
-
-  const userCredits = (user?.credits as number) ?? 0
-
-  return (
-    <div className="purchase-area">
-      <h3>选择型号兑换</h3>
-      {user && (
-        <div style={{ marginBottom: '1rem', color: 'var(--gold-bright)', fontWeight: 500 }}>
-          你的积分：{userCredits}
-        </div>
-      )}
-      <div className="models">
-        {models.map((m, i) => (
-          <div key={m.id ?? i} className="model-card">
-            <div className="model-header">
-              <h4>{m.name}</h4>
-              <span className="model-price">{m.price} 积分</span>
+        {!canSeeCode && (
+          <div className="purchase-area">
+            <h3>兑换此宏</h3>
+            <div className="macro-price-card">
+              <div className="model-header">
+                <h4>{macro.title}</h4>
+                <span className="model-price">{macro.price} 积分</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                {(macro.durationDays ?? 0) === 0
+                  ? '永久有效'
+                  : `有效期 ${macro.durationDays} 天`}
+                {macro.autoRenewable && ' · 支持自动续费'}
+              </p>
+              <div className="model-actions" style={{ marginTop: '1rem' }}>
+                {user ? (
+                  <ExchangeButton
+                    macroSlug={macro.slug}
+                    price={macro.price ?? 0}
+                    userCredits={(user.credits as number) ?? 0}
+                  />
+                ) : (
+                  <Link
+                    href={`/login?return=/macros/${macro.slug}`}
+                    className="btn btn-primary"
+                    style={{ width: '100%', display: 'block', textAlign: 'center' }}
+                  >
+                    登录后兑换
+                  </Link>
+                )}
+              </div>
             </div>
-            <ul className="model-features">
-              {(m.features ?? []).map((f, fi) => (
-                <li key={f.id ?? fi}>{f.value}</li>
-              ))}
-            </ul>
-            <div className="model-actions">
-              {user ? (
+            <p className="locked-notice">
+              积分不足？<Link href="/account/credits" style={{ marginLeft: 4, color: 'var(--gold-bright)' }}>去充值</Link>
+            </p>
+          </div>
+        )}
+
+        {canSeeCode && exchange?.expiresAt && (
+          <div className="purchase-area" style={{ marginTop: '1.5rem' }}>
+            <h3>续费管理</h3>
+            <div className="macro-price-card">
+              <div className="model-header">
+                <h4>{macro.title}</h4>
+                <span className="model-price">{macro.price} 积分</span>
+              </div>
+              <div className="model-actions" style={{ marginTop: '0.75rem' }}>
                 <ExchangeButton
                   macroSlug={macro.slug}
-                  modelIndex={i}
-                  modelName={m.name}
-                  price={m.price}
-                  userCredits={userCredits}
+                  price={macro.price ?? 0}
+                  userCredits={(user?.credits as number) ?? 0}
+                  mode="renew"
+                  exchangeId={exchange.id}
                 />
-              ) : (
-                <Link
-                  href={`/login?return=/macros/${macro.slug}`}
-                  className="btn btn-primary"
-                >
-                  登录后兑换
-                </Link>
-              )}
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-              {(m.durationDays ?? 0) === 0
-                ? '永久有效'
-                : `有效期 ${m.durationDays} 天`}
-              {m.autoRenewable && ' · 支持自动续费'}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-      <p className="locked-notice">
-        积分不足？<Link href="/account/credits" style={{ marginLeft: 4, color: 'var(--gold-bright)' }}>去充值</Link>
-      </p>
-    </div>
-  )
-}
-
-function RenewSection({ macro, exchange, user }: { macro: Macro; exchange: any; user: any }) {
-  const model = (macro.models ?? []).find((m: any) => m.name === exchange.modelName)
-  if (!model) return null
-
-  const userCredits = (user?.credits as number) ?? 0
-  const now = new Date()
-  const expiresAt = exchange.expiresAt ? new Date(exchange.expiresAt) : null
-  const daysLeft = expiresAt ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
-
-  return (
-    <div className="purchase-area" style={{ marginTop: '1.5rem' }}>
-      <h3>续费管理</h3>
-      <div className="model-card">
-        <div className="model-header">
-          <h4>{exchange.modelName}</h4>
-          <span className="model-price">{model.price} 积分</span>
-        </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-          {daysLeft !== null && daysLeft > 0
-            ? `还剩 ${daysLeft} 天过期`
-            : daysLeft !== null && daysLeft <= 0
-              ? '已过期'
-              : '永久有效'}
-        </p>
-        <div className="model-actions" style={{ marginTop: '0.75rem' }}>
-          <ExchangeButton
-            macroSlug={macro.slug}
-            modelIndex={(macro.models ?? []).findIndex((m: any) => m.name === exchange.modelName)}
-            modelName={exchange.modelName}
-            price={model.price}
-            userCredits={userCredits}
-            mode="renew"
-            exchangeId={exchange.id}
-          />
-        </div>
-      </div>
+        )}
+      </article>
     </div>
   )
 }

@@ -4,16 +4,12 @@ import { useState, useTransition } from 'react'
 
 export function ExchangeButton({
   macroSlug,
-  modelIndex,
-  modelName,
   price,
   userCredits,
   mode = 'exchange',
   exchangeId,
 }: {
   macroSlug: string
-  modelIndex: number
-  modelName: string
   price: number
   userCredits: number
   mode?: 'exchange' | 'renew'
@@ -37,7 +33,7 @@ export function ExchangeButton({
         const body =
           mode === 'renew'
             ? JSON.stringify({ exchangeId })
-            : JSON.stringify({ macroSlug, modelIndex })
+            : JSON.stringify({ macroSlug })
 
         const resp = await fetch(url, {
           method: 'POST',

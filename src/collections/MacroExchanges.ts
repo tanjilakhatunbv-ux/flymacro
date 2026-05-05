@@ -1,17 +1,17 @@
 import type { CollectionConfig } from 'payload'
-import { isOwnerOrStaff, isOperatorOrAbove, isSuperAdmin } from '../lib/access'
+import { isAuthenticated, isOwnerOrStaff, isSuperAdmin } from '../lib/access'
 
 export const MacroExchanges: CollectionConfig = {
   slug: 'macro-exchanges',
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['user', 'macro', 'modelName', 'creditsSpent', 'expiresAt', 'autoRenew', 'grantedAt'],
+    defaultColumns: ['user', 'macro', 'creditsSpent', 'expiresAt', 'autoRenew', 'grantedAt'],
     group: '商务',
   },
   access: {
     read: isOwnerOrStaff,
-    create: isOperatorOrAbove,
-    update: isOperatorOrAbove,
+    create: isAuthenticated,
+    update: isOwnerOrStaff,
     delete: isSuperAdmin,
   },
   indexes: [
@@ -20,7 +20,6 @@ export const MacroExchanges: CollectionConfig = {
   fields: [
     { name: 'user', type: 'relationship', relationTo: 'users', required: true, index: true },
     { name: 'macro', type: 'relationship', relationTo: 'macros', required: true, index: true },
-    { name: 'modelName', type: 'text', label: '兑换的型号名' },
     { name: 'creditsSpent', type: 'number', required: true, label: '花费积分' },
     {
       name: 'grantedAt',

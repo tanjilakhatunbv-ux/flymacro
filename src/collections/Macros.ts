@@ -24,7 +24,6 @@ const stripCodeForUnpurchased: FieldHook = async ({ value, req, data }) => {
   if (req.user && (req.user.role === 'super-admin' || req.user.role === 'operator' || req.user.role === 'support')) {
     return value
   }
-  if (data?.type === 'free') return value
   if (!req.user) return null
   try {
     const found = await req.payload.find({
@@ -55,7 +54,7 @@ export const Macros: CollectionConfig = {
   slug: 'macros',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'classes', 'publishedAt', '_status'],
+    defaultColumns: ['title', 'tier', 'price', 'classes', 'publishedAt', '_status'],
     group: '宏库',
     listSearchableFields: ['title', 'slug', 'summary'],
   },
@@ -72,7 +71,7 @@ export const Macros: CollectionConfig = {
     maxPerDoc: 20,
   },
   fields: [
-    { name: 'title', type: 'text', required: true, label: '标题' },
+    { name: 'title', type: 'text', required: true, label: '名称' },
     {
       name: 'slug',
       type: 'text',
@@ -80,17 +79,41 @@ export const Macros: CollectionConfig = {
       unique: true,
       index: true,
       hooks: { beforeValidate: [ensureSlug] },
-      admin: { position: 'sidebar', description: '留空将根据标题自动生成' },
+      admin: { position: 'sidebar', description: '留空将根据名称自动生成' },
     },
     {
-      name: 'type',
+      name: 'tier',
       type: 'select',
       required: true,
-      defaultValue: 'free',
+      defaultValue: 'regular',
       options: [
-        { label: '免费', value: 'free' },
-        { label: '付费', value: 'premium' },
+        { label: '普通宏', value: 'regular' },
+        { label: '高级宏', value: 'premium' },
       ],
+      admin: { position: 'sidebar', description: '普通宏建议 5 积分，高级宏建议 50 积分' },
+    },
+    {
+      name: 'price',
+      type: 'number',
+      required: true,
+      label: '兑换积分',
+      min: 0,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'durationDays',
+      type: 'number',
+      required: true,
+      defaultValue: 0,
+      label: '有效期（天）',
+      min: 0,
+      admin: { position: 'sidebar', description: '0 = 永久有效' },
+    },
+    {
+      name: 'autoRenewable',
+      type: 'checkbox',
+      defaultValue: true,
+      label: '支持自动续费',
       admin: { position: 'sidebar' },
     },
     {
@@ -136,7 +159,7 @@ export const Macros: CollectionConfig = {
     {
       name: 'body',
       type: 'richText',
-      label: '正文',
+      label: '详细介绍',
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
@@ -149,65 +172,12 @@ export const Macros: CollectionConfig = {
     {
       name: 'codeContent',
       type: 'code',
-      label: '宏代码（已购买/免费才可见）',
+      label: '宏代码（兑换后才可见）',
       admin: {
         language: 'lua',
-        description: '此字段对未购买的付费宏将自动返回 null',
+        description: '此字段对未兑换用户将自动返回 null',
       },
       hooks: { afterRead: [stripCodeForUnpurchased] },
-    },
-    {
-      name: 'models',
-      type: 'array',
-      label: '型号（仅付费宏）',
-      labels: { singular: '型号', plural: '型号' },
-      admin: {
-        condition: (data) => data?.type === 'premium',
-        description: '积分兑换配置：价格=积分、有效期、是否支持自动续费',
-      },
-      fields: [
-        { name: 'name', type: 'text', required: true, label: '型号名（基础版/进阶版/大师版）' },
-        {
-          name: 'price',
-          type: 'number',
-          required: true,
-          label: '积分价格',
-          min: 0,
-        },
-        {
-          name: 'tier',
-          type: 'select',
-          required: true,
-          defaultValue: 'regular',
-          label: '档次',
-          options: [
-            { label: '常规宏', value: 'regular' },
-            { label: '高级宏', value: 'premium' },
-          ],
-        },
-        {
-          name: 'durationDays',
-          type: 'number',
-          required: true,
-          defaultValue: 0,
-          label: '有效期（天）',
-          min: 0,
-          admin: { description: '0 = 永久有效' },
-        },
-        {
-          name: 'autoRenewable',
-          type: 'checkbox',
-          defaultValue: true,
-          label: '支持自动续费',
-        },
-        {
-          name: 'features',
-          type: 'array',
-          label: '型号特性列表',
-          fields: [{ name: 'value', type: 'text' }],
-        },
-        { name: 'sort', type: 'number', defaultValue: 0 },
-      ],
     },
     {
       name: 'publishedAt',

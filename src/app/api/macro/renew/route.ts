@@ -45,12 +45,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'macro-not-found', message: '关联宏不存在。' }, { status: 404 })
   }
 
-  const model = (macro.models ?? []).find((m: any) => m.name === exchange.modelName)
-  if (!model) {
-    return NextResponse.json({ error: 'model-not-found', message: '型号配置已变更。' }, { status: 404 })
-  }
-
-  const price = model.price
+  const price = macro.price ?? 0
   const currentCredits = (user.credits as number) ?? 0
 
   if (currentCredits < price) {
@@ -65,8 +60,9 @@ export async function POST(req: Request) {
     ? new Date(exchange.expiresAt)
     : now
 
-  const newExpiresAt = model.durationDays > 0
-    ? new Date(baseTime.getTime() + model.durationDays * 24 * 60 * 60 * 1000).toISOString()
+  const durationDays = macro.durationDays ?? 0
+  const newExpiresAt = durationDays > 0
+    ? new Date(baseTime.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
     : null
 
   // Deduct credits
@@ -98,7 +94,7 @@ export async function POST(req: Request) {
       balanceAfter: newCredits,
       type: 'renew',
       relatedExchange: exchangeId,
-      reason: `续费「${macro.title}」${exchange.modelName}`,
+      reason: `续费「${macro.title}」`,
     } as any,
     overrideAccess: true,
   })

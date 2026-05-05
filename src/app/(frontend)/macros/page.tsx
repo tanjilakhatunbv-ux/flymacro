@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 
 export const revalidate = 60
 
-type SearchParams = Promise<{ type?: string; class?: string }>
+type SearchParams = Promise<{ tier?: string; class?: string }>
 
 export default async function MacrosListPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams
-  const type = sp.type === 'free' || sp.type === 'premium' ? sp.type : 'all'
+  const tier = sp.tier === 'regular' || sp.tier === 'premium' ? sp.tier : 'all'
   const classSlug = sp.class || null
 
   const payload = await getPayload()
@@ -29,7 +29,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
 
   const where: Record<string, unknown> = { _status: { equals: 'published' } }
   const conditions: Record<string, unknown>[] = [{ _status: { equals: 'published' } }]
-  if (type !== 'all') conditions.push({ type: { equals: type } })
+  if (tier !== 'all') conditions.push({ tier: { equals: tier } })
   if (classSlug) {
     const cls = classes.find((c) => c.slug === classSlug)
     if (cls) conditions.push({ classes: { in: [cls.id] } })
@@ -46,18 +46,19 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
 
   const macros = result.docs as Macro[]
 
+  const tierLabel = tier === 'all' ? '全部' : tier === 'regular' ? '普通宏' : '高级宏'
+
   return (
     <div className="container-page page-list">
       <h1>宏 库</h1>
       <p className="page-content">
-        共 {result.totalDocs} 个宏 · 当前筛选：
-        {type === 'all' ? '全部' : type === 'free' ? '免费' : '付费'}
+        共 {result.totalDocs} 个宏 · 当前筛选：{tierLabel}
         {classSlug && ` · ${classes.find((c) => c.slug === classSlug)?.nameZh ?? classSlug}`}
       </p>
 
       <MacroFilters
         classes={classes.map((c) => ({ slug: c.slug, nameZh: c.nameZh }))}
-        type={type}
+        tier={tier}
         classSlug={classSlug}
       />
 
