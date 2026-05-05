@@ -31,6 +31,11 @@ const dirname = path.dirname(filename)
 const useResend = !!process.env.RESEND_API_KEY
 const useS3 = !!process.env.S3_BUCKET && !!process.env.S3_ACCESS_KEY_ID
 
+// Resolve the actual public URL — critical for cookie, CORS and CSRF to work
+const serverUrl =
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -76,7 +81,7 @@ export default buildConfig({
     },
     push: false,
   }),
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  serverURL: serverUrl,
   sharp,
   ...(useResend && {
     email: resendAdapter({
@@ -114,6 +119,6 @@ export default buildConfig({
         ]
       : []),
   ],
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean) as string[],
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean) as string[],
+  cors: [serverUrl],
+  csrf: [serverUrl],
 })

@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: '注册 — FlyMacro',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function RegisterPage() {
   const user = await getCurrentUser()
   if (user) redirect('/account')

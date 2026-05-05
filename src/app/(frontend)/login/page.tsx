@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: '登录 — FlyMacro',
 }
 
+export const dynamic = 'force-dynamic'
+
 type SearchParams = Promise<{ return?: string; error?: string; message?: string }>
 
 export default async function LoginPage({ searchParams }: { searchParams: SearchParams }) {
