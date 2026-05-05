@@ -4,25 +4,39 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from './auth'
 import { getPayload } from './payload'
 
-export async function markAllNotificationsReadAction(): Promise<{ error?: string }> {
+export async function markAllNotificationsReadAction(
+  _prev: { error?: string },
+  _formData: FormData,
+): Promise<{ error?: string }> {
   const user = await getCurrentUser()
   if (!user) return { error: '请先登录' }
 
   const payload = await getPayload()
 
   try {
-    await payload.update({
+    const r = await payload.find({
       collection: 'notifications',
       where: {
-        and: [
-          { recipient: { equals: user.id } },
-          { read: { equals: false } },
-        ],
+        recipient: { equals: user.id },
+        read: { equals: false },
       },
-      data: { read: true },
+      limit: 100,
+      depth: 0,
       overrideAccess: true,
     })
+
+    const now = new Date().toISOString()
+    for (const doc of r.docs) {
+      await payload.update({
+        collection: 'notifications',
+        id: doc.id,
+        data: { read: true, readAt: now },
+        overrideAccess: true,
+      })
+    }
+
     revalidatePath('/account/notifications')
+    revalidatePath('/account')
     return {}
   } catch (err) {
     return { error: err instanceof Error ? err.message : '操作失败' }
@@ -55,10 +69,11 @@ export async function markNotificationReadAction(
     await payload.update({
       collection: 'notifications',
       id,
-      data: { read: true },
+      data: { read: true, readAt: new Date().toISOString() },
       overrideAccess: true,
     })
     revalidatePath('/account/notifications')
+    revalidatePath('/account')
     return {}
   } catch (err) {
     return { error: err instanceof Error ? err.message : '操作失败' }

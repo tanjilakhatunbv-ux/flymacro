@@ -29,7 +29,7 @@ export default async function NotificationsPage() {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>通知中心</h1>
-        {notifications.length > 0 && (
+        {notifications.some((n) => !n.read) && (
           <MarkAllReadButton />
         )}
       </div>
@@ -55,24 +55,47 @@ function NotificationItem({ notification }: { notification: Notification }) {
   const body = notification.body ?? ''
   const link = notification.link ?? undefined
 
-  const inner = (
-    <div className="notif-item" data-read={String(read)}>
-      <div className="notif-item-row">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {!read && <span className="notif-unread-dot" aria-hidden="true" />}
-          <span className="notif-title">{notification.title}</span>
-          {!read && <MarkNotificationReadForm id={String(notification.id)} />}
-        </div>
-        <span className="notif-time">{formatDate(notification.createdAt)}</span>
-      </div>
-      {body && <div className="notif-body">{body}</div>}
-    </div>
+  const TitleLink = link ? (
+    <Link href={link} className="notif-title" style={{ textDecoration: 'none' }}>
+      {notification.title}
+    </Link>
+  ) : (
+    <span className="notif-title">{notification.title}</span>
   )
 
-  if (link) {
-    return <Link href={link} style={{ textDecoration: 'none' }}>{inner}</Link>
-  }
-  return inner
+  const BodyContent = body ? (
+    link ? (
+      <Link href={link} style={{ color: 'inherit', textDecoration: 'none' }}>
+        {body}
+      </Link>
+    ) : (
+      body
+    )
+  ) : null
+
+  return (
+    <div className="notif-item" data-read={String(read)}>
+      <div className="notif-item-row">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          {!read && <span className="notif-unread-dot" aria-hidden="true" />}
+          {TitleLink}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {!read && <MarkNotificationReadForm id={String(notification.id)} />}
+          <span className="notif-time">{formatDate(notification.createdAt)}</span>
+        </div>
+      </div>
+      {BodyContent && <div className="notif-body">{BodyContent}</div>}
+    </div>
+  )
 }
 
 function formatDate(iso: string): string {
