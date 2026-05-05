@@ -122,20 +122,25 @@ function textToLexical(text: string): any {
     .split(/\n{2,}/)
     .map((para) => para.replace(/\n/g, ' ').trim())
     .filter(Boolean)
+
+  // If no paragraphs (empty text), create one empty paragraph
+  if (paragraphs.length === 0) {
+    paragraphs.push('')
+  }
+
   return {
     root: {
       type: 'root',
-      format: '',
+      format: 0,
       indent: 0,
       version: 1,
       direction: 'ltr',
       children: paragraphs.map((p) => ({
         type: 'paragraph',
-        format: '',
+        format: 0,
         indent: 0,
         version: 1,
         direction: 'ltr',
-        textFormat: 0,
         children: [
           {
             type: 'text',
