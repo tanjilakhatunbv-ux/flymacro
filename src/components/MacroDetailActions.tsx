@@ -75,28 +75,49 @@ export function MacroDetailActions({
   useEffect(() => {
     let cancelled = false
 
-    // 1. Try exchange cache first
-    const cachedExchange = readExchangeCache(macroId)
-    const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
-    if (exchangeValid) {
-      setStatus(cachedExchange.status)
+    // 1. Always use session cache first for immediate optimistic logged-in state
+    const cachedSession = readSessionCache()
+    const sessionValid = cachedSession && Date.now() - cachedSession.ts < CACHE_TTL_MS
+    if (sessionValid && cachedSession.user) {
+      setStatus({
+        loggedIn: true,
+        isStaff: false,
+        exchange: null,
+        userCredits: (cachedSession.user.credits as number) ?? 0,
+      })
+      setLoading(false)
+    } else if (sessionValid && !cachedSession.user) {
+      setStatus({
+        loggedIn: false,
+        isStaff: false,
+        exchange: null,
+        userCredits: 0,
+      })
       setLoading(false)
     }
 
-    // 2. Try session cache for optimistic UI if no exchange cache
-    if (!exchangeValid) {
-      const cachedSession = readSessionCache()
-      const sessionValid = cachedSession && Date.now() - cachedSession.ts < CACHE_TTL_MS
-      if (sessionValid && cachedSession.user) {
-        // Optimistically show logged-in state with cached credits
-        setStatus({
-          loggedIn: true,
+    // 2. Merge exchange cache data (exchange details only, not loggedIn)
+    const cachedExchange = readExchangeCache(macroId)
+    const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
+    if (exchangeValid) {
+      setStatus((prev) => {
+        const base = prev ?? {
+          loggedIn: false,
           isStaff: false,
           exchange: null,
-          userCredits: (cachedSession.user.credits as number) ?? 0,
-        })
-        setLoading(false)
-      }
+          userCredits: 0,
+        }
+        return {
+          ...base,
+          exchange: cachedExchange.status.exchange ?? base.exchange,
+          userCredits:
+            sessionValid && cachedSession.user
+              ? ((cachedSession.user.credits as number) ?? 0)
+              : (cachedExchange.status.userCredits ?? base.userCredits),
+          isStaff: cachedExchange.status.isStaff ?? base.isStaff,
+        }
+      })
+      if (!sessionValid) setLoading(false)
     }
 
     // 3. Always fetch fresh in background
