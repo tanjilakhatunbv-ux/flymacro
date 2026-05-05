@@ -39,6 +39,12 @@ function readExchangeCache(macroId: number | string): { status: ExchangeStatus; 
     const raw = sessionStorage.getItem(EXCHANGE_CACHE_KEY(macroId))
     if (!raw) return null
     const parsed = JSON.parse(raw)
+    // Invalidate cache if it belongs to a different user
+    const cachedSession = readSessionCache()
+    const currentUserId = cachedSession?.user ? (cachedSession.user as any).id : null
+    if (parsed.cachedUserId != null && String(parsed.cachedUserId) !== String(currentUserId)) {
+      return null
+    }
     return { status: parsed, ts: parsed.ts }
   } catch {
     return null
@@ -48,7 +54,12 @@ function readExchangeCache(macroId: number | string): { status: ExchangeStatus; 
 function writeExchangeCache(macroId: number | string, status: ExchangeStatus) {
   if (typeof sessionStorage === 'undefined') return
   try {
-    sessionStorage.setItem(EXCHANGE_CACHE_KEY(macroId), JSON.stringify({ ...status, ts: Date.now() }))
+    const cachedSession = readSessionCache()
+    const currentUserId = cachedSession?.user ? (cachedSession.user as any).id : null
+    sessionStorage.setItem(
+      EXCHANGE_CACHE_KEY(macroId),
+      JSON.stringify({ ...status, cachedUserId: currentUserId, ts: Date.now() }),
+    )
   } catch {}
 }
 
@@ -76,9 +87,10 @@ export function MacroDetailActions({
   useEffect(() => {
     let cancelled = false
 
-    // 1. Always use session cache first for immediate optimistic logged-in state
     const cachedSession = readSessionCache()
     const sessionValid = cachedSession && Date.now() - cachedSession.ts < CACHE_TTL_MS
+
+    // 1. Start with session cache for immediate optimistic UI
     if (sessionValid && cachedSession.user) {
       setStatus({
         loggedIn: true,
@@ -97,31 +109,29 @@ export function MacroDetailActions({
       setLoading(false)
     }
 
-    // 2. Merge exchange cache data (exchange details only, not loggedIn)
-    const cachedExchange = readExchangeCache(macroId)
-    const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
-    if (exchangeValid) {
-      setStatus((prev) => {
-        const base = prev ?? {
-          loggedIn: false,
-          isStaff: false,
-          exchange: null,
-          userCredits: 0,
-        }
-        return {
-          ...base,
-          exchange: cachedExchange.status.exchange ?? base.exchange,
-          userCredits:
-            sessionValid && cachedSession.user
-              ? ((cachedSession.user.credits as number) ?? 0)
-              : (cachedExchange.status.userCredits ?? base.userCredits),
-          isStaff: cachedExchange.status.isStaff ?? base.isStaff,
-        }
-      })
-      if (!sessionValid) setLoading(false)
+    // 2. Merge exchange cache ONLY when we know the current user identity
+    if (sessionValid && cachedSession.user) {
+      const userCredits = (cachedSession.user.credits as number) ?? 0
+      const cachedExchange = readExchangeCache(macroId)
+      const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
+      if (exchangeValid && cachedExchange.status.exchange) {
+        setStatus((prev) => {
+          const base = prev ?? {
+            loggedIn: true,
+            isStaff: false,
+            exchange: null,
+            userCredits,
+          }
+          return {
+            ...base,
+            exchange: cachedExchange.status.exchange,
+            isStaff: cachedExchange.status.isStaff ?? base.isStaff,
+          }
+        })
+      }
     }
 
-    // 3. Always fetch fresh in background
+    // 3. Always fetch fresh state from server
     fetch(`/api/macro/exchange-status?macroId=${macroId}`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
