@@ -21,7 +21,7 @@ function verifyJwt(token: string, secret: string) {
 
 export async function GET(req: Request) {
   const payload = await getPayload()
-  const secret = (payload.config as any).secret || 'UNKNOWN'
+  const secret = (payload as any).secret || 'UNKNOWN'
 
   // Method 1: req.headers
   const auth1 = await payload.auth({ headers: req.headers })

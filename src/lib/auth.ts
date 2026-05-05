@@ -32,7 +32,7 @@ export async function getCurrentUser(): Promise<User | null> {
     console.log('[getCurrentUser] cookie present:', !!tokenCookie)
     if (!tokenCookie?.value) return null
 
-    const secret = (payload.config as any).secret
+    const secret = (payload as any).secret
     if (!secret) {
       console.error('[getCurrentUser] no secret configured')
       return null
