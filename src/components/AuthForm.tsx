@@ -239,7 +239,7 @@ type AuthResult = { ok: true; warning?: string } | { ok: false; errors: FieldErr
 
 async function runAuth(mode: Mode, input: AuthInput): Promise<AuthResult> {
   if (mode === 'login') {
-    return postJson('/api/users/login', { email: input.email, password: input.password })
+    return postJson('/api/auth/login', { email: input.email, password: input.password })
   }
   if (mode === 'register') {
     return postJson('/api/auth/register', {
