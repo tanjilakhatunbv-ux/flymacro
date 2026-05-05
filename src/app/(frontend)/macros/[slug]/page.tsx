@@ -11,7 +11,7 @@ import type { Macro, Class, Spec, Version, Media } from '../../../../payload-typ
 
 type Params = Promise<{ slug: string }>
 
-export const revalidate = 60
+export const revalidate = 3600
 
 function isMedia(v: unknown): v is Media {
   return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
@@ -37,7 +37,7 @@ const findMacroBySlugCached = unstable_cache(
     return (result.docs[0] as Macro | undefined) ?? null
   },
   ['macro-by-slug'],
-  { revalidate: 60, tags: ['macros'] }
+  { revalidate: 3600, tags: ['macros'] }
 )
 
 export async function generateStaticParams() {

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: '产品公告、更新日志与博客内容。',
 }
 
-export const revalidate = 60
+export const revalidate = 300
 
 export default async function BlogListPage() {
   const payload = await getPayload()

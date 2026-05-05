@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: '浏览全部魔兽世界宏，按职业、专精、版本筛选。',
 }
 
-export const revalidate = 60
+export const revalidate = 300
 
 const getClasses = unstable_cache(
   async () => {
@@ -41,7 +41,7 @@ const getMacros = unstable_cache(
     return result.docs as Macro[]
   },
   ['macros-list'],
-  { revalidate: 60, tags: ['macros'] }
+  { revalidate: 300, tags: ['macros'] }
 )
 
 export default async function MacrosListPage() {

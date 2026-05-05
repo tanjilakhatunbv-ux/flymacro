@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Macro, Class, Spec, Version, Media } from '../payload-types'
 import { ClassTag, SpecTag, VersionTag, TierTag } from './Tags'
 
@@ -21,8 +22,14 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
     <article className="macro-card" data-tier={macro.tier} data-exchanged={isExchanged}>
       {img ? (
         <Link href={`/macros/${macro.slug}`} className="card-img" aria-label={macro.title}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={img} alt={macro.title} loading="lazy" />
+          <Image
+            src={img}
+            alt={macro.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
+            loading="lazy"
+          />
           {isExchanged && <span className="card-badge owned">已兑换</span>}
         </Link>
       ) : (

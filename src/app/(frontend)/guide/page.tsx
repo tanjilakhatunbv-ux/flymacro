@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: '学习编写魔兽世界宏与插件的入门教程。',
 }
 
-export const revalidate = 60
+export const revalidate = 300
 
 export default async function GuideListPage() {
   const payload = await getPayload()

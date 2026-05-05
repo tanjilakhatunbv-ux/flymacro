@@ -12,10 +12,10 @@ type User = {
   credits: number
 }
 
-const CACHE_KEY = 'flymacro_user_v1'
+const CACHE_KEY = 'flymacro_session_v2'
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
-function readCache(): { user: User | null; ts: number } | null {
+function readCache(): { user: User | null; unread: number; ts: number } | null {
   if (typeof sessionStorage === 'undefined') return null
   try {
     const raw = sessionStorage.getItem(CACHE_KEY)
@@ -26,10 +26,10 @@ function readCache(): { user: User | null; ts: number } | null {
   }
 }
 
-function writeCache(user: User | null) {
+function writeCache(user: User | null, unread: number) {
   if (typeof sessionStorage === 'undefined') return
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ user, ts: Date.now() }))
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ user, unread, ts: Date.now() }))
   } catch {}
 }
 
@@ -40,42 +40,30 @@ export function HeaderAuth() {
   useEffect(() => {
     let cancelled = false
 
-    // 1. Use cached value instantly to avoid skeleton flicker on every navigation
+    // 1. Use cached value instantly
     const cached = readCache()
     const cacheValid = cached && Date.now() - cached.ts < CACHE_TTL_MS
     if (cacheValid) {
       setUser(cached.user)
-      if (cached.user) {
-        // Silently refresh unread count in background
-        fetch('/api/auth/unread-count', { credentials: 'same-origin' })
-          .then((r) => (r.ok ? r.json() : { count: 0 }))
-          .then((d) => {
-            if (!cancelled) setUnread(d.count ?? 0)
-          })
-          .catch(() => {})
-      }
+      setUnread(cached.unread)
     }
 
-    // 2. Always fetch fresh in background to update cache
-    fetch('/api/auth/me', { credentials: 'same-origin' })
-      .then((r) => (r.ok ? r.json() : { user: null }))
+    // 2. Always fetch fresh in background
+    fetch('/api/auth/session', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : { user: null, unread: 0 }))
       .then((data) => {
         if (cancelled) return
-        setUser(data.user ?? null)
-        writeCache(data.user ?? null)
-        if (data.user) {
-          fetch('/api/auth/unread-count', { credentials: 'same-origin' })
-            .then((r) => (r.ok ? r.json() : { count: 0 }))
-            .then((d) => {
-              if (!cancelled) setUnread(d.count ?? 0)
-            })
-            .catch(() => {})
-        }
+        const u = data.user ?? null
+        const count = data.unread ?? 0
+        setUser(u)
+        setUnread(count)
+        writeCache(u, count)
       })
       .catch(() => {
         if (!cancelled) {
           setUser(null)
-          writeCache(null)
+          setUnread(0)
+          writeCache(null, 0)
         }
       })
 
