@@ -34,9 +34,14 @@ const findMacroBySlugCached = unstable_cache(
       limit: 1,
       depth: 1,
     })
-    return (result.docs[0] as Macro | undefined) ?? null
+    const macro = (result.docs[0] as Macro | undefined) ?? null
+    // Never leak codeContent from SSR cache — it is always fetched client-side after auth check
+    if (macro) {
+      ;(macro as any).codeContent = null
+    }
+    return macro
   },
-  ['macro-by-slug'],
+  ['macro-by-slug-v2'],
   { revalidate: 3600, tags: ['macros'] }
 )
 

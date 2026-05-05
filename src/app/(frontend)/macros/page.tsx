@@ -38,9 +38,14 @@ const getMacros = unstable_cache(
       limit: 200,
       depth: 1,
     })
-    return result.docs as Macro[]
+    const macros = result.docs as Macro[]
+    // Never leak codeContent from SSR cache
+    macros.forEach((m: any) => {
+      if (m) m.codeContent = null
+    })
+    return macros
   },
-  ['macros-list'],
+  ['macros-list-v2'],
   { revalidate: 300, tags: ['macros'] }
 )
 
