@@ -44,9 +44,9 @@ export async function GET(req: Request) {
     }
   }
 
-  // Method 4: direct DB lookup by decoded ID
+  // Method 4: direct DB lookup by decoded ID (skip signature check)
   let dbLookup: any = { checked: false }
-  if (manualVerify.valid && manualVerify.payload?.id) {
+  if (manualVerify.payload?.id) {
     try {
       const user = await payload.findByID({
         collection: 'users',
@@ -56,6 +56,27 @@ export async function GET(req: Request) {
       dbLookup = { checked: true, found: !!user, email: (user as any)?.email }
     } catch (e: any) {
       dbLookup = { checked: true, error: e.message }
+    }
+  }
+
+  // Method 5: signature diagnostics
+  let sigDiagnostics: any = { checked: false }
+  if (tokenCookie) {
+    try {
+      const [headerB64, payloadB64, signatureB64] = tokenCookie.value.split('.')
+      const signingInput = `${headerB64}.${payloadB64}`
+      const expectedSig = createHmac('sha256', secret).update(signingInput).digest('base64url')
+      sigDiagnostics = {
+        checked: true,
+        actualSig: signatureB64,
+        expectedSig,
+        match: signatureB64 === expectedSig,
+        secretLength: secret.length,
+        secretPrefix: String(secret).slice(0, 10),
+        signingInputPrefix: signingInput.slice(0, 30),
+      }
+    } catch (e: any) {
+      sigDiagnostics = { checked: true, error: e.message }
     }
   }
 
@@ -73,6 +94,7 @@ export async function GET(req: Request) {
     },
     method3_manualJwt: manualVerify,
     method4_dbLookup: dbLookup,
+    method5_sigDiagnostics: sigDiagnostics,
     secretPrefix: String(secret).slice(0, 15) + '...',
     diagnostics: {
       hasCookieHeader: reqCookie.includes('payload-token'),

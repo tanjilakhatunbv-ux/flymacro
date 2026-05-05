@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { createHmac } from 'crypto'
+import { createHmac, createHash } from 'crypto'
 import { getPayload } from './payload'
 import type { User } from '../payload-types'
 
@@ -18,6 +18,20 @@ function verifyJwt(token: string, secret: string): { valid: boolean; payload: an
   return { valid: signatureB64 === expectedSig, payload }
 }
 
+function getCandidateSecrets(payload: any): string[] {
+  const raw = payload.config?.secret
+  const hashed = raw
+    ? createHash('sha256').update(raw).digest('hex').slice(0, 32)
+    : null
+  const instance = payload.secret
+
+  const candidates = new Set<string>()
+  if (raw) candidates.add(raw)
+  if (hashed) candidates.add(hashed)
+  if (instance && typeof instance === 'string') candidates.add(instance)
+  return Array.from(candidates)
+}
+
 /**
  * Resolves the currently authenticated user from the Payload auth cookie.
  * Bypasses payload.auth() which may fail silently in certain Vercel / Payload 3
@@ -32,18 +46,21 @@ export async function getCurrentUser(): Promise<User | null> {
     console.log('[getCurrentUser] cookie present:', !!tokenCookie)
     if (!tokenCookie?.value) return null
 
-    const secret = (payload as any).secret
-    if (!secret) {
-      console.error('[getCurrentUser] no secret configured')
-      return null
+    const candidates = getCandidateSecrets(payload)
+    console.log('[getCurrentUser] trying', candidates.length, 'secret candidates')
+
+    let jwtResult: { valid: boolean; payload: any } | null = null
+    for (const secret of candidates) {
+      const result = verifyJwt(tokenCookie.value, secret)
+      if (result.valid) {
+        jwtResult = result
+        console.log('[getCurrentUser] jwt verified with candidate prefix:', secret.slice(0, 10))
+        break
+      }
     }
 
-    // Manual JWT verification
-    const jwtResult = verifyJwt(tokenCookie.value, secret)
-    console.log('[getCurrentUser] jwt valid:', jwtResult.valid, 'payload id:', jwtResult.payload?.id)
-
-    if (!jwtResult.valid) {
-      console.log('[getCurrentUser] jwt signature invalid')
+    if (!jwtResult) {
+      console.log('[getCurrentUser] jwt signature invalid for all', candidates.length, 'candidates')
       return null
     }
 
