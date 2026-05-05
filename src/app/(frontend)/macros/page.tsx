@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 import { getPayload } from '../../../lib/payload'
 import { getCurrentUser } from '../../../lib/auth'
 import { MacroCard } from '../../../components/MacroCard'
@@ -10,9 +11,24 @@ export const metadata: Metadata = {
   description: '浏览全部魔兽世界宏，按职业、专精、版本筛选。',
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 type SearchParams = Promise<{ tier?: string; class?: string }>
+
+const getClasses = unstable_cache(
+  async () => {
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: 'classes',
+      sort: 'sort',
+      limit: 50,
+      depth: 0,
+    })
+    return result.docs as Class[]
+  },
+  ['classes-list'],
+  { revalidate: 3600, tags: ['classes'] }
+)
 
 export default async function MacrosListPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams
@@ -22,12 +38,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
   const payload = await getPayload()
   const user = await getCurrentUser()
 
-  const classes = (await payload.find({
-    collection: 'classes',
-    sort: 'sort',
-    limit: 50,
-    depth: 0,
-  })).docs as Class[]
+  const classes = await getClasses()
 
   const where: Record<string, unknown> = { _status: { equals: 'published' } }
   const conditions: Record<string, unknown>[] = [{ _status: { equals: 'published' } }]
@@ -43,7 +54,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: S
     where: where as any,
     sort: '-publishedAt',
     limit: 100,
-    depth: 2,
+    depth: 1,
   })
 
   const macros = result.docs as Macro[]

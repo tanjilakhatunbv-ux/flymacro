@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { unstable_cache } from 'next/cache'
 import { getPayload } from '../../../../lib/payload'
 import { getCurrentUser, isStaffRole } from '../../../../lib/auth'
 import { ClassTag, SpecTag, VersionTag, TierTag } from '../../../../components/Tags'
@@ -12,7 +13,7 @@ import type { Macro, Class, Spec, Version, Media } from '../../../../payload-typ
 
 type Params = Promise<{ slug: string }>
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 function isMedia(v: unknown): v is Media {
   return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
@@ -24,18 +25,22 @@ function previewUrl(macro: Macro): string | null {
   return img.sizes?.hero?.url ?? img.url ?? null
 }
 
-async function findMacroBySlug(slug: string) {
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'macros',
-    where: {
-      and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
-    },
-    limit: 1,
-    depth: 2,
-  })
-  return (result.docs[0] as Macro | undefined) ?? null
-}
+const findMacroBySlugCached = unstable_cache(
+  async (slug: string) => {
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: 'macros',
+      where: {
+        and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
+      },
+      limit: 1,
+      depth: 1,
+    })
+    return (result.docs[0] as Macro | undefined) ?? null
+  },
+  ['macro-by-slug'],
+  { revalidate: 60, tags: ['macros'] }
+)
 
 async function findUserExchange(userId: number, macroId: number) {
   const payload = await getPayload()
@@ -57,7 +62,7 @@ async function findUserExchange(userId: number, macroId: number) {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params
-  const macro = await findMacroBySlug(slug)
+  const macro = await findMacroBySlugCached(slug)
   if (!macro) return { title: '宏不存在 — FlyMacro' }
   return {
     title: `${macro.title} — FlyMacro`,
@@ -71,7 +76,7 @@ export default async function MacroDetailPage({
   params: Params
 }) {
   const { slug } = await params
-  const macro = await findMacroBySlug(slug)
+  const macro = await findMacroBySlugCached(slug)
   if (!macro) notFound()
 
   const user = await getCurrentUser()

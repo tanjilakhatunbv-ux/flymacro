@@ -9,31 +9,42 @@ export const revalidate = 60
 
 async function loadHomeData() {
   const payload = await getPayload()
-  const [featured, classesList] = await Promise.all([
+  const [featured, classesList, allMacros] = await Promise.all([
     payload.find({
       collection: 'macros',
       where: { _status: { equals: 'published' } },
       sort: '-publishedAt',
       limit: 6,
-      depth: 2,
+      depth: 1,
     }),
     payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0 }),
+    payload.find({
+      collection: 'macros',
+      where: { _status: { equals: 'published' } },
+      limit: 1000,
+      depth: 0,
+    }),
   ])
 
+  // Build id -> slug lookup
+  const classIdToSlug = new Map<string | number, string>()
+  for (const c of classesList.docs as Class[]) {
+    classIdToSlug.set(c.id, c.slug)
+  }
+
+  // Count macros per class in memory (single query instead of 13 serial counts)
   const counts: Record<string, number> = {}
-  for (const slug of classSlugs) {
-    const cls = classesList.docs.find((c) => c.slug === slug)
-    if (!cls) {
-      counts[slug] = 0
-      continue
+  for (const slug of classSlugs) counts[slug] = 0
+
+  for (const macro of allMacros.docs) {
+    const macroClasses = (macro as any).classes
+    if (Array.isArray(macroClasses)) {
+      for (const clsRef of macroClasses) {
+        const clsId = typeof clsRef === 'object' ? clsRef.id : clsRef
+        const slug = classIdToSlug.get(clsId)
+        if (slug) counts[slug] = (counts[slug] ?? 0) + 1
+      }
     }
-    const r = await payload.count({
-      collection: 'macros',
-      where: {
-        and: [{ classes: { in: [cls.id] } }, { _status: { equals: 'published' } }],
-      },
-    })
-    counts[slug] = r.totalDocs ?? 0
   }
 
   return {

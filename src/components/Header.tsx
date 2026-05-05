@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { unstable_cache } from 'next/cache'
 import { getCurrentUser } from '../lib/auth'
 import { getPayload } from '../lib/payload'
 import { UserMenu } from './UserMenu'
@@ -11,9 +12,23 @@ const navItems = [
   { href: '/about', label: '关于' },
 ]
 
+const getUnreadCount = unstable_cache(
+  async (userId: string | number) => {
+    const payload = await getPayload()
+    const r = await payload.count({
+      collection: 'notifications',
+      where: { and: [{ recipient: { equals: userId } }, { read: { equals: false } }] },
+      overrideAccess: true,
+    })
+    return r.totalDocs ?? 0
+  },
+  ['unread-notifications'],
+  { revalidate: 30, tags: ['notifications'] }
+)
+
 export async function Header() {
   const user = await getCurrentUser()
-  const unread = user ? await countUnreadNotifications(user.id) : 0
+  const unread = user ? await getUnreadCount(user.id) : 0
 
   return (
     <header className="site-header">
@@ -57,18 +72,4 @@ export async function Header() {
       </div>
     </header>
   )
-}
-
-async function countUnreadNotifications(userId: string | number): Promise<number> {
-  try {
-    const payload = await getPayload()
-    const r = await payload.count({
-      collection: 'notifications',
-      where: { and: [{ recipient: { equals: userId } }, { read: { equals: false } }] },
-      overrideAccess: true,
-    })
-    return r.totalDocs ?? 0
-  } catch {
-    return 0
-  }
 }
