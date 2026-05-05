@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from '../../../lib/payload'
-import { getCurrentUser } from '../../../lib/auth'
-import { MacroCard } from '../../../components/MacroCard'
-import { MacroFilters, ClearFiltersLink } from '../../../components/MacroFilters'
+import { MacroGridClient } from '../../../components/MacroGridClient'
+import { MacroFilters } from '../../../components/MacroFilters'
 import type { Macro, Class } from '../../../payload-types'
 
 export const metadata: Metadata = {
@@ -12,8 +12,6 @@ export const metadata: Metadata = {
 }
 
 export const revalidate = 60
-
-type SearchParams = Promise<{ tier?: string; class?: string }>
 
 const getClasses = unstable_cache(
   async () => {
@@ -30,93 +28,41 @@ const getClasses = unstable_cache(
   { revalidate: 3600, tags: ['classes'] }
 )
 
-export default async function MacrosListPage({ searchParams }: { searchParams: SearchParams }) {
-  const sp = await searchParams
-  const tier = sp.tier === 'regular' || sp.tier === 'premium' ? sp.tier : 'all'
-  const classSlug = sp.class || null
-
-  const payload = await getPayload()
-  const user = await getCurrentUser()
-
-  const classes = await getClasses()
-
-  const where: Record<string, unknown> = { _status: { equals: 'published' } }
-  const conditions: Record<string, unknown>[] = [{ _status: { equals: 'published' } }]
-  if (tier !== 'all') conditions.push({ tier: { equals: tier } })
-  if (classSlug) {
-    const cls = classes.find((c) => c.slug === classSlug)
-    if (cls) conditions.push({ classes: { in: [cls.id] } })
-  }
-  ;(where as { and: typeof conditions }).and = conditions
-
-  const result = await payload.find({
-    collection: 'macros',
-    where: where as any,
-    sort: '-publishedAt',
-    limit: 100,
-    depth: 1,
-  })
-
-  const macros = result.docs as Macro[]
-
-  // Query user's exchanges to show ownership status on cards
-  let exchangedMacroIds = new Set<number | string>()
-  if (user) {
-    const exchanges = await payload.find({
-      collection: 'macro-exchanges',
-      where: {
-        and: [
-          { user: { equals: user.id } },
-          {
-            or: [
-              { expiresAt: { exists: false } },
-              { expiresAt: { greater_than_equal: new Date().toISOString() } },
-            ],
-          },
-        ],
-      },
+const getMacros = unstable_cache(
+  async () => {
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: 'macros',
+      where: { _status: { equals: 'published' } },
+      sort: '-publishedAt',
       limit: 200,
-      depth: 0,
-      overrideAccess: true,
+      depth: 1,
     })
-    exchanges.docs.forEach((e: any) => {
-      const macroId = typeof e.macro === 'object' ? e.macro.id : e.macro
-      if (macroId) exchangedMacroIds.add(macroId)
-    })
-  }
+    return result.docs as Macro[]
+  },
+  ['macros-list'],
+  { revalidate: 60, tags: ['macros'] }
+)
 
-  const tierLabel = tier === 'all' ? '全部' : tier === 'regular' ? '普通宏' : '高级宏'
+export default async function MacrosListPage() {
+  const [classes, macros] = await Promise.all([getClasses(), getMacros()])
 
   return (
     <div className="container-page page-list">
       <h1>宏 库</h1>
-      <p className="page-content">
-        共 {result.totalDocs} 个宏 · 当前筛选：{tierLabel}
-        {classSlug && ` · ${classes.find((c) => c.slug === classSlug)?.nameZh ?? classSlug}`}
-      </p>
 
-      <MacroFilters
-        classes={classes.map((c) => ({ slug: c.slug, nameZh: c.nameZh }))}
-        tier={tier}
-        classSlug={classSlug}
-      />
+      <Suspense fallback={<div style={{ minHeight: 120 }} />}>
+        <MacroFilters
+          classes={classes.map((c) => ({ slug: c.slug, nameZh: c.nameZh }))}
+        />
+      </Suspense>
 
-      {macros.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>当前条件下暂无宏包。</p>
-          <ClearFiltersLink />
-        </div>
-      ) : (
-        <div className="macro-grid">
-          {macros.map((m) => (
-            <MacroCard
-              key={m.id}
-              macro={m}
-              isExchanged={exchangedMacroIds.has(m.id)}
-            />
-          ))}
-        </div>
-      )}
+      <Suspense fallback={<div style={{ minHeight: 200 }} />}>
+        <MacroGridClient
+          macros={macros}
+          classes={classes.map((c) => ({ slug: c.slug, nameZh: c.nameZh, id: c.id }))}
+        />
+      </Suspense>
     </div>
   )
 }

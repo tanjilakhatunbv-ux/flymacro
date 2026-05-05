@@ -6,15 +6,18 @@ import { useTransition } from 'react'
 
 type MacroFiltersProps = {
   classes: { slug: string; nameZh: string }[]
-  tier: 'all' | 'regular' | 'premium'
-  classSlug: string | null
 }
 
-export function MacroFilters({ classes, tier, classSlug }: MacroFiltersProps) {
+export function MacroFilters({ classes }: MacroFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
   const [isPending, startTransition] = useTransition()
+
+  const tier = (params.get('tier') === 'regular' || params.get('tier') === 'premium')
+    ? params.get('tier')!
+    : 'all'
+  const classSlug = params.get('class') || null
 
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(params.toString())
