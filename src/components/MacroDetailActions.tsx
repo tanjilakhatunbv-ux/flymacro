@@ -18,7 +18,7 @@ type ExchangeStatus = {
 }
 
 const SESSION_CACHE_KEY = 'flymacro_session_v2'
-const EXCHANGE_CACHE_KEY = (macroId: number | string) => `flymacro_macro_${macroId}_v1`
+const EXCHANGE_CACHE_KEY = (macroId: number | string) => `flymacro_macro_${macroId}_v2`
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 function readSessionCache(): { user: { credits: number } | null; ts: number } | null {
@@ -39,6 +39,10 @@ function readExchangeCache(macroId: number | string): { status: ExchangeStatus; 
     const raw = sessionStorage.getItem(EXCHANGE_CACHE_KEY(macroId))
     if (!raw) return null
     const parsed = JSON.parse(raw)
+    // Reject old-format cache without user isolation (v1 caches)
+    if (!('cachedUserId' in parsed)) {
+      return null
+    }
     // Invalidate cache if it belongs to a different user
     const cachedSession = readSessionCache()
     const currentUserId = cachedSession?.user ? (cachedSession.user as any).id : null
