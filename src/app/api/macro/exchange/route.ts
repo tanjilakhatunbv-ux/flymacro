@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import type { User } from '../../../../payload-types'
 
@@ -6,22 +7,15 @@ export async function POST(req: Request) {
   console.log('[exchange] API called')
 
   try {
-    // Direct auth from request headers — more reliable in Route Handlers than nextHeaders()
-    const cookieHeader = req.headers.get('cookie')
-    console.log('[exchange] cookie header present:', !!cookieHeader)
-    if (cookieHeader) {
-      console.log('[exchange] has payload-token:', cookieHeader.includes('payload-token'))
-    }
-
-    const payload = await getPayload()
-    const auth = await payload.auth({ headers: req.headers })
-    const user = auth.user as User | undefined ?? null
+    const user = await getCurrentUser()
     console.log('[exchange] user:', user ? { id: user.id, email: user.email, credits: user.credits } : null)
 
     if (!user) {
       console.log('[exchange] ERROR: user not authenticated')
       return NextResponse.json({ error: 'unauthenticated', message: '请先登录。' }, { status: 401 })
     }
+
+    const payload = await getPayload()
 
     let body: { macroSlug?: string }
     try {

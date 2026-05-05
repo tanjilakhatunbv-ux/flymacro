@@ -17,6 +17,41 @@ type ExchangeStatus = {
   userCredits: number
 }
 
+const SESSION_CACHE_KEY = 'flymacro_session_v2'
+const EXCHANGE_CACHE_KEY = (macroId: number | string) => `flymacro_macro_${macroId}_v1`
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+function readSessionCache(): { user: { credits: number } | null; ts: number } | null {
+  if (typeof sessionStorage === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(SESSION_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return { user: parsed.user, ts: parsed.ts }
+  } catch {
+    return null
+  }
+}
+
+function readExchangeCache(macroId: number | string): { status: ExchangeStatus; ts: number } | null {
+  if (typeof sessionStorage === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(EXCHANGE_CACHE_KEY(macroId))
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return { status: parsed, ts: parsed.ts }
+  } catch {
+    return null
+  }
+}
+
+function writeExchangeCache(macroId: number | string, status: ExchangeStatus) {
+  if (typeof sessionStorage === 'undefined') return
+  try {
+    sessionStorage.setItem(EXCHANGE_CACHE_KEY(macroId), JSON.stringify({ ...status, ts: Date.now() }))
+  } catch {}
+}
+
 export function MacroDetailActions({
   macroId,
   macroSlug,
@@ -38,26 +73,69 @@ export function MacroDetailActions({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+
+    // 1. Try exchange cache first
+    const cachedExchange = readExchangeCache(macroId)
+    const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
+    if (exchangeValid) {
+      setStatus(cachedExchange.status)
+      setLoading(false)
+    }
+
+    // 2. Try session cache for optimistic UI if no exchange cache
+    if (!exchangeValid) {
+      const cachedSession = readSessionCache()
+      const sessionValid = cachedSession && Date.now() - cachedSession.ts < CACHE_TTL_MS
+      if (sessionValid && cachedSession.user) {
+        // Optimistically show logged-in state with cached credits
+        setStatus({
+          loggedIn: true,
+          isStaff: false,
+          exchange: null,
+          userCredits: (cachedSession.user.credits as number) ?? 0,
+        })
+        setLoading(false)
+      }
+    }
+
+    // 3. Always fetch fresh in background
     fetch(`/api/macro/exchange-status?macroId=${macroId}`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (d) setStatus(d)
+        if (cancelled) return
+        if (d && !d.error) {
+          const freshStatus: ExchangeStatus = {
+            loggedIn: d.loggedIn ?? false,
+            isStaff: d.isStaff ?? false,
+            exchange: d.exchange ?? null,
+            userCredits: d.userCredits ?? 0,
+          }
+          setStatus(freshStatus)
+          writeExchangeCache(macroId, freshStatus)
+        }
       })
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [macroId])
 
-  if (loading) {
-    return (
-      <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-        加载中…
-      </div>
-    )
+  // Default state: not logged in, no exchange
+  const effectiveStatus: ExchangeStatus = status ?? {
+    loggedIn: false,
+    isStaff: false,
+    exchange: null,
+    userCredits: 0,
   }
 
-  const hasExchanged = !!status?.exchange && !status.exchange.expired
-  const expired = !!status?.exchange?.expired
-  const canSeeCode = status?.isStaff || hasExchanged
+  const hasExchanged = !!effectiveStatus.exchange && !effectiveStatus.exchange.expired
+  const expired = !!effectiveStatus.exchange?.expired
+  const canSeeCode = effectiveStatus.isStaff || hasExchanged
 
   return (
     <>
@@ -66,10 +144,10 @@ export function MacroDetailActions({
           <span className="ownership-icon">✓</span>
           <span>
             你已兑换此宏
-            {status.exchange?.expiresAt
-              ? ` · 有效期至 ${status.exchange.expiresAt.slice(0, 10)}`
+            {effectiveStatus.exchange?.expiresAt
+              ? ` · 有效期至 ${effectiveStatus.exchange.expiresAt.slice(0, 10)}`
               : ' · 永久有效'}
-            {status.exchange?.autoRenew && ' · 自动续费已开启'}
+            {effectiveStatus.exchange?.autoRenew && ' · 自动续费已开启'}
           </span>
         </div>
       )}
@@ -87,12 +165,12 @@ export function MacroDetailActions({
             宏命令
           </h3>
           <CodeBlock code={codeContent} language="lua" />
-          {status?.exchange?.expiresAt && (
+          {effectiveStatus?.exchange?.expiresAt && (
             <p className="hint" style={{ color: expired ? 'var(--text-muted)' : 'var(--gold)' }}>
               {expired
                 ? '有效期已过期，请续费后继续使用。'
-                : `有效期至 ${status.exchange.expiresAt.slice(0, 10)}`}
-              {status.exchange.autoRenew && !expired && ' · 自动续费已开启'}
+                : `有效期至 ${effectiveStatus.exchange.expiresAt.slice(0, 10)}`}
+              {effectiveStatus.exchange.autoRenew && !expired && ' · 自动续费已开启'}
             </p>
           )}
           <p className="hint">复制全部内容，粘贴到游戏宏编辑器（按 ESC 输入 /macro），保存即可使用。</p>
@@ -112,11 +190,11 @@ export function MacroDetailActions({
               {autoRenewable && ' · 支持自动续费'}
             </p>
             <div className="model-actions" style={{ marginTop: '1rem' }}>
-              {status?.loggedIn ? (
+              {effectiveStatus?.loggedIn ? (
                 <ExchangeButton
                   macroSlug={macroSlug}
                   price={price}
-                  userCredits={status.userCredits}
+                  userCredits={effectiveStatus.userCredits}
                 />
               ) : (
                 <Link
@@ -135,7 +213,7 @@ export function MacroDetailActions({
         </div>
       )}
 
-      {canSeeCode && status?.exchange?.expiresAt && (
+      {canSeeCode && effectiveStatus?.exchange?.expiresAt && (
         <div className="purchase-area" style={{ marginTop: '1.5rem' }}>
           <h3>续费管理</h3>
           <div className="macro-price-card">
@@ -147,9 +225,9 @@ export function MacroDetailActions({
               <ExchangeButton
                 macroSlug={macroSlug}
                 price={price}
-                userCredits={status.userCredits}
+                userCredits={effectiveStatus.userCredits}
                 mode="renew"
-                exchangeId={status.exchange.id}
+                exchangeId={effectiveStatus.exchange.id}
               />
             </div>
           </div>

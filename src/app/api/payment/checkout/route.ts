@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import type { User } from '../../../../payload-types'
 import { dodoFetch, isDodoConfigured, type DodoCheckoutSession } from '../../../../lib/dodo'
@@ -11,15 +12,15 @@ export async function POST(req: Request) {
     )
   }
 
-  const payload = await getPayload()
-  const auth = await payload.auth({ headers: req.headers })
-  const user = auth.user as User | undefined ?? null
+  const user = await getCurrentUser()
   if (!user) {
     return NextResponse.json(
       { error: 'unauthenticated', message: '请先登录。' },
       { status: 401 },
     )
   }
+
+  const payload = await getPayload()
 
   let body: { packageId?: number | string }
   try {
