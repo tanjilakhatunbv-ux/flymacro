@@ -1,8 +1,5 @@
 import Link from 'next/link'
-import { unstable_cache } from 'next/cache'
-import { getCurrentUser } from '../lib/auth'
-import { getPayload } from '../lib/payload'
-import { UserMenu } from './UserMenu'
+import { HeaderAuth } from './HeaderAuth'
 
 const navItems = [
   { href: '/', label: '首页' },
@@ -12,24 +9,7 @@ const navItems = [
   { href: '/about', label: '关于' },
 ]
 
-const getUnreadCount = unstable_cache(
-  async (userId: string | number) => {
-    const payload = await getPayload()
-    const r = await payload.count({
-      collection: 'notifications',
-      where: { and: [{ recipient: { equals: userId } }, { read: { equals: false } }] },
-      overrideAccess: true,
-    })
-    return r.totalDocs ?? 0
-  },
-  ['unread-notifications'],
-  { revalidate: 30, tags: ['notifications'] }
-)
-
-export async function Header() {
-  const user = await getCurrentUser()
-  const unread = user ? await getUnreadCount(user.id) : 0
-
+export function Header() {
   return (
     <header className="site-header">
       <div className="container-page">
@@ -42,32 +22,7 @@ export async function Header() {
               {item.label}
             </Link>
           ))}
-          {user ? (
-            <UserMenu
-              email={user.email}
-              name={user.name ?? null}
-              role={user.role ?? 'user'}
-              unread={unread}
-              credits={(user.credits as number) ?? 0}
-            />
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="btn"
-                style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}
-              >
-                登录
-              </Link>
-              <Link
-                href="/register"
-                className="btn btn-primary"
-                style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}
-              >
-                注册
-              </Link>
-            </>
-          )}
+          <HeaderAuth />
         </nav>
       </div>
     </header>
