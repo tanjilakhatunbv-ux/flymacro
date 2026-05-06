@@ -24,8 +24,8 @@ const StatCard: React.FC<{
       alignItems: 'center',
       gap: 16,
       padding: '20px 24px',
-      background: '#1e293b',
-      border: '1px solid #334155',
+      background: '#ffffff',
+      border: '1px solid #e2e8f0',
       borderRadius: 12,
       textDecoration: 'none',
       transition: 'all 0.2s ease',
@@ -37,7 +37,7 @@ const StatCard: React.FC<{
       e.currentTarget.style.boxShadow = `0 8px 30px ${color}20`
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.borderColor = '#334155'
+      e.currentTarget.style.borderColor = '#e2e8f0'
       e.currentTarget.style.transform = 'translateY(0)'
       e.currentTarget.style.boxShadow = 'none'
     }}
@@ -62,7 +62,7 @@ const StatCard: React.FC<{
         style={{
           fontSize: 28,
           fontWeight: 700,
-          color: '#f8fafc',
+          color: '#0f172a',
           lineHeight: 1.2,
           fontFamily: 'system-ui, -apple-system, sans-serif',
         }}
@@ -72,7 +72,7 @@ const StatCard: React.FC<{
       <div
         style={{
           fontSize: 13,
-          color: '#94a3b8',
+          color: '#64748b',
           marginTop: 4,
           fontWeight: 500,
           letterSpacing: '0.02em',
@@ -94,8 +94,8 @@ const QuickLink: React.FC<{
     style={{
       display: 'block',
       padding: '16px 20px',
-      background: '#1e293b',
-      border: '1px solid #334155',
+      background: '#ffffff',
+      border: '1px solid #e2e8f0',
       borderRadius: 10,
       textDecoration: 'none',
       transition: 'all 0.15s ease',
@@ -103,18 +103,18 @@ const QuickLink: React.FC<{
     }}
     onMouseEnter={(e) => {
       e.currentTarget.style.borderColor = '#6366f1'
-      e.currentTarget.style.background = '#252f42'
+      e.currentTarget.style.background = '#f0f9ff'
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.borderColor = '#334155'
-      e.currentTarget.style.background = '#1e293b'
+      e.currentTarget.style.borderColor = '#e2e8f0'
+      e.currentTarget.style.background = '#ffffff'
     }}
   >
     <div
       style={{
         fontSize: 14,
         fontWeight: 600,
-        color: '#f8fafc',
+        color: '#0f172a',
         marginBottom: 4,
       }}
     >
@@ -194,7 +194,7 @@ export function Dashboard() {
           style={{
             fontSize: 28,
             fontWeight: 700,
-            color: '#f8fafc',
+            color: '#0f172a',
             margin: 0,
             letterSpacing: '-0.02em',
           }}
@@ -285,7 +285,7 @@ export function Dashboard() {
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: '#94a3b8',
+            color: '#64748b',
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
             marginBottom: 16,

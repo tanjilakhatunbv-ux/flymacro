@@ -33,7 +33,7 @@ function SubmitButton() {
         opacity: pending ? 0.6 : 1,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(212,175,55,0.1)'
+        e.currentTarget.style.background = 'rgba(14,165,233,0.1)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = 'transparent'
