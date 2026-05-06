@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" role="img" aria-label="卷轴横幅">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none" role="img" aria-label="科技横幅">
   <defs>
     <linearGradient id="banner" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#4a1f12"/>
-      <stop offset="50%" stop-color="#7a2c14"/>
-      <stop offset="100%" stop-color="#3a1208"/>
+      <stop offset="0%" stop-color="#0c4a6e"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#0284c7"/>
     </linearGradient>
     <linearGradient id="trim" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#e9c66a"/>
-      <stop offset="50%" stop-color="#c9962f"/>
-      <stop offset="100%" stop-color="#8e6418"/>
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
     </linearGradient>
   </defs>
   <!-- Side caps -->
-  <path d="M10 22 L24 22 L18 40 L24 58 L10 58 L4 40 Z" fill="url(#trim)" stroke="#3a2a14" stroke-width="0.6"/>
-  <path d="M256 22 L270 22 L276 40 L270 58 L256 58 L262 40 Z" fill="url(#trim)" stroke="#3a2a14" stroke-width="0.6"/>
+  <path d="M10 22 L24 22 L18 40 L24 58 L10 58 L4 40 Z" fill="url(#trim)" stroke="#0284c7" stroke-width="0.6"/>
+  <path d="M256 22 L270 22 L276 40 L270 58 L256 58 L262 40 Z" fill="url(#trim)" stroke="#0284c7" stroke-width="0.6"/>
   <!-- Main banner -->
-  <path d="M22 22 L258 22 L252 40 L258 58 L22 58 L28 40 Z" fill="url(#banner)" stroke="#3a2a14" stroke-width="0.8"/>
+  <path d="M22 22 L258 22 L252 40 L258 58 L22 58 L28 40 Z" fill="url(#banner)" stroke="#0284c7" stroke-width="0.8"/>
   <!-- Inner highlight -->
-  <path d="M22 22 L258 22 L256 28 L24 28 Z" fill="#e9c66a" fill-opacity="0.18"/>
+  <path d="M22 22 L258 22 L256 28 L24 28 Z" fill="#7dd3fc" fill-opacity="0.18"/>
   <!-- Top and bottom trim -->
   <path d="M22 22 L258 22 M22 58 L258 58" stroke="url(#trim)" stroke-width="2"/>
   <!-- Stitch dots -->
-  <g fill="#e9c66a" opacity="0.6">
+  <g fill="#7dd3fc" opacity="0.6">
     <circle cx="40" cy="25" r="0.8"/>
     <circle cx="80" cy="25" r="0.8"/>
     <circle cx="120" cy="25" r="0.8"/>

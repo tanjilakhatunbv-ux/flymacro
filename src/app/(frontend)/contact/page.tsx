@@ -53,7 +53,7 @@ export default function ContactPage() {
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
                   扫码添加客服微信。
                 </p>
-                <div style={{ width: 120, height: 120, background: 'var(--surface)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ width: 120, height: 120, background: 'var(--bg-surface)', borderRadius: 3, overflow: 'hidden' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={wechatQrUrl} alt="微信客服二维码" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
