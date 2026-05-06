@@ -14,26 +14,17 @@ export async function markAllNotificationsReadAction(
   const payload = await getPayload()
 
   try {
-    const r = await payload.find({
+    await payload.update({
       collection: 'notifications',
       where: {
         recipient: { equals: user.id },
         read: { equals: false },
       },
-      limit: 100,
+      data: { read: true, readAt: new Date().toISOString() },
+      limit: 1000,
       depth: 0,
       overrideAccess: true,
     })
-
-    const now = new Date().toISOString()
-    for (const doc of r.docs) {
-      await payload.update({
-        collection: 'notifications',
-        id: doc.id,
-        data: { read: true, readAt: now },
-        overrideAccess: true,
-      })
-    }
 
     revalidatePath('/account/notifications')
     revalidatePath('/account')
@@ -56,22 +47,21 @@ export async function markNotificationReadAction(
   const payload = await getPayload()
 
   try {
-    const existing = await payload.findByID({
+    const result = await payload.update({
       collection: 'notifications',
-      id,
-      overrideAccess: true,
-      depth: 0,
-    })
-    if (!existing) return { error: '通知不存在' }
-    const ownerId = typeof existing.recipient === 'object' ? existing.recipient?.id : existing.recipient
-    if (String(ownerId) !== String(user.id)) return { error: '无权操作' }
-
-    await payload.update({
-      collection: 'notifications',
-      id,
+      where: {
+        and: [
+          { id: { equals: id } },
+          { recipient: { equals: user.id } },
+        ],
+      },
       data: { read: true, readAt: new Date().toISOString() },
+      limit: 1,
+      depth: 0,
       overrideAccess: true,
     })
+    if (!result.docs.length) return { error: '通知不存在或无权操作' }
+
     revalidatePath('/account/notifications')
     revalidatePath('/account')
     return {}
