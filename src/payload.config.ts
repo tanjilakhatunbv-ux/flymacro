@@ -24,6 +24,7 @@ import { CreditTransactions } from './collections/CreditTransactions'
 import { Tickets } from './collections/Tickets'
 import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
+import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -44,9 +45,24 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: ' — FlyMacro 后台',
+      description: '魔兽世界宏库管理后台',
       icons: [],
     },
-    components: {},
+    components: {
+      graphics: {
+        Logo: '@/components/admin/Logo#Logo',
+        Icon: '@/components/admin/Logo#Icon',
+      },
+      views: {
+        dashboard: {
+          Component: '@/components/admin/Dashboard#Dashboard',
+        },
+      },
+    },
+    dateFormat: 'yyyy-MM-dd HH:mm',
+    timezones: {
+      defaultTimezone: 'Asia/Shanghai',
+    },
   },
   i18n: {
     supportedLanguages: { zh },
@@ -70,6 +86,7 @@ export default buildConfig({
     TicketMessages,
     Notifications,
   ],
+  globals: [SiteSettings],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'CHANGE_ME_IN_ENV',
   typescript: {

@@ -7,6 +7,8 @@ export const Tickets: CollectionConfig = {
     useAsTitle: 'subject',
     defaultColumns: ['subject', 'user', 'status', 'priority', 'assignee', 'updatedAt'],
     group: '客服',
+    description: '用户提交的客服工单。员工可指派、回复、变更优先级和状态。',
+    listSearchableFields: ['subject'],
   },
   access: {
     read: isOwnerOrStaff,

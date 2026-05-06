@@ -12,8 +12,13 @@ async function loadHomeData() {
   const [featured, classesList, allMacros] = await Promise.all([
     payload.find({
       collection: 'macros',
-      where: { _status: { equals: 'published' } },
-      sort: '-publishedAt',
+      where: {
+        and: [
+          { _status: { equals: 'published' } },
+          { isFeatured: { equals: true } },
+        ],
+      },
+      sort: ['featuredOrder', '-publishedAt'],
       limit: 6,
       depth: 1,
     }),

@@ -115,8 +115,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -185,6 +189,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * 媒体库：图片、视频、PDF。已建预览图、卡片、封面、社交分享四个尺寸。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -222,6 +228,14 @@ export interface Media {
       filename?: string | null;
     };
     hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -278,6 +292,8 @@ export interface Version {
   createdAt: string;
 }
 /**
+ * 魔兽世界宏代码商品。普通宏建议 5 积分、高级宏 50 积分；代码字段对未兑换用户自动隐藏。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "macros".
  */
@@ -285,28 +301,54 @@ export interface Macro {
   id: number;
   title: string;
   /**
-   * 留空将根据名称自动生成
+   * 留空将根据名称自动生成，影响前台 URL
    */
   slug: string;
   /**
    * 普通宏建议 5 积分，高级宏建议 50 积分
    */
   tier: 'regular' | 'premium';
-  price: number;
   /**
-   * 0 = 永久有效
+   * 0 = 免费宏（用户无需兑换即可查看代码）
    */
-  durationDays: number;
+  price?: number | null;
+  /**
+   * 0 = 永久有效。仅付费宏需要
+   */
+  durationDays?: number | null;
+  /**
+   * 仅在付费且有期限时有意义
+   */
   autoRenewable?: boolean | null;
-  summary?: string | null;
+  /**
+   * 勾选后在首页"精选宏包"区显示
+   */
+  isFeatured?: boolean | null;
+  /**
+   * 数值越小越靠前
+   */
+  featuredOrder?: number | null;
+  /**
+   * 一句话描述用途，会在列表卡片、SEO meta、社交分享中使用
+   */
+  summary: string;
+  /**
+   * 建议尺寸 1600x900，会自动生成卡片/封面/OG 图多个尺寸
+   */
   previewImg?: (number | null) | Media;
+  /**
+   * 支持 YouTube / Bilibili / 直链 MP4，留空则不显示
+   */
   demoVideoUrl?: string | null;
   classes?: (number | Class)[] | null;
   specs?: (number | Spec)[] | null;
   versions?: (number | Version)[] | null;
+  /**
+   * 便于前台筛选和聚合，例如：单体输出、群体输出、保命、控场、自我治疗
+   */
   tags?:
     | {
-        value?: string | null;
+        value: string;
         id?: string | null;
       }[]
     | null;
@@ -326,15 +368,34 @@ export interface Macro {
     [k: string]: unknown;
   } | null;
   /**
-   * 此字段对未兑换用户将自动返回 null
+   * 此字段对未兑换用户自动返回 null。新建草稿时也会被隐藏，正常发布后由购买者自动可见。
    */
   codeContent?: string | null;
+  /**
+   * 搜索引擎与社交分享时使用，留空则回落到名称/简介/预览图
+   */
+  seo?: {
+    /**
+     * 默认使用宏名称 + 站名
+     */
+    seoTitle?: string | null;
+    /**
+     * 默认使用简介
+     */
+    seoDescription?: string | null;
+    /**
+     * 建议 1200x630，留空则使用预览图
+     */
+    ogImage?: (number | null) | Media;
+  };
   publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * 新手教程与使用指南。weight 越小越靠前。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "guides".
  */
@@ -369,6 +430,8 @@ export interface Guide {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * 站内文章：公告、博客、更新日志。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".
  */
@@ -404,6 +467,8 @@ export interface Article {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * 独立页面（关于、联系、隐私政策等）。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -432,6 +497,8 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * 积分充值档次配置。可设置原价、优惠标签和角标，用于前台营销展示。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-packages".
  */
@@ -443,9 +510,18 @@ export interface CreditPackage {
   label: string;
   amount: number;
   /**
+   * 划线显示的原价，需大于实际售价才有效果
+   */
+  originalAmount?: number | null;
+  /**
    * 例如充 100 元送 10 积分，则填 110
    */
   creditsGranted: number;
+  /**
+   * 如：限时8折、首充特惠、VIP专享
+   */
+  discountLabel?: string | null;
+  badge?: ('none' | 'hot' | 'recommended' | 'new') | null;
   /**
    * 在 DodoPayments 后台创建的对应价格产品 ID
    */
@@ -457,6 +533,8 @@ export interface CreditPackage {
   createdAt: string;
 }
 /**
+ * 充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-orders".
  */
@@ -464,8 +542,14 @@ export interface CreditOrder {
   id: number;
   orderNumber: string;
   user: number | User;
+  /**
+   * 财务数据不可修改
+   */
   amount: number;
   currency: 'CNY' | 'USD';
+  /**
+   * 财务数据不可修改
+   */
   creditsGranted: number;
   status: 'pending' | 'paid' | 'failed';
   /**
@@ -474,7 +558,7 @@ export interface CreditOrder {
   dodoCheckoutId?: string | null;
   paidAt?: string | null;
   /**
-   * 调试用
+   * 调试用，请勿手动修改
    */
   meta?:
     | {
@@ -489,6 +573,8 @@ export interface CreditOrder {
   createdAt: string;
 }
 /**
+ * 宏兑换记录。每条记录表示一个用户用积分解锁了某个宏。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "macro-exchanges".
  */
@@ -496,6 +582,9 @@ export interface MacroExchange {
   id: number;
   user: number | User;
   macro: number | Macro;
+  /**
+   * 兑换后不可修改，避免破坏对账
+   */
   creditsSpent: number;
   grantedAt?: string | null;
   /**
@@ -503,16 +592,25 @@ export interface MacroExchange {
    */
   expiresAt?: string | null;
   autoRenew?: boolean | null;
+  /**
+   * 设置后该兑换记录将不再授予访问权限
+   */
   revokedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * 积分流水。仅由系统程序化创建，所有字段只读，用作对账依据。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-transactions".
  */
 export interface CreditTransaction {
   id: number;
+  /**
+   * 系统自动生成的列表显示标题
+   */
+  label?: string | null;
   user: number | User;
   /**
    * 正数=增加，负数=减少
@@ -527,6 +625,8 @@ export interface CreditTransaction {
   createdAt: string;
 }
 /**
+ * 用户提交的客服工单。员工可指派、回复、变更优先级和状态。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tickets".
  */
@@ -545,11 +645,17 @@ export interface Ticket {
   createdAt: string;
 }
 /**
+ * 工单消息。每条消息可标记为内部备注（用户不可见）。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ticket-messages".
  */
 export interface TicketMessage {
   id: number;
+  /**
+   * 系统自动生成的列表显示标题，方便客服快速识别消息内容
+   */
+  label?: string | null;
   ticket: number | Ticket;
   sender: number | User;
   senderType: 'user' | 'staff';
@@ -575,13 +681,15 @@ export interface TicketMessage {
       }[]
     | null;
   /**
-   * 只有客服之间可见
+   * ⚠️ 警告：勾选后该消息只有客服之间可见，绝不会发送给提交工单的用户。请仔细确认！
    */
   isInternalNote?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * 站内通知。可按系统、订单、工单、促销分类。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notifications".
  */
@@ -812,6 +920,16 @@ export interface MediaSelect<T extends boolean = true> {
               filesize?: T;
               filename?: T;
             };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
 }
 /**
@@ -865,6 +983,8 @@ export interface MacrosSelect<T extends boolean = true> {
   price?: T;
   durationDays?: T;
   autoRenewable?: T;
+  isFeatured?: T;
+  featuredOrder?: T;
   summary?: T;
   previewImg?: T;
   demoVideoUrl?: T;
@@ -879,6 +999,13 @@ export interface MacrosSelect<T extends boolean = true> {
       };
   body?: T;
   codeContent?: T;
+  seo?:
+    | T
+    | {
+        seoTitle?: T;
+        seoDescription?: T;
+        ogImage?: T;
+      };
   publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -937,7 +1064,10 @@ export interface PagesSelect<T extends boolean = true> {
 export interface CreditPackagesSelect<T extends boolean = true> {
   label?: T;
   amount?: T;
+  originalAmount?: T;
   creditsGranted?: T;
+  discountLabel?: T;
+  badge?: T;
   dodoProductId?: T;
   currency?: T;
   enabled?: T;
@@ -982,6 +1112,7 @@ export interface MacroExchangesSelect<T extends boolean = true> {
  * via the `definition` "credit-transactions_select".
  */
 export interface CreditTransactionsSelect<T extends boolean = true> {
+  label?: T;
   user?: T;
   amount?: T;
   balanceAfter?: T;
@@ -1014,6 +1145,7 @@ export interface TicketsSelect<T extends boolean = true> {
  * via the `definition` "ticket-messages_select".
  */
 export interface TicketMessagesSelect<T extends boolean = true> {
+  label?: T;
   ticket?: T;
   sender?: T;
   senderType?: T;
@@ -1082,6 +1214,70 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * 全局运营配置：充值页面文案、活动横幅、充值须知等。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * 控制前台 /credits 页面的标题、副标题、活动横幅与充值须知。
+   */
+  creditPage?: {
+    title?: string | null;
+    subtitle?: string | null;
+    /**
+     * 开启后在页面顶部显示活动横幅条
+     */
+    promoEnabled?: boolean | null;
+    /**
+     * 例如：新用户首充双倍积分、限时全场8折
+     */
+    promoBanner?: string | null;
+    noticeEnabled?: boolean | null;
+    /**
+     * 留空则使用系统默认充值须知
+     */
+    notice?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  creditPage?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        promoEnabled?: T;
+        promoBanner?: T;
+        noticeEnabled?: T;
+        notice?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

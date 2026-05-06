@@ -8,6 +8,12 @@ export const Articles: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'pinned', 'publishedAt', '_status'],
     group: '内容',
+    description: '站内文章：公告、博客、更新日志。',
+    listSearchableFields: ['title', 'slug', 'summary'],
+    preview: (doc) => {
+      const slug = (doc as { slug?: string })?.slug
+      return slug ? `/blog/${slug}` : null
+    },
   },
   access: {
     read: publishedOrStaff,

@@ -14,9 +14,27 @@ function previewUrl(macro: Macro): string | null {
   return card ?? img.url ?? null
 }
 
+function extractTagValues(macro: Macro): string[] {
+  const arr = (macro as unknown as { tags?: Array<{ value?: string | null } | null> | null }).tags
+  if (!Array.isArray(arr)) return []
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of arr) {
+    const v = item?.value?.trim()
+    if (v && !seen.has(v)) {
+      seen.add(v)
+      out.push(v)
+    }
+  }
+  return out
+}
+
 export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: boolean }) {
   const img = previewUrl(macro)
   const durationText = (macro.durationDays ?? 0) === 0 ? '永久' : `${macro.durationDays}天`
+  const tagValues = extractTagValues(macro)
+  const visibleTags = tagValues.slice(0, 3)
+  const extraTagCount = Math.max(0, tagValues.length - visibleTags.length)
 
   return (
     <article className="macro-card" data-tier={macro.tier} data-exchanged={isExchanged}>
@@ -55,6 +73,20 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
           <Link href={`/macros/${macro.slug}`}>{macro.title}</Link>
         </h3>
         {macro.summary && <p className="summary">{macro.summary}</p>}
+        {visibleTags.length > 0 && (
+          <div className="tag-chip-list" aria-label="标签">
+            {visibleTags.map((t) => (
+              <Link
+                key={t}
+                href={`/macros?tag=${encodeURIComponent(t)}`}
+                className="tag-chip"
+              >
+                #{t}
+              </Link>
+            ))}
+            {extraTagCount > 0 && <span className="tag-chip-more">+{extraTagCount}</span>}
+          </div>
+        )}
         <div className="card-footer">
           <span className="card-price">{macro.price ?? 0} 积分</span>
           <span className="card-duration">{durationText}</span>

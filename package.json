@@ -13,6 +13,7 @@
     "payload": "node --env-file=.env node_modules/payload/bin.js",
     "seed": "tsx --env-file=.env src/scripts/seed.ts",
     "seed:demos": "tsx --env-file=.env src/scripts/seed-demos.ts",
+    "seed:full": "tsx --env-file=.env src/scripts/seed-full-demos.ts",
     "migrate:content": "tsx --env-file=.env src/scripts/migrate-content.ts"
   },
   "dependencies": {

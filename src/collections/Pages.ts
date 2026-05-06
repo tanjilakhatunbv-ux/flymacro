@@ -8,6 +8,12 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', '_status'],
     group: '内容',
+    description: '独立页面（关于、联系、隐私政策等）。',
+    listSearchableFields: ['title', 'slug'],
+    preview: (doc) => {
+      const slug = (doc as { slug?: string })?.slug
+      return slug ? `/${slug}` : null
+    },
   },
   access: {
     read: publishedOrStaff,

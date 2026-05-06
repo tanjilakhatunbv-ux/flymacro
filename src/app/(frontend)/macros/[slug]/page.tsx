@@ -7,6 +7,8 @@ import { getPayload } from '../../../../lib/payload'
 import { ClassTag, SpecTag, VersionTag, TierTag } from '../../../../components/Tags'
 import { RichText } from '../../../../components/RichText'
 import { MacroDetailActions } from '../../../../components/MacroDetailActions'
+import { VideoEmbed } from '../../../../components/VideoEmbed'
+import { MacroJsonLd } from '../../../../components/MacroJsonLd'
 import type { Macro, Class, Spec, Version, Media } from '../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
@@ -21,6 +23,31 @@ function previewUrl(macro: Macro): string | null {
   const img = macro.previewImg
   if (!isMedia(img)) return null
   return img.sizes?.hero?.url ?? img.url ?? null
+}
+
+function extractTagValues(macro: Macro): string[] {
+  const arr = (macro as unknown as { tags?: Array<{ value?: string | null } | null> | null }).tags
+  if (!Array.isArray(arr)) return []
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of arr) {
+    const v = item?.value?.trim()
+    if (v && !seen.has(v)) {
+      seen.add(v)
+      out.push(v)
+    }
+  }
+  return out
+}
+
+function pickSeoOgUrl(macro: Macro): string | null {
+  const seo = (macro as unknown as { seo?: { ogImage?: unknown } }).seo
+  const ogImage = isMedia(seo?.ogImage) ? seo!.ogImage : null
+  if (ogImage) return ogImage.sizes?.og?.url ?? ogImage.url ?? null
+  if (isMedia(macro.previewImg)) {
+    return macro.previewImg.sizes?.og?.url ?? macro.previewImg.sizes?.hero?.url ?? macro.previewImg.url ?? null
+  }
+  return null
 }
 
 const findMacroBySlugCached = unstable_cache(
@@ -41,7 +68,7 @@ const findMacroBySlugCached = unstable_cache(
     }
     return macro
   },
-  ['macro-by-slug-v2'],
+  ['macro-by-slug-v3'],
   { revalidate: 3600, tags: ['macros'] }
 )
 
@@ -64,9 +91,30 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params
   const macro = await findMacroBySlugCached(slug)
   if (!macro) return { title: '宏不存在 — FlyMacro' }
+
+  const seo = (macro as unknown as { seo?: { seoTitle?: string | null; seoDescription?: string | null } }).seo
+  const title = seo?.seoTitle?.trim() || `${macro.title} — FlyMacro`
+  const description = seo?.seoDescription?.trim() || macro.summary || undefined
+  const ogUrl = pickSeoOgUrl(macro)
+  const ogImages = ogUrl ? [{ url: ogUrl }] : []
+
   return {
-    title: `${macro.title} — FlyMacro`,
-    description: macro.summary ?? undefined,
+    title,
+    description,
+    alternates: { canonical: `/macros/${macro.slug}` },
+    openGraph: {
+      type: 'article',
+      title,
+      description,
+      url: `/macros/${macro.slug}`,
+      images: ogImages,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ogUrl ? [ogUrl] : [],
+    },
   }
 }
 
@@ -80,9 +128,12 @@ export default async function MacroDetailPage({
   if (!macro) notFound()
 
   const img = previewUrl(macro)
+  const tagValues = extractTagValues(macro)
+  const demoVideoUrl = (macro as unknown as { demoVideoUrl?: string | null }).demoVideoUrl ?? null
 
   return (
     <div className="container-page page-single">
+      <MacroJsonLd macro={macro} />
       <article className="macro-detail" data-tier={macro.tier}>
         <header className="detail-header">
           <h1>{macro.title}</h1>
@@ -98,6 +149,19 @@ export default async function MacroDetailPage({
             ))}
             <TierTag tier={macro.tier ?? 'regular'} />
           </div>
+          {tagValues.length > 0 && (
+            <div className="tag-chip-list" aria-label="标签">
+              {tagValues.map((t) => (
+                <Link
+                  key={t}
+                  href={`/macros?tag=${encodeURIComponent(t)}`}
+                  className="tag-chip"
+                >
+                  #{t}
+                </Link>
+              ))}
+            </div>
+          )}
         </header>
 
         {img && (
@@ -113,6 +177,7 @@ export default async function MacroDetailPage({
             </p>
           )}
           <RichText content={macro.body} />
+          <VideoEmbed url={demoVideoUrl} />
         </div>
 
         <MacroDetailActions

@@ -8,6 +8,12 @@ export const Guides: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'weight', 'publishedAt', '_status'],
     group: '内容',
+    description: '新手教程与使用指南。weight 越小越靠前。',
+    listSearchableFields: ['title', 'slug', 'summary'],
+    preview: (doc) => {
+      const slug = (doc as { slug?: string })?.slug
+      return slug ? `/guide/${slug}` : null
+    },
   },
   access: {
     read: publishedOrStaff,

@@ -51,43 +51,70 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
   return (
     <>
       <div className="models">
-        {packages.map((pkg) => (
-          <div key={pkg.id} className="model-card">
-            <div className="model-header">
-              <h4>{pkg.label}</h4>
-              <span className="model-price">¥{pkg.amount}</span>
-            </div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--gold-bright)', marginBottom: '0.75rem' }}>
-              到账 <strong>{pkg.creditsGranted}</strong> 积分
-              {pkg.creditsGranted > pkg.amount && (
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginLeft: 6 }}>
-                  （赠 {pkg.creditsGranted - pkg.amount} 积分）
-                </span>
+        {packages.map((pkg) => {
+          const original = (pkg as any).originalAmount as number | undefined
+          const discount = (pkg as any).discountLabel as string | undefined
+          const badge = (pkg as any).badge as string | undefined
+          const hasOriginal = original && original > (pkg.amount ?? 0)
+
+          return (
+            <div key={pkg.id} className={`model-card ${badge && badge !== 'none' ? `badge-${badge}` : ''}`}>
+              {badge && badge !== 'none' && (
+                <span className="package-badge">{badgeLabel(badge)}</span>
               )}
-            </div>
-            <div className="model-actions">
-              {loggedIn ? (
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ width: '100%' }}
-                  onClick={() => handleCheckout(pkg)}
-                  disabled={isPending && pendingId === pkg.id}
-                >
-                  {isPending && pendingId === pkg.id ? '准备支付…' : '立即充值'}
-                </button>
-              ) : (
-                <Link href="/login?return=/account/credits" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }}>
-                  登录后充值
-                </Link>
+              <div className="model-header">
+                <h4>{pkg.label}</h4>
+                <div className="price-row">
+                  {hasOriginal && (
+                    <span className="original-price">¥{original}</span>
+                  )}
+                  <span className="model-price">¥{pkg.amount}</span>
+                </div>
+              </div>
+              <div className="credit-granted-row">
+                到账 <strong>{pkg.creditsGranted}</strong> 积分
+                {pkg.creditsGranted > (pkg.amount ?? 0) && (
+                  <span className="credit-bonus">
+                    （赠 {pkg.creditsGranted - (pkg.amount ?? 0)} 积分）
+                  </span>
+                )}
+              </div>
+              {discount && (
+                <div className="discount-label">{discount}</div>
               )}
+              <div className="model-actions">
+                {loggedIn ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ width: '100%' }}
+                    onClick={() => handleCheckout(pkg)}
+                    disabled={isPending && pendingId === pkg.id}
+                  >
+                    {isPending && pendingId === pkg.id ? '准备支付…' : '立即充值'}
+                  </button>
+                ) : (
+                  <Link href="/login?return=/account/credits" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }}>
+                    登录后充值
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
       {error && (
         <p className="auth-field-err" style={{ marginTop: '1rem', textAlign: 'center' }}>{error}</p>
       )}
     </>
   )
+}
+
+function badgeLabel(badge: string): string {
+  switch (badge) {
+    case 'hot': return '热卖'
+    case 'recommended': return '推荐'
+    case 'new': return '新品'
+    default: return ''
+  }
 }

@@ -7,6 +7,8 @@ export const Notifications: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'recipient', 'category', 'read', 'createdAt'],
     group: '客服',
+    description: '站内通知。可按系统、订单、工单、促销分类。',
+    listSearchableFields: ['title', 'body'],
   },
   access: {
     read: ({ req: { user } }) => {
