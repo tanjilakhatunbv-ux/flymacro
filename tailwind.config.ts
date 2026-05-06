@@ -9,14 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        gold: {
-          DEFAULT: '#d4af37',
-          light: '#f5d76e',
-          dark: '#a88b2b',
+        primary: {
+          DEFAULT: '#0ea5e9',
+          light: '#38bdf8',
+          dark: '#0284c7',
         },
-        parchment: {
-          DEFAULT: '#f4e4bc',
-          dark: '#e8d4a0',
+        surface: {
+          DEFAULT: '#ffffff',
+          muted: '#f8fafc',
+          deep: '#f0f4f8',
         },
         quality: {
           poor: '#9d9d9d',
@@ -43,9 +44,9 @@ const config: Config = {
           evoker: '#33937F',
         },
         bg: {
-          dark: '#0f0e0d',
-          card: '#1a1817',
-          elevated: '#252220',
+          dark: '#f0f4f8',
+          card: '#ffffff',
+          elevated: '#f8fafc',
         },
       },
       fontFamily: {
