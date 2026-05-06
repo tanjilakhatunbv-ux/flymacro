@@ -516,7 +516,7 @@ main { min-height: calc(100vh - 200px); }
   border: 1px solid var(--gold-dim);
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(94, 74, 35, 0.4) 0%, transparent 70%),
+    radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%),
     var(--bg-deep);
   color: var(--gold-bright);
   filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.18));
@@ -950,7 +950,7 @@ main { min-height: calc(100vh - 200px); }
 }
 
 .filter-btn.active {
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.15) 0%, rgba(94, 74, 35, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.15) 0%, rgba(14, 165, 233, 0.15) 100%);
   border-color: var(--gold);
   color: var(--gold-bright);
   text-shadow: 0 0 8px rgba(14, 165, 233, 0.25);
