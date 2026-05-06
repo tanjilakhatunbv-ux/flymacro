@@ -186,6 +186,122 @@ async function main() {
 
   await ensureSuperAdmin(payload)
 
+  await upsertBySlug(payload, 'guides', 'how-to-use-macro', {
+    title: '宏命令使用指南',
+    slug: 'how-to-use-macro',
+    summary: '从复制到粘贴，手把手教你在魔兽世界里使用兑换到的宏命令。',
+    weight: 1,
+    publishedAt: new Date().toISOString(),
+    body: {
+      root: {
+        children: [
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '1. 打开宏编辑器', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'heading', version: 1, tag: 'h2'
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: '在游戏中按下 ', type: 'text', version: 1 },
+              { detail: 0, format: 1, mode: 'normal', style: '', text: 'ESC', type: 'text', version: 1 },
+              { detail: 0, format: 0, mode: 'normal', style: '', text: ' 键打开系统菜单，点击「宏命令设置」，或者在聊天框直接输入 ', type: 'text', version: 1 },
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '/macro', type: 'text', version: 1 },
+              { detail: 0, format: 0, mode: 'normal', style: '', text: ' 回车。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '2. 新建宏', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'heading', version: 1, tag: 'h2'
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: '点击「新建」按钮，选择一个图标并为宏命名（名称不影响功能，只显示在动作条上）。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '3. 粘贴代码', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'heading', version: 1, tag: 'h2'
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: '在 FlyMacro 宏详情页点击「复制」按钮，回到游戏宏编辑器的大文本框内，按 ', type: 'text', version: 1 },
+              { detail: 0, format: 1, mode: 'normal', style: '', text: 'Ctrl + V', type: 'text', version: 1 },
+              { detail: 0, format: 0, mode: 'normal', style: '', text: ' 粘贴全部内容。注意要完整粘贴，不要遗漏行首的 ', type: 'text', version: 1 },
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '#showtooltip', type: 'text', version: 1 },
+              { detail: 0, format: 0, mode: 'normal', style: '', text: ' 或 ', type: 'text', version: 1 },
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '/cast', type: 'text', version: 1 },
+              { detail: 0, format: 0, mode: 'normal', style: '', text: ' 等指令。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '4. 保存并使用', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'heading', version: 1, tag: 'h2'
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: '点击「保存」后，将宏图标拖拽到动作条上。战斗中或平时点击该图标即可触发宏效果。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: '常见问题', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'heading', version: 1, tag: 'h2'
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: 'Q: 粘贴后提示「此宏已存在」？', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: 'A: 说明你之前已经创建过同名宏。建议新建一个宏再粘贴，或者删除旧宏后重新创建。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: 'Q: 宏没有反应或报错？', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: 'A: 检查是否完整复制了全部代码；某些宏依赖特定天赋或装备，请确保你当前处于对应专精。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 1, mode: 'normal', style: '', text: 'Q: 可以修改宏代码吗？', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          },
+          {
+            children: [
+              { detail: 0, format: 0, mode: 'normal', style: '', text: 'A: 可以。如果你熟悉宏语法，可以根据自己的习惯修改技能名称或条件判断。但修改后若出现问题，建议恢复原始代码。', type: 'text', version: 1 }
+            ],
+            direction: 'ltr', format: '', indent: 0, type: 'paragraph', version: 1
+          }
+        ],
+        direction: 'ltr', format: '', indent: 0, type: 'root', version: 1
+      }
+    }
+  })
+  console.log('[seed] upserted guide: how-to-use-macro')
+
   console.log('[seed] done.')
   process.exit(0)
 }

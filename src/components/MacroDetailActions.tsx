@@ -229,7 +229,14 @@ export function MacroDetailActions({
               {effectiveStatus.exchange.autoRenew && !expired && ' · 自动续费已开启'}
             </p>
           )}
-          <p className="hint">复制全部内容，粘贴到游戏宏编辑器（按 ESC 输入 /macro），保存即可使用。</p>
+          <div className="code-footer-bar">
+            <span className="code-footer-text">
+              复制全部内容，粘贴到游戏宏编辑器（按 ESC 输入 /macro），保存即可使用。
+            </span>
+            <a href="/guide/how-to-use-macro" className="code-footer-link">
+              使用指南
+            </a>
+          </div>
         </div>
       )}
 

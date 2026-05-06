@@ -20,9 +20,11 @@ export function CodeBlock({ code, language = 'lua' }: { code: string; language?:
       <button type="button" className="code-copy-btn" onClick={handleCopy}>
         {copied ? '已复制' : '复制'}
       </button>
-      <pre>
-        <code className={`language-${language}`}>{code}</code>
-      </pre>
+      <div className="code-scroll-area">
+        <pre>
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      </div>
     </div>
   )
 }
