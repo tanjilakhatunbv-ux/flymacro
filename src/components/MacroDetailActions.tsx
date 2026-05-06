@@ -270,9 +270,14 @@ export function MacroDetailActions({
               )}
             </div>
           </div>
-          <p className="locked-notice">
-            积分不足？<Link href="/account/credits" style={{ marginLeft: 4, color: 'var(--gold-bright)' }}>去充值</Link>
-          </p>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', justifyContent: 'center' }}>
+            <Link href="/guide/how-to-use-macro" className="btn btn-ghost" style={{ fontSize: '0.8rem', padding: '0.55rem 1rem' }}>
+              使用指南
+            </Link>
+            <Link href="/account/credits" className="btn btn-ghost" style={{ fontSize: '0.8rem', padding: '0.55rem 1rem' }}>
+              充值积分
+            </Link>
+          </div>
         </div>
       )}
 

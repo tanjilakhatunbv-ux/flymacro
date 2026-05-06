@@ -21,7 +21,7 @@ export function CodeBlock({ code, language = 'lua' }: { code: string; language?:
         {copied ? '已复制' : '复制'}
       </button>
       <div className="code-scroll-area">
-        <pre>
+        <pre tabIndex={0}>
           <code className={`language-${language}`}>{code}</code>
         </pre>
       </div>
