@@ -173,17 +173,51 @@ async function main() {
     console.log(`[test] renew simulated: credits ${renewCredits} -> ${afterRenewCredits}, expiresAt=${newExpiresAt}`)
   }
 
-  // 7. Verify code access via raw DB (bypass stripCodeForUnpurchased hook)
+  // 7. Verify code access via staff req (bypass stripCodeForUnpurchased hook)
   const macroRaw = await payload.findByID({
     collection: 'macros',
     id: macro.id,
     depth: 0,
     overrideAccess: true,
+    req: { user: { id: 1, role: 'super-admin' }, payload } as any,
   })
   const rawCode = (macroRaw as any)?.codeContent
   console.log(`[test] raw codeContent length=${rawCode ? rawCode.length : 0}`)
 
-  // 8. Verify notification created
+  // 8. Simulate /api/macro/code access for the exchanged user
+  const hasAccess = true // user has exchange
+  if (hasAccess) {
+    const exchangeCheckForCode = await payload.find({
+      collection: 'macro-exchanges',
+      where: {
+        and: [
+          { user: { equals: user.id } },
+          { macro: { equals: macro.id } },
+          {
+            or: [
+              { expiresAt: { exists: false } },
+              { expiresAt: { greater_than_equal: new Date().toISOString() } },
+            ],
+          },
+        ],
+      },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    if (exchangeCheckForCode.docs.length > 0) {
+      const codeMacro = await payload.findByID({
+        collection: 'macros',
+        id: macro.id,
+        depth: 0,
+        req: { user, payload } as any,
+      })
+      const userCode = (codeMacro as any)?.codeContent
+      console.log(`[test] user code access: length=${userCode ? userCode.length : 0}`)
+    }
+  }
+
+  // 9. Verify notification created
   const notifRes = await payload.find({
     collection: 'notifications',
     where: { recipient: { equals: user.id } },
