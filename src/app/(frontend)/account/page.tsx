@@ -95,7 +95,7 @@ export default async function AccountHome() {
       </section>
 
       <section style={{ marginTop: '2.5rem' }}>
-        <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '1.2rem', color: 'var(--gold)', marginBottom: '1rem' }}>
+        <h2 style={{ fontFamily: 'var(--font-main)', fontSize: '1.2rem', color: 'var(--gold)', marginBottom: '1rem' }}>
           账号信息
         </h2>
         <dl style={{ display: 'grid', gridTemplateColumns: '120px 1fr', rowGap: '0.6rem', fontSize: '0.92rem' }}>

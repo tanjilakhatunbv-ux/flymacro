@@ -49,9 +49,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        title: ['Cinzel', 'Noto Serif SC', 'serif'],
-        body: ['Noto Sans SC', 'system-ui', 'sans-serif'],
-        accent: ['IM Fell English', 'serif'],
+        title: ['var(--font-main)'],
+        body: ['var(--font-main)'],
+        accent: ['var(--font-main)'],
       },
     },
   },

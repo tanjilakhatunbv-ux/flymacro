@@ -55,14 +55,17 @@
   --shadow-deep:    0 12px 32px rgba(0, 0, 0, 0.6);
   --shadow-frame:   0 4px 16px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 209, 0, 0.08);
 
-  /* Typography */
-  --font-hero:      var(--font-cinzel-decorative), var(--font-cinzel), 'Noto Serif SC', serif;
-  --font-display:   var(--font-cinzel), var(--font-marcellus), 'Noto Serif SC', serif;
-  --font-caps:      var(--font-marcellus), var(--font-cinzel), 'Noto Serif SC', serif;
-  --font-decor:     var(--font-im-fell), var(--font-marcellus), serif;
-  --font-body:      'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-serif:     'Noto Serif SC', var(--font-cinzel), serif;
-  --font-mono:      var(--font-jetbrains-mono), 'Consolas', monospace;
+  /* Typography — unified sans-serif stack, no serif/Song typeface */
+  --font-main:      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono:      'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+
+  /* Legacy aliases kept for backward compat — all point to the same unified font */
+  --font-hero:      var(--font-main);
+  --font-display:   var(--font-main);
+  --font-caps:      var(--font-main);
+  --font-decor:     var(--font-main);
+  --font-body:      var(--font-main);
+  --font-serif:     var(--font-main);
 }
 
 @layer base {
@@ -1569,7 +1572,7 @@ main { min-height: calc(100vh - 200px); }
   font-size: 0.85rem;
   letter-spacing: 0.04em;
   color: var(--text-muted, #a09080);
-  font-family: var(--font-display, 'IM Fell English SC', serif);
+  font-family: var(--font-main);
 }
 .auth-field input {
   background: rgba(15, 14, 13, 0.8);
@@ -1578,7 +1581,7 @@ main { min-height: calc(100vh - 200px); }
   padding: 0.7rem 0.9rem;
   border-radius: 3px;
   font-size: 0.95rem;
-  font-family: var(--font-body, 'Noto Sans SC', sans-serif);
+  font-family: var(--font-main);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 .auth-field input:focus {
@@ -1644,7 +1647,7 @@ main { min-height: calc(100vh - 200px); }
   border: 1px solid rgba(212, 175, 55, 0.25);
   color: var(--text, #e6dfd1);
   border-radius: 999px;
-  font-family: var(--font-body, 'Noto Sans SC', sans-serif);
+  font-family: var(--font-main);
   font-size: 0.78rem;
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease;
@@ -1664,7 +1667,7 @@ main { min-height: calc(100vh - 200px); }
   justify-content: center;
   font-weight: 700;
   font-size: 0.85rem;
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
 }
 .user-display {
   max-width: 8rem;
@@ -1702,7 +1705,7 @@ main { min-height: calc(100vh - 200px); }
   margin-bottom: 0.25rem;
 }
 .user-menu-name {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 0.95rem;
   color: var(--gold, #d4af37);
 }
@@ -1723,7 +1726,7 @@ main { min-height: calc(100vh - 200px); }
   background: transparent;
   border: none;
   cursor: pointer;
-  font-family: var(--font-body, 'Noto Sans SC', sans-serif);
+  font-family: var(--font-main);
   text-decoration: none;
 }
 .user-menu-pop a:hover,
@@ -1780,7 +1783,7 @@ main { min-height: calc(100vh - 200px); }
   font-weight: 500;
 }
 .account-side h3 {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1795,7 +1798,7 @@ main { min-height: calc(100vh - 200px); }
   padding: 2rem;
 }
 .account-content h1 {
-  font-family: var(--font-hero, 'Cinzel Decorative', serif);
+  font-family: var(--font-main);
   font-size: 1.9rem;
   margin: 0 0 0.4rem;
   color: var(--gold, #d4af37);
@@ -1818,7 +1821,7 @@ main { min-height: calc(100vh - 200px); }
   padding: 1rem 1.1rem;
 }
 .account-card h4 {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1826,7 +1829,7 @@ main { min-height: calc(100vh - 200px); }
   margin: 0 0 0.4rem;
 }
 .account-card .num {
-  font-family: var(--font-hero, 'Cinzel Decorative', serif);
+  font-family: var(--font-main);
   font-size: 1.7rem;
   color: var(--gold, #d4af37);
 }
@@ -1842,7 +1845,7 @@ main { min-height: calc(100vh - 200px); }
   border-bottom: 1px solid var(--border-soft, rgba(212, 175, 55, 0.12));
 }
 .account-table th {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   color: var(--text-muted, #a09080);
@@ -1877,7 +1880,7 @@ main { min-height: calc(100vh - 200px); }
   gap: 0.75rem;
 }
 .ticket-subject {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 1rem;
   color: var(--gold, #d4af37);
 }
@@ -1889,7 +1892,7 @@ main { min-height: calc(100vh - 200px); }
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
 }
 .status-pill[data-status="open"] { background: rgba(60, 130, 200, 0.18); color: #8ab8ee; border: 1px solid rgba(60, 130, 200, 0.4); }
 .status-pill[data-status="in-progress"] { background: rgba(212, 175, 55, 0.16); color: var(--gold-bright, #f5d76e); border: 1px solid rgba(212, 175, 55, 0.4); }
@@ -1918,7 +1921,7 @@ main { min-height: calc(100vh - 200px); }
   font-size: 0.78rem;
   color: var(--text-muted, #a09080);
   margin-bottom: 0.5rem;
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   letter-spacing: 0.06em;
 }
 .ticket-msg-body { font-size: 0.92rem; line-height: 1.65; color: var(--text, #e6dfd1); }
@@ -1931,7 +1934,7 @@ main { min-height: calc(100vh - 200px); }
   font-size: 0.85rem;
   letter-spacing: 0.04em;
   color: var(--text-muted, #a09080);
-  font-family: var(--font-display, 'IM Fell English SC', serif);
+  font-family: var(--font-main);
 }
 .ticket-form input,
 .ticket-form select,
@@ -1942,7 +1945,7 @@ main { min-height: calc(100vh - 200px); }
   padding: 0.7rem 0.9rem;
   border-radius: 3px;
   font-size: 0.95rem;
-  font-family: var(--font-body, 'Noto Sans SC', sans-serif);
+  font-family: var(--font-main);
 }
 .ticket-form textarea { min-height: 140px; resize: vertical; }
 .ticket-form input:focus,
@@ -1970,7 +1973,7 @@ main { min-height: calc(100vh - 200px); }
   gap: 0.75rem;
 }
 .notif-title {
-  font-family: var(--font-display, 'Cinzel', serif);
+  font-family: var(--font-main);
   font-size: 0.95rem;
   color: var(--gold, #d4af37);
 }
