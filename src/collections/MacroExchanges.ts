@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, isOwnerOrStaff, isSuperAdmin } from '../lib/access'
+import { isOwnerOrStaff, isStaff, isSuperAdmin } from '../lib/access'
 
 export const MacroExchanges: CollectionConfig = {
   slug: 'macro-exchanges',
@@ -10,7 +10,7 @@ export const MacroExchanges: CollectionConfig = {
   },
   access: {
     read: isOwnerOrStaff,
-    create: isAuthenticated,
+    create: isStaff,
     update: isOwnerOrStaff,
     delete: isSuperAdmin,
   },

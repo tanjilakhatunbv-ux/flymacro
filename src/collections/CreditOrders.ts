@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isOwnerOrStaff, isSuperAdmin } from '../lib/access'
+import { isOwnerOrStaff, isStaff, isSuperAdmin } from '../lib/access'
 
 export const CreditOrders: CollectionConfig = {
   slug: 'credit-orders',
@@ -11,7 +11,7 @@ export const CreditOrders: CollectionConfig = {
   access: {
     read: isOwnerOrStaff,
     create: () => false,
-    update: isOwnerOrStaff,
+    update: isStaff,
     delete: isSuperAdmin,
   },
   fields: [

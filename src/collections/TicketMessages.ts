@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { isAuthenticated, isStaff, isSuperAdmin } from '../lib/access'
+import { isStaff, isSuperAdmin } from '../lib/access'
 
 export const TicketMessages: CollectionConfig = {
   slug: 'ticket-messages',
@@ -15,7 +15,18 @@ export const TicketMessages: CollectionConfig = {
       if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
       return { sender: { equals: user.id } }
     },
-    create: isAuthenticated,
+    create: async ({ req: { user, payload }, data }) => {
+      if (!user) return false
+      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      const ticketId = (data as any)?.ticket
+      if (!ticketId) return false
+      try {
+        const ticket = await payload.findByID({ collection: 'tickets', id: ticketId, depth: 0 })
+        return (ticket as any)?.user === user.id
+      } catch {
+        return false
+      }
+    },
     update: isStaff,
     delete: isSuperAdmin,
   },

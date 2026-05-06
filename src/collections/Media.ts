@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { anyone, isStaff } from '../lib/access'
+import { anyone, isOperatorOrAbove } from '../lib/access'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -8,9 +8,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: anyone,
-    create: isStaff,
-    update: isStaff,
-    delete: isStaff,
+    create: isOperatorOrAbove,
+    update: isOperatorOrAbove,
+    delete: isOperatorOrAbove,
   },
   upload: {
     staticDir: 'media',

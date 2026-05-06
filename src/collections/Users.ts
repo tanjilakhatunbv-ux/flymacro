@@ -37,7 +37,7 @@ export const Users: CollectionConfig = {
     create: () => true,
     read: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator') return true
+      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
       return { id: { equals: user.id } }
     },
     update: isOwnerOrSuperAdmin,
