@@ -3,6 +3,7 @@ import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
 
 export const CreditPackages: CollectionConfig = {
   slug: 'credit-packages',
+  labels: { singular: '充值档次', plural: '充值档次' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'amount', 'originalAmount', 'creditsGranted', 'enabled', 'sort'],

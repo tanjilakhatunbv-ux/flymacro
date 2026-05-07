@@ -10,6 +10,7 @@ const buildLabel = (data: Record<string, unknown> | undefined): string => {
 
 export const CreditTransactions: CollectionConfig = {
   slug: 'credit-transactions',
+  labels: { singular: '积分流水', plural: '积分流水' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'user', 'amount', 'balanceAfter', 'type', 'createdAt'],

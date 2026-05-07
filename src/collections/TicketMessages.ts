@@ -34,6 +34,7 @@ const buildMessageLabel = (data: Record<string, unknown> | undefined): string =>
 
 export const TicketMessages: CollectionConfig = {
   slug: 'ticket-messages',
+  labels: { singular: '工单消息', plural: '工单消息' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'ticket', 'sender', 'senderType', 'isInternalNote', 'createdAt'],

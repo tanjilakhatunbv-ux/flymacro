@@ -3,6 +3,7 @@ import { isOwnerOrStaff, isStaff, isSuperAdmin } from '../lib/access'
 
 export const MacroExchanges: CollectionConfig = {
   slug: 'macro-exchanges',
+  labels: { singular: '宏兑换记录', plural: '宏兑换记录' },
   admin: {
     useAsTitle: 'macro',
     defaultColumns: ['macro', 'user', 'creditsSpent', 'expiresAt', 'autoRenew', 'grantedAt'],

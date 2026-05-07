@@ -3,6 +3,7 @@ import { anyone, isOperatorOrAbove, isSuperAdmin } from '../lib/access'
 
 export const PluginFiles: CollectionConfig = {
   slug: 'plugin-files',
+  labels: { singular: '插件文件', plural: '插件文件' },
   admin: {
     group: '插件',
     useAsTitle: 'filename',

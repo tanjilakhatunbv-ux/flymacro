@@ -4,6 +4,7 @@ import { isOperatorOrAbove, publishedOrStaff } from '../lib/access'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
+  labels: { singular: '页面', plural: '页面' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', '_status'],
@@ -25,14 +26,15 @@ export const Pages: CollectionConfig = {
     drafts: { autosave: { interval: 2000 } },
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'title', type: 'text', required: true, label: '标题' },
+    { name: 'slug', type: 'text', required: true, unique: true, index: true, label: '标识符' },
     {
       name: 'body',
       type: 'richText',
+      label: '正文',
       editor: lexicalEditor({}),
     },
-    { name: 'publishedAt', type: 'date', admin: { position: 'sidebar' } },
+    { name: 'publishedAt', type: 'date', label: '发布时间', admin: { position: 'sidebar' } },
   ],
   timestamps: true,
 }

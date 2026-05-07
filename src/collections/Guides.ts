@@ -4,6 +4,7 @@ import { isOperatorOrAbove, publishedOrStaff } from '../lib/access'
 
 export const Guides: CollectionConfig = {
   slug: 'guides',
+  labels: { singular: '教程', plural: '教程' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'weight', 'publishedAt', '_status'],
@@ -26,9 +27,9 @@ export const Guides: CollectionConfig = {
   },
   fields: [
     { name: 'title', type: 'text', required: true, label: '标题' },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', type: 'text', required: true, unique: true, index: true, label: '标识符' },
     { name: 'summary', type: 'textarea', label: '简介', maxLength: 240 },
-    { name: 'weight', type: 'number', defaultValue: 100, admin: { position: 'sidebar', description: '排序权重，数值越小越靠前' } },
+    { name: 'weight', type: 'number', defaultValue: 100, label: '排序权重', admin: { position: 'sidebar', description: '排序权重，数值越小越靠前' } },
     { name: 'cover', type: 'upload', relationTo: 'media', label: '封面' },
     {
       name: 'body',
@@ -36,7 +37,7 @@ export const Guides: CollectionConfig = {
       label: '正文',
       editor: lexicalEditor({}),
     },
-    { name: 'publishedAt', type: 'date', admin: { position: 'sidebar' } },
+    { name: 'publishedAt', type: 'date', label: '发布时间', admin: { position: 'sidebar' } },
   ],
   timestamps: true,
 }

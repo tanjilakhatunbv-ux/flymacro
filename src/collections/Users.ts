@@ -3,6 +3,7 @@ import { isSuperAdmin, isOwnerOrSuperAdmin, isSuperAdminField } from '../lib/acc
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  labels: { singular: '用户', plural: '用户' },
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'name', 'role', 'createdAt'],
@@ -78,6 +79,7 @@ export const Users: CollectionConfig = {
     {
       name: 'oauthProvider',
       type: 'select',
+      label: 'OAuth 提供商',
       options: [
         { label: 'Google', value: 'google' },
         { label: 'GitHub', value: 'github' },
@@ -87,6 +89,7 @@ export const Users: CollectionConfig = {
     {
       name: 'oauthId',
       type: 'text',
+      label: 'OAuth ID',
       admin: { readOnly: true, position: 'sidebar' },
     },
     {

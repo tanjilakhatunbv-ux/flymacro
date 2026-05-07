@@ -9,6 +9,7 @@ const hasRole = (user: AnyUser | null | undefined, ...roles: UserRole[]) =>
 
 export const PluginReleases: CollectionConfig = {
   slug: 'plugin-releases',
+  labels: { singular: '插件版本', plural: '插件版本' },
   admin: {
     group: '插件',
     useAsTitle: 'version',

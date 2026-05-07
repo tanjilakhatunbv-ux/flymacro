@@ -3,6 +3,7 @@ import { anyone, isOperatorOrAbove } from '../lib/access'
 
 export const Specs: CollectionConfig = {
   slug: 'specs',
+  labels: { singular: '专精', plural: '专精' },
   admin: {
     useAsTitle: 'nameZh',
     defaultColumns: ['slug', 'nameZh', 'nameEn', 'class', 'role'],
@@ -15,7 +16,7 @@ export const Specs: CollectionConfig = {
     delete: isOperatorOrAbove,
   },
   fields: [
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', type: 'text', required: true, unique: true, index: true, label: '标识符' },
     { name: 'nameZh', type: 'text', required: true, label: '中文名' },
     { name: 'nameEn', type: 'text', required: true, label: '英文名' },
     {
@@ -29,6 +30,7 @@ export const Specs: CollectionConfig = {
       name: 'role',
       type: 'select',
       required: true,
+      label: '职责',
       options: [
         { label: '坦克', value: 'tank' },
         { label: '治疗', value: 'healer' },
@@ -36,6 +38,6 @@ export const Specs: CollectionConfig = {
         { label: '远程 DPS', value: 'ranged-dps' },
       ],
     },
-    { name: 'sort', type: 'number', defaultValue: 0, admin: { position: 'sidebar' } },
+    { name: 'sort', type: 'number', defaultValue: 0, label: '排序', admin: { position: 'sidebar' } },
   ],
 }

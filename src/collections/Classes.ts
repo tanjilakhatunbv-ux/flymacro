@@ -3,6 +3,7 @@ import { anyone, isOperatorOrAbove } from '../lib/access'
 
 export const Classes: CollectionConfig = {
   slug: 'classes',
+  labels: { singular: '职业', plural: '职业' },
   admin: {
     useAsTitle: 'nameZh',
     defaultColumns: ['slug', 'nameZh', 'nameEn', 'color'],
@@ -15,7 +16,7 @@ export const Classes: CollectionConfig = {
     delete: isOperatorOrAbove,
   },
   fields: [
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', type: 'text', required: true, unique: true, index: true, label: '标识符' },
     { name: 'nameZh', type: 'text', required: true, label: '中文名' },
     { name: 'nameEn', type: 'text', required: true, label: '英文名' },
     {
@@ -31,6 +32,6 @@ export const Classes: CollectionConfig = {
       relationTo: 'media',
       label: '职业图标 (SVG)',
     },
-    { name: 'sort', type: 'number', defaultValue: 0, admin: { position: 'sidebar' } },
+    { name: 'sort', type: 'number', defaultValue: 0, label: '排序', admin: { position: 'sidebar' } },
   ],
 }

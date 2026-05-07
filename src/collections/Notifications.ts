@@ -3,6 +3,7 @@ import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
 
 export const Notifications: CollectionConfig = {
   slug: 'notifications',
+  labels: { singular: '站内通知', plural: '站内通知' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'recipient', 'category', 'read', 'createdAt'],
@@ -31,14 +32,16 @@ export const Notifications: CollectionConfig = {
       relationTo: 'users',
       required: true,
       index: true,
+      label: '接收用户',
     },
-    { name: 'title', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
-    { name: 'link', type: 'text', admin: { description: '点击通知后跳转的站内链接' } },
+    { name: 'title', type: 'text', required: true, label: '标题' },
+    { name: 'body', type: 'textarea', label: '内容' },
+    { name: 'link', type: 'text', label: '跳转链接', admin: { description: '点击通知后跳转的站内链接' } },
     {
       name: 'category',
       type: 'select',
       defaultValue: 'system',
+      label: '分类',
       options: [
         { label: '系统', value: 'system' },
         { label: '订单', value: 'order' },
@@ -46,8 +49,8 @@ export const Notifications: CollectionConfig = {
         { label: '促销', value: 'promotion' },
       ],
     },
-    { name: 'read', type: 'checkbox', defaultValue: false, index: true },
-    { name: 'readAt', type: 'date' },
+    { name: 'read', type: 'checkbox', defaultValue: false, label: '已读', index: true },
+    { name: 'readAt', type: 'date', label: '阅读时间' },
   ],
   timestamps: true,
 }

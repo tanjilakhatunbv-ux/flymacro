@@ -69,6 +69,7 @@ const isPaidWithDuration = (sib: unknown) => {
 
 export const Macros: CollectionConfig = {
   slug: 'macros',
+  labels: { singular: '宏', plural: '宏' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'tier', 'price', 'isFeatured', 'classes', 'publishedAt', '_status'],

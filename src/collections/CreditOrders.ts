@@ -3,6 +3,7 @@ import { isOwnerOrStaff, isStaff, isSuperAdmin } from '../lib/access'
 
 export const CreditOrders: CollectionConfig = {
   slug: 'credit-orders',
+  labels: { singular: '充值订单', plural: '充值订单' },
   admin: {
     useAsTitle: 'orderNumber',
     defaultColumns: ['orderNumber', 'user', 'amount', 'creditsGranted', 'status', 'createdAt'],
@@ -39,9 +40,10 @@ export const CreditOrders: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'CNY',
+      label: '币种',
       options: [
-        { label: 'CNY', value: 'CNY' },
-        { label: 'USD', value: 'USD' },
+        { label: '人民币 CNY', value: 'CNY' },
+        { label: '美元 USD', value: 'USD' },
       ],
       admin: { readOnly: true },
     },
@@ -57,6 +59,7 @@ export const CreditOrders: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'pending',
+      label: '订单状态',
       options: [
         { label: '待支付', value: 'pending' },
         { label: '已支付', value: 'paid' },

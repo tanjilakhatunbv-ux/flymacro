@@ -3,6 +3,7 @@ import { anyone, isOperatorOrAbove } from '../lib/access'
 
 export const Versions: CollectionConfig = {
   slug: 'versions',
+  labels: { singular: '游戏版本', plural: '游戏版本' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'codename', 'releasedAt', 'isCurrent'],
