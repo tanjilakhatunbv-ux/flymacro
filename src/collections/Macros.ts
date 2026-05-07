@@ -73,7 +73,7 @@ export const Macros: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'tier', 'price', 'isFeatured', 'classes', 'publishedAt', '_status'],
     group: '宏库',
-    description: '魔兽世界宏代码商品。普通宏建议 5 积分、高级宏 50 积分；代码字段对未兑换用户自动隐藏。',
+    description: '魔兽世界宏代码商品。普通宏建议 5 积分、高级宏 100 积分；代码字段对未兑换用户自动隐藏。',
     listSearchableFields: ['title', 'slug', 'summary'],
     preview: (doc) => {
       const slug = (doc as { slug?: string })?.slug
@@ -112,7 +112,7 @@ export const Macros: CollectionConfig = {
         { label: '普通宏', value: 'regular' },
         { label: '高级宏', value: 'premium' },
       ],
-      admin: { position: 'sidebar', description: '普通宏建议 5 积分，高级宏建议 50 积分' },
+      admin: { position: 'sidebar', description: '普通宏建议 5 积分，高级宏建议 100 积分' },
     },
     {
       name: 'price',

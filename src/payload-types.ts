@@ -292,7 +292,7 @@ export interface Version {
   createdAt: string;
 }
 /**
- * 魔兽世界宏代码商品。普通宏建议 5 积分、高级宏 50 积分；代码字段对未兑换用户自动隐藏。
+ * 魔兽世界宏代码商品。普通宏建议 5 积分、高级宏 100 积分；代码字段对未兑换用户自动隐藏。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "macros".
@@ -305,7 +305,7 @@ export interface Macro {
    */
   slug: string;
   /**
-   * 普通宏建议 5 积分，高级宏建议 50 积分
+   * 普通宏建议 5 积分，高级宏建议 100 积分
    */
   tier: 'regular' | 'premium';
   /**
