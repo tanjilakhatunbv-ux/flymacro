@@ -5,6 +5,7 @@ import { getPayload } from '../../../lib/payload'
 import { MacroGridClient } from '../../../components/MacroGridClient'
 import { MacroFilters } from '../../../components/MacroFilters'
 import { Pagination } from '../../../components/Pagination'
+import { FilterSkeleton, MacroGridSkeleton } from '../../../components/Skeleton'
 import type { Macro, Class, Spec, Version } from '../../../payload-types'
 
 export const metadata: Metadata = {
@@ -35,10 +36,8 @@ const getLookupTables = unstable_cache(
     const tagSet = new Set<string>()
     for (const m of allMacrosRes.docs as Macro[]) {
       for (const t of m.tags ?? []) {
-        if (typeof t === 'object' && t !== null && 'value' in t) {
-          const v = (t as { value?: string }).value?.trim()
-          if (v) tagSet.add(v)
-        }
+        const v = t.value?.trim()
+        if (v) tagSet.add(v)
       }
     }
 
@@ -81,7 +80,7 @@ const findMacros = unstable_cache(
     const docs = result.docs as Macro[]
     for (const m of docs) {
       if (m) {
-        ;(m as Macro & { codeContent?: unknown }).codeContent = null
+        m.codeContent = null
       }
     }
     return {
@@ -150,21 +149,21 @@ export default async function MacrosListPage({ searchParams }: { searchParams: P
     <div className="container-page page-list">
       <h1>宏 库</h1>
 
-      <Suspense fallback={<div style={{ minHeight: 120 }} />}>
+      <Suspense fallback={<FilterSkeleton />}>
         <MacroFilters
           classes={lookups.classes.map((c) => ({ id: c.id, slug: c.slug, nameZh: c.nameZh }))}
           specs={lookups.specs.map((s) => ({
             id: s.id,
             slug: s.slug,
             nameZh: s.nameZh,
-            classId: typeof s.class === 'object' ? s.class?.id : (s.class as number | string),
+            classId: typeof s.class === 'object' ? s.class?.id : s.class,
           }))}
           versions={lookups.versions.map((v) => ({ id: v.id, label: v.label }))}
           tags={lookups.tags}
         />
       </Suspense>
 
-      <Suspense fallback={<div style={{ minHeight: 200 }} />}>
+      <Suspense fallback={<MacroGridSkeleton />}>
         <MacroGridClient macros={result.docs} totalDocs={result.totalDocs} />
       </Suspense>
 

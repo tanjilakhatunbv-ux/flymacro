@@ -21,14 +21,14 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
           credentials: 'same-origin',
           body: JSON.stringify({ packageId: pkg.id }),
         })
-        const data = (await resp.json()) as { checkoutUrl?: string; error?: string; message?: string }
-        if (!resp.ok) {
-          setError(data.message || '创建支付会话失败')
+        const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; message?: string }
+        if (!resp.ok || !data.success) {
+          setError(data.error || data.message || '创建支付会话失败')
           setPendingId(null)
           return
         }
-        if (data.checkoutUrl) {
-          window.location.href = data.checkoutUrl
+        if (data.data?.checkoutUrl) {
+          window.location.href = data.data.checkoutUrl
         } else {
           setError('未获得支付链接')
           setPendingId(null)
@@ -52,9 +52,9 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
     <>
       <div className="models">
         {packages.map((pkg) => {
-          const original = (pkg as any).originalAmount as number | undefined
-          const discount = (pkg as any).discountLabel as string | undefined
-          const badge = (pkg as any).badge as string | undefined
+          const original = pkg.originalAmount
+          const discount = pkg.discountLabel
+          const badge = pkg.badge
           const hasOriginal = original && original > (pkg.amount ?? 0)
 
           return (

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
+import { unauthorized, success } from '../../../../lib/api-response'
+import type { MacroExchange } from '../../../../payload-types'
 
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({ exchangedIds: [] })
+    return unauthorized('unauthenticated')
   }
 
   try {
@@ -25,15 +27,15 @@ export async function GET() {
       },
       limit: 200,
       depth: 0,
-      overrideAccess: true,
     })
 
-    const exchangedIds = result.docs.map((e: any) =>
-      typeof e.macro === 'object' ? e.macro.id : e.macro
-    )
+    const exchangedIds = result.docs.map((e) => {
+      const doc = e as MacroExchange
+      return typeof doc.macro === 'object' ? doc.macro?.id : doc.macro
+    })
 
-    return NextResponse.json({ exchangedIds })
+    return NextResponse.json(success({ exchangedIds }))
   } catch {
-    return NextResponse.json({ exchangedIds: [] })
+    return NextResponse.json(success({ exchangedIds: [] }))
   }
 }

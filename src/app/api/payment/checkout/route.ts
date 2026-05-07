@@ -1,23 +1,18 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
-import type { User } from '../../../../payload-types'
 import { dodoFetch, isDodoConfigured, type DodoCheckoutSession } from '../../../../lib/dodo'
+import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
+import { parseParam, IdParam } from '../../../../lib/validation'
 
 export async function POST(req: Request) {
   if (!isDodoConfigured()) {
-    return NextResponse.json(
-      { error: 'payment-not-configured', message: '支付系统尚未配置。' },
-      { status: 501 },
-    )
+    return internalError('支付系统尚未配置', 'payment-not-configured')
   }
 
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json(
-      { error: 'unauthenticated', message: '请先登录。' },
-      { status: 401 },
-    )
+    return unauthorized('unauthenticated')
   }
 
   const payload = await getPayload()
@@ -26,31 +21,29 @@ export async function POST(req: Request) {
   try {
     body = (await req.json()) as typeof body
   } catch {
-    return NextResponse.json(
-      { error: 'invalid-body', message: '请求体格式错误。' },
-      { status: 400 },
-    )
+    return badRequest('请求体格式错误', 'invalid-body')
   }
 
   const { packageId } = body
   if (!packageId) {
-    return NextResponse.json(
-      { error: 'missing-package', message: '请选择充值档次。' },
-      { status: 400 },
-    )
+    return badRequest('请选择充值档次', 'missing-package')
   }
 
-  const pkg = await payload.findByID({
-    collection: 'credit-packages',
-    id: packageId,
-    depth: 0,
-  }).catch(() => null)
+  const parsed = parseParam(IdParam, packageId)
+  if (!parsed.ok) {
+    return badRequest('无效的充值档次 ID', 'invalid-package-id')
+  }
+
+  const pkg = await payload
+    .findByID({
+      collection: 'credit-packages',
+      id: parsed.data,
+      depth: 0,
+    })
+    .catch(() => null)
 
   if (!pkg || !pkg.enabled) {
-    return NextResponse.json(
-      { error: 'package-not-found', message: '充值档次不存在或已下架。' },
-      { status: 404 },
-    )
+    return notFound('充值档次不存在或已下架', 'package-not-found')
   }
 
   const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`
@@ -72,21 +65,14 @@ export async function POST(req: Request) {
         cancel_url: cancelUrl,
         metadata: {
           userId: String(user.id),
-          packageId: String(packageId),
+          packageId: String(parsed.data),
         },
       },
     })
 
-    return NextResponse.json({
-      checkoutUrl: session.checkout_url,
-      sessionId: session.session_id,
-    })
+    return NextResponse.json(success({ checkoutUrl: session.checkout_url, sessionId: session.session_id }))
   } catch (err) {
     const msg = err instanceof Error ? err.message : '创建支付会话失败'
-    console.error('[DodoPayments checkout error]', err)
-    return NextResponse.json(
-      { error: 'checkout-failed', message: msg },
-      { status: 500 },
-    )
+    return internalError(msg, 'checkout-failed')
   }
 }

@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
+import { success, unauthorized } from '../../../../lib/api-response'
 
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({ user: null })
+    return unauthorized('unauthenticated')
   }
-  return NextResponse.json({
-    user: {
+  return NextResponse.json(
+    success({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
       credits: user.credits,
-    },
-  })
+    }),
+  )
 }

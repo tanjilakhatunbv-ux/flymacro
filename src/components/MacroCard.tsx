@@ -35,13 +35,13 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
       <div className="card-body">
         <div className="meta">
           {(macro.classes ?? []).map((c, i) => (
-            <ClassTag key={`c-${i}`} value={c as number | Class} />
+            <ClassTag key={`c-${i}`} value={c} />
           ))}
           {(macro.specs ?? []).map((s, i) => (
-            <SpecTag key={`s-${i}`} value={s as number | Spec} />
+            <SpecTag key={`s-${i}`} value={s} />
           ))}
           {(macro.versions ?? []).map((v, i) => (
-            <VersionTag key={`v-${i}`} value={v as number | Version} />
+            <VersionTag key={`v-${i}`} value={v} />
           ))}
           <TierTag tier={macro.tier ?? 'regular'} />
         </div>

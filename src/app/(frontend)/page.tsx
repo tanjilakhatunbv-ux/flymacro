@@ -41,8 +41,8 @@ async function loadHomeData() {
   const counts: Record<string, number> = {}
   for (const slug of classSlugs) counts[slug] = 0
 
-  for (const macro of allMacros.docs) {
-    const macroClasses = (macro as any).classes
+  for (const macro of allMacros.docs as Partial<Macro>[]) {
+    const macroClasses = macro.classes
     if (Array.isArray(macroClasses)) {
       for (const clsRef of macroClasses) {
         const clsId = typeof clsRef === 'object' ? clsRef.id : clsRef

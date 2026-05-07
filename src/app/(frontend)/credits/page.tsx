@@ -3,7 +3,7 @@ import { getCurrentUser } from '../../../lib/auth'
 import { getPayload } from '../../../lib/payload'
 import { CreditPackages } from '../../../components/CreditPackages'
 import { RichText } from '../../../components/RichText'
-import type { CreditPackage } from '../../../payload-types'
+import type { CreditPackage, SiteSetting } from '../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +30,7 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
   ])
 
   const packages = pkgResult.docs as CreditPackage[]
-  const creditPage = (settingsResult as any)?.creditPage ?? {}
+  const creditPage = (settingsResult as SiteSetting | null)?.creditPage ?? {}
 
   const pageTitle = creditPage.title || '充值积分'
   const pageSubtitle = creditPage.subtitle || (user

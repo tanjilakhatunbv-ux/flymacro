@@ -18,7 +18,8 @@ export function MacroGridClient({
     fetch('/api/macro/my-exchanges', { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : { exchangedIds: [] }))
       .then((d) => {
-        setExchangedIds(new Set(d.exchangedIds ?? []))
+        const payload = d.data ?? d
+        setExchangedIds(new Set(payload.exchangedIds ?? []))
       })
       .catch(() => {})
   }, [])

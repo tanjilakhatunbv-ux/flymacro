@@ -1,76 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CodeBlock } from './CodeBlock'
 import { ExchangeButton } from './ExchangeButton'
-
-type ExchangeStatus = {
-  loggedIn: boolean
-  isStaff: boolean
-  exchange: {
-    id: number | string
-    expiresAt: string | null
-    autoRenew: boolean
-    expired: boolean
-  } | null
-  userCredits: number
-}
-
-const SESSION_CACHE_KEY = 'flymacro_session_v2'
-const EXCHANGE_CACHE_KEY = (macroId: number | string) => `flymacro_macro_${macroId}_v2`
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
-
-interface SessionUser {
-  id: number | string
-  credits: number
-}
-
-function readSessionCache(): { user: SessionUser | null; ts: number } | null {
-  if (typeof sessionStorage === 'undefined') return null
-  try {
-    const raw = sessionStorage.getItem(SESSION_CACHE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as { user: SessionUser | null; ts: number }
-    return { user: parsed.user, ts: parsed.ts }
-  } catch {
-    return null
-  }
-}
-
-function readExchangeCache(macroId: number | string): { status: ExchangeStatus; ts: number } | null {
-  if (typeof sessionStorage === 'undefined') return null
-  try {
-    const raw = sessionStorage.getItem(EXCHANGE_CACHE_KEY(macroId))
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as ExchangeStatus & { cachedUserId?: number | string | null; ts: number }
-    // Reject old-format cache without user isolation (v1 caches)
-    if (!('cachedUserId' in parsed)) {
-      return null
-    }
-    // Invalidate cache if it belongs to a different user
-    const cachedSession = readSessionCache()
-    const currentUserId = cachedSession?.user?.id ?? null
-    if (parsed.cachedUserId != null && String(parsed.cachedUserId) !== String(currentUserId)) {
-      return null
-    }
-    return { status: parsed, ts: parsed.ts }
-  } catch {
-    return null
-  }
-}
-
-function writeExchangeCache(macroId: number | string, status: ExchangeStatus) {
-  if (typeof sessionStorage === 'undefined') return
-  try {
-    const cachedSession = readSessionCache()
-    const currentUserId = cachedSession?.user?.id ?? null
-    sessionStorage.setItem(
-      EXCHANGE_CACHE_KEY(macroId),
-      JSON.stringify({ ...status, cachedUserId: currentUserId, ts: Date.now() }),
-    )
-  } catch {}
-}
+import { useExchangeStatus } from '../hooks/useExchangeStatus'
 
 export function MacroDetailActions({
   macroId,
@@ -89,101 +22,9 @@ export function MacroDetailActions({
   autoRenewable: boolean
   codeContent: string | null | undefined
 }) {
-  const [status, setStatus] = useState<ExchangeStatus | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [fetchedCode, setFetchedCode] = useState<string | null>(null)
+  const { status, loading, fetchedCode } = useExchangeStatus(macroId, codeContent)
 
-  useEffect(() => {
-    let cancelled = false
-
-    const cachedSession = readSessionCache()
-    const sessionValid = cachedSession && Date.now() - cachedSession.ts < CACHE_TTL_MS
-
-    // 1. Start with session cache for immediate optimistic UI
-    if (sessionValid && cachedSession.user) {
-      setStatus({
-        loggedIn: true,
-        isStaff: false,
-        exchange: null,
-        userCredits: cachedSession.user.credits ?? 0,
-      })
-      setLoading(false)
-    } else if (sessionValid && !cachedSession.user) {
-      setStatus({
-        loggedIn: false,
-        isStaff: false,
-        exchange: null,
-        userCredits: 0,
-      })
-      setLoading(false)
-    }
-
-    // 2. Merge exchange cache ONLY when we know the current user identity
-    if (sessionValid && cachedSession.user) {
-      const userCredits = (cachedSession.user.credits as number) ?? 0
-      const cachedExchange = readExchangeCache(macroId)
-      const exchangeValid = cachedExchange && Date.now() - cachedExchange.ts < CACHE_TTL_MS
-      if (exchangeValid && cachedExchange.status.exchange) {
-        setStatus((prev) => {
-          const base = prev ?? {
-            loggedIn: true,
-            isStaff: false,
-            exchange: null,
-            userCredits,
-          }
-          return {
-            ...base,
-            exchange: cachedExchange.status.exchange,
-            isStaff: cachedExchange.status.isStaff ?? base.isStaff,
-          }
-        })
-      }
-    }
-
-    // 3. Always fetch fresh state from server
-    fetch(`/api/macro/exchange-status?macroId=${macroId}`, { credentials: 'same-origin' })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (cancelled) return
-        if (d && !d.error) {
-          const freshStatus: ExchangeStatus = {
-            loggedIn: d.loggedIn ?? false,
-            isStaff: d.isStaff ?? false,
-            exchange: d.exchange ?? null,
-            userCredits: d.userCredits ?? 0,
-          }
-          setStatus(freshStatus)
-          writeExchangeCache(macroId, freshStatus)
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [macroId])
-
-  // Fetch code content client-side when user has access but SSR didn't provide it
-  useEffect(() => {
-    if (!status) return
-    const hasAccess = status.isStaff || (!!status.exchange && !status.exchange.expired)
-    if (hasAccess && !codeContent && !fetchedCode) {
-      fetch(`/api/macro/code?macroId=${macroId}`, { credentials: 'same-origin' })
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => {
-          if (d && !d.error && d.code) {
-            setFetchedCode(d.code)
-          }
-        })
-        .catch(() => {})
-    }
-  }, [status, codeContent, fetchedCode, macroId])
-
-  // Default state: not logged in, no exchange
-  const effectiveStatus: ExchangeStatus = status ?? {
+  const effectiveStatus = status ?? {
     loggedIn: false,
     isStaff: false,
     exchange: null,
@@ -193,6 +34,14 @@ export function MacroDetailActions({
   const hasExchanged = !!effectiveStatus.exchange && !effectiveStatus.exchange.expired
   const expired = !!effectiveStatus.exchange?.expired
   const canSeeCode = effectiveStatus.isStaff || hasExchanged
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ color: 'var(--text-muted)' }}>加载中…</span>
+      </div>
+    )
+  }
 
   return (
     <>

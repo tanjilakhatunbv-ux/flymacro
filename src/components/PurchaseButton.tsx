@@ -24,13 +24,13 @@ export function PurchaseButton({
           credentials: 'same-origin',
           body: JSON.stringify({ macroSlug, modelIndex }),
         })
-        const data = (await resp.json()) as { checkoutUrl?: string; error?: string; message?: string }
-        if (!resp.ok) {
-          setError(data.message || '支付请求失败')
+        const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; message?: string }
+        if (!resp.ok || !data.success) {
+          setError(data.error || data.message || '支付请求失败')
           return
         }
-        if (data.checkoutUrl) {
-          window.location.href = data.checkoutUrl
+        if (data.data?.checkoutUrl) {
+          window.location.href = data.data.checkoutUrl
         } else {
           setError('未获得支付链接')
         }
