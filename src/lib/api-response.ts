@@ -12,16 +12,22 @@ export function error(message: string, code: string, status = 400): NextResponse
   return NextResponse.json({ success: false, error: message, code } as ApiError, { status })
 }
 
-export function unauthorized(code = 'unauthorized'): NextResponse {
-  return error('Unauthorized', code, 401)
+export function unauthorized(messageOrCode?: string, code?: string): NextResponse {
+  const msg = code ? messageOrCode! : messageOrCode === undefined ? 'Unauthorized' : messageOrCode
+  const c = code ?? 'unauthorized'
+  return error(msg, c, 401)
 }
 
-export function forbidden(code = 'forbidden'): NextResponse {
-  return error('Forbidden', code, 403)
+export function forbidden(messageOrCode?: string, code?: string): NextResponse {
+  const msg = code ? messageOrCode! : messageOrCode === undefined ? 'Forbidden' : messageOrCode
+  const c = code ?? 'forbidden'
+  return error(msg, c, 403)
 }
 
-export function notFound(code = 'not_found'): NextResponse {
-  return error('Not found', code, 404)
+export function notFound(messageOrCode?: string, code?: string): NextResponse {
+  const msg = code ? messageOrCode! : messageOrCode === undefined ? 'Not found' : messageOrCode
+  const c = code ?? 'not_found'
+  return error(msg, c, 404)
 }
 
 export function conflict(message: string, code = 'conflict'): NextResponse {

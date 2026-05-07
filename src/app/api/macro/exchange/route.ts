@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
-import type { User } from '../../../../payload-types'
+import { success, unauthorized, badRequest, notFound, forbidden, conflict, internalError } from '../../../../lib/api-response'
+import type { Macro, User } from '../../../../payload-types'
 
 export async function POST(req: Request) {
-  console.log('[exchange] API called')
-
   try {
     const user = await getCurrentUser()
-    console.log('[exchange] user:', user ? { id: user.id, email: user.email, credits: user.credits } : null)
-
     if (!user) {
-      console.log('[exchange] ERROR: user not authenticated')
-      return NextResponse.json({ error: 'unauthenticated', message: '请先登录。' }, { status: 401 })
+      return unauthorized('unauthenticated')
     }
 
     const payload = await getPayload()
@@ -20,16 +16,13 @@ export async function POST(req: Request) {
     let body: { macroSlug?: string }
     try {
       body = (await req.json()) as typeof body
-    } catch (err) {
-      console.log('[exchange] ERROR: invalid JSON body', err)
-      return NextResponse.json({ error: 'invalid-body', message: '请求体格式错误。' }, { status: 400 })
+    } catch {
+      return badRequest('请求体格式错误', 'invalid-body')
     }
 
     const { macroSlug } = body
-    console.log('[exchange] macroSlug:', macroSlug)
-
     if (!macroSlug) {
-      return NextResponse.json({ error: 'missing-macro', message: '缺少宏标识。' }, { status: 400 })
+      return badRequest('缺少宏标识', 'missing-macro')
     }
 
     const macroRes = await payload.find({
@@ -38,21 +31,19 @@ export async function POST(req: Request) {
       limit: 1,
       depth: 0,
     })
-    const macro = macroRes.docs[0] as any
-    console.log('[exchange] macro found:', macro ? { id: macro.id, slug: macro.slug, price: macro.price } : null)
+    const macro = macroRes.docs[0] as Macro | undefined
 
     if (!macro) {
-      return NextResponse.json({ error: 'macro-not-found', message: '宏不存在。' }, { status: 404 })
+      return notFound('macro-not-found')
     }
 
     const price = macro.price ?? 0
-    const currentCredits = (user.credits as number) ?? 0
-    console.log('[exchange] price:', price, 'currentCredits:', currentCredits)
+    const currentCredits = user.credits ?? 0
 
     if (currentCredits < price) {
-      return NextResponse.json(
-        { error: 'insufficient-credits', message: `积分不足，需要 ${price} 积分，当前 ${currentCredits} 积分。` },
-        { status: 403 },
+      return forbidden(
+        `积分不足，需要 ${price} 积分，当前 ${currentCredits} 积分`,
+        'insufficient-credits',
       )
     }
 
@@ -75,13 +66,9 @@ export async function POST(req: Request) {
       depth: 0,
       overrideAccess: true,
     })
-    console.log('[exchange] existing exchanges:', existing.docs.length)
 
     if (existing.docs.length > 0) {
-      return NextResponse.json(
-        { error: 'already-exchanged', message: '你已经兑换过此宏，且仍在有效期内。' },
-        { status: 409 },
-      )
+      return conflict('你已经兑换过此宏，且仍在有效期内', 'already-exchanged')
     }
 
     const now = new Date()
@@ -92,16 +79,14 @@ export async function POST(req: Request) {
 
     // Deduct credits
     const newCredits = currentCredits - price
-    console.log('[exchange] deducting credits:', currentCredits, '->', newCredits)
     await payload.update({
       collection: 'users',
       id: user.id,
-      data: { credits: newCredits } as any,
+      data: { credits: newCredits },
       overrideAccess: true,
     })
 
     // Create exchange record
-    console.log('[exchange] creating exchange record')
     const exchange = await payload.create({
       collection: 'macro-exchanges',
       data: {
@@ -111,10 +96,9 @@ export async function POST(req: Request) {
         grantedAt: now.toISOString(),
         expiresAt,
         autoRenew: macro.autoRenewable ?? false,
-      } as any,
+      },
       overrideAccess: true,
     })
-    console.log('[exchange] exchange created:', exchange.id)
 
     // Create credit transaction
     await payload.create({
@@ -126,7 +110,7 @@ export async function POST(req: Request) {
         type: 'exchange',
         relatedExchange: exchange.id,
         reason: `兑换「${macro.title}」`,
-      } as any,
+      },
       overrideAccess: true,
     })
 
@@ -140,22 +124,16 @@ export async function POST(req: Request) {
         link: `/macros/${macroSlug}`,
         category: 'order',
         read: false,
-      } as any,
+      },
       overrideAccess: true,
     })
 
-    console.log('[exchange] SUCCESS')
-    return NextResponse.json({
-      success: true,
+    return NextResponse.json(success({
       credits: newCredits,
       expiresAt,
       autoRenew: macro.autoRenewable ?? false,
-    })
-  } catch (err: any) {
-    console.error('[exchange] UNEXPECTED ERROR:', err.message, err.stack)
-    return NextResponse.json(
-      { error: 'internal-error', message: '服务器内部错误：' + err.message },
-      { status: 500 },
-    )
+    }))
+  } catch (err) {
+    return internalError('服务器内部错误')
   }
 }

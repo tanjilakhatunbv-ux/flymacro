@@ -1,26 +1,30 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser, isStaffRole } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
+import { badRequest, internalError, success } from '../../../../lib/api-response'
+import type { MacroExchange } from '../../../../payload-types'
 
 export async function GET(req: Request) {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({
+    return NextResponse.json(success({
       loggedIn: false,
       isStaff: false,
       exchange: null,
       userCredits: 0,
-    })
+    }))
   }
 
   const { searchParams } = new URL(req.url)
   const macroId = searchParams.get('macroId')
 
   if (!macroId) {
-    return NextResponse.json(
-      { error: 'missing-macro-id', message: '缺少宏 ID' },
-      { status: 400 }
-    )
+    return badRequest('缺少宏 ID', 'missing-macro-id')
+  }
+
+  const id = Number(macroId)
+  if (!id || id <= 0) {
+    return badRequest('无效的宏 ID', 'invalid-macro-id')
   }
 
   try {
@@ -32,20 +36,19 @@ export async function GET(req: Request) {
       where: {
         and: [
           { user: { equals: user.id } },
-          { macro: { equals: Number(macroId) } },
+          { macro: { equals: id } },
         ],
       },
       sort: '-createdAt',
       limit: 1,
       depth: 0,
-      overrideAccess: true,
     })
 
-    const exchange = (result.docs[0] as any) ?? null
+    const exchange = result.docs[0] as MacroExchange | undefined
     const now = new Date()
     const expired = exchange?.expiresAt ? new Date(exchange.expiresAt) <= now : false
 
-    return NextResponse.json({
+    return NextResponse.json(success({
       loggedIn: true,
       isStaff: staff,
       exchange: exchange
@@ -56,12 +59,9 @@ export async function GET(req: Request) {
             expired,
           }
         : null,
-      userCredits: (user.credits as number) ?? 0,
-    })
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: 'internal-error', message: err.message },
-      { status: 500 }
-    )
+      userCredits: user.credits ?? 0,
+    }))
+  } catch {
+    return internalError('查询兑换状态失败')
   }
 }

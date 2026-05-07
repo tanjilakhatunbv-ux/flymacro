@@ -15,10 +15,10 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
   return (
     <article className="macro-card" data-tier={macro.tier} data-exchanged={isExchanged}>
       {img ? (
-        <Link href={`/macros/${macro.slug}`} className="card-img" aria-label={macro.title}>
+        <Link href={`/macros/${macro.slug}`} className="card-img" aria-hidden="true">
           <Image
             src={img}
-            alt={macro.title}
+            alt=""
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
@@ -27,7 +27,7 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
           {isExchanged && <span className="card-badge owned">已兑换</span>}
         </Link>
       ) : (
-        <Link href={`/macros/${macro.slug}`} className="card-img card-img--empty" aria-label={macro.title}>
+        <Link href={`/macros/${macro.slug}`} className="card-img card-img--empty" aria-hidden="true">
           <span className="card-img-placeholder">{macro.title.charAt(0)}</span>
           {isExchanged && <span className="card-badge owned">已兑换</span>}
         </Link>
