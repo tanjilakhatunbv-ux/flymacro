@@ -2383,4 +2383,41 @@ main { min-height: calc(100vh - 200px); }
   opacity: 0.85;
 }
 
+.plugin-latest-section {
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.plugin-latest-section h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 20px rgba(255, 209, 0, 0.3), 0 2px 0 rgba(0,0,0,0.55);
+}
+
+.plugin-older-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 3rem 0 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.plugin-older-title::after {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 2px;
+  margin: 0.5rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
 @import './skeleton.css';

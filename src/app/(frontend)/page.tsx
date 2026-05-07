@@ -80,8 +80,8 @@ export default async function HomePage() {
             <Link href="/macros" className="btn btn-primary">
               进入宏库
             </Link>
-            <Link href="/guide" className="btn">
-              学习编写
+            <Link href="/plugins" className="btn">
+              插件下载
             </Link>
           </div>
         </div>

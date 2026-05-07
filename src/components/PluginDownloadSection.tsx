@@ -8,6 +8,7 @@ interface Props {
   publishedAt?: string
   changelog?: string
   downloadInfo: PluginDownloadInfo
+  showHistoryLink?: boolean
 }
 
 function formatDate(dateStr?: string) {
@@ -17,7 +18,7 @@ function formatDate(dateStr?: string) {
   return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-export function PluginDownloadSection({ version, publishedAt, changelog, downloadInfo }: Props) {
+export function PluginDownloadSection({ version, publishedAt, changelog, downloadInfo, showHistoryLink = true }: Props) {
   return (
     <div className="plugin-download-section">
       <div className="plugin-download-meta">
@@ -64,9 +65,11 @@ export function PluginDownloadSection({ version, publishedAt, changelog, downloa
           <span className="plugin-unavailable">暂无下载资源</span>
         )}
 
-        <Link href="/plugins" className="btn">
-          查看历史版本
-        </Link>
+        {showHistoryLink && (
+          <Link href="/plugins" className="btn">
+            查看历史版本
+          </Link>
+        )}
       </div>
     </div>
   )
