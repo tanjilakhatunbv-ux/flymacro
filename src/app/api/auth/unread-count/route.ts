@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
+import { success, internalError } from '../../../../lib/api-response'
 
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({ count: 0 })
+    return NextResponse.json(success({ count: 0 }))
   }
 
   try {
@@ -17,8 +18,8 @@ export async function GET() {
       },
       overrideAccess: true,
     })
-    return NextResponse.json({ count: r.totalDocs ?? 0 })
+    return NextResponse.json(success({ count: r.totalDocs ?? 0 }))
   } catch {
-    return NextResponse.json({ count: 0 })
+    return internalError('查询未读通知失败')
   }
 }
