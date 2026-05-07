@@ -85,6 +85,7 @@ export interface Config {
     notifications: Notification;
     'plugin-files': PluginFile;
     'plugin-releases': PluginRelease;
+    'audit-logs': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -118,6 +119,7 @@ export interface Config {
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'plugin-files': PluginFilesSelect<false> | PluginFilesSelect<true>;
     'plugin-releases': PluginReleasesSelect<false> | PluginReleasesSelect<true>;
+    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -817,6 +819,51 @@ export interface PluginRelease {
   createdAt: string;
 }
 /**
+ * 后台关键操作审计日志，支持按时间、操作人、操作类型筛选查询。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs".
+ */
+export interface AuditLog {
+  id: number;
+  action:
+    | 'create_user'
+    | 'update_user'
+    | 'delete_user'
+    | 'create_ticket'
+    | 'update_ticket'
+    | 'delete_ticket'
+    | 'create_order'
+    | 'update_order'
+    | 'delete_order'
+    | 'other';
+  collection: string;
+  docId?: string | null;
+  before?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  after?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  operator: number | User;
+  reason?: string | null;
+  ip?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -911,6 +958,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'plugin-releases';
         value: number | PluginRelease;
+      } | null)
+    | ({
+        relationTo: 'audit-logs';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1332,6 +1383,22 @@ export interface PluginReleasesSelect<T extends boolean = true> {
   pluginFile?: T;
   cloudUrl?: T;
   cloudPassword?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  action?: T;
+  collection?: T;
+  docId?: T;
+  before?: T;
+  after?: T;
+  operator?: T;
+  reason?: T;
+  ip?: T;
   updatedAt?: T;
   createdAt?: T;
 }

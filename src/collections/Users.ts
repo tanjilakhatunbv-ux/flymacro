@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isSuperAdmin, isOwnerOrSuperAdmin, isSuperAdminField } from '../lib/access'
+import { isOwnerOrSuperAdmin, isSuperAdminField } from '../lib/access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -44,7 +44,14 @@ export const Users: CollectionConfig = {
       return { id: { equals: user.id } }
     },
     update: isOwnerOrSuperAdmin,
-    delete: isSuperAdmin,
+    delete: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'super-admin') return true
+      if (user.role === 'operator' || user.role === 'support') {
+        return { role: { equals: 'user' } }
+      }
+      return false
+    },
     admin: ({ req: { user } }) =>
       !!user && (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support'),
   },
@@ -195,5 +202,53 @@ export const Users: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      async ({ req, operation, doc, previousDoc }) => {
+        if (!req.user) return
+        try {
+          const { getIPFromPayloadReq, sanitizeDoc } = await import('../lib/audit')
+          await req.payload.create({
+            collection: 'audit-logs',
+            data: {
+              action: operation === 'create' ? 'create_user' : 'update_user',
+              collection: 'users',
+              docId: String(doc.id),
+              before: previousDoc ? sanitizeDoc(previousDoc) : null,
+              after: sanitizeDoc(doc),
+              operator: req.user.id,
+              ip: getIPFromPayloadReq(req),
+            },
+            overrideAccess: true,
+          })
+        } catch {
+          /* audit log failure must not block business */
+        }
+      },
+    ],
+    afterDelete: [
+      async ({ req, doc, id }) => {
+        if (!req.user) return
+        try {
+          const { getIPFromPayloadReq, sanitizeDoc } = await import('../lib/audit')
+          await req.payload.create({
+            collection: 'audit-logs',
+            data: {
+              action: 'delete_user',
+              collection: 'users',
+              docId: String(id),
+              before: doc ? sanitizeDoc(doc) : null,
+              after: null,
+              operator: req.user.id,
+              ip: getIPFromPayloadReq(req),
+            },
+            overrideAccess: true,
+          })
+        } catch {
+          /* ignore */
+        }
+      },
+    ],
+  },
   timestamps: true,
 }

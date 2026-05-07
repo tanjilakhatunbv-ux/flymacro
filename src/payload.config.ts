@@ -26,6 +26,7 @@ import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
 import { PluginFiles } from './collections/PluginFiles'
 import { PluginReleases } from './collections/PluginReleases'
+import { AuditLogs } from './collections/AuditLogs'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -78,6 +79,7 @@ export default buildConfig({
     Notifications,
     PluginFiles,
     PluginReleases,
+    AuditLogs,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor({}),
