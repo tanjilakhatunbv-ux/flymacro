@@ -40,8 +40,33 @@ export async function POST(req: Request) {
       return unauthorized('invalid_credentials')
     }
 
+    const user = result.user as User
+
+    // Check account status
+    if (user.status === 'suspended') {
+      return forbidden('account_suspended', '账号已被停用，请联系客服')
+    }
+    if (user.status === 'banned') {
+      return forbidden('account_banned', '账号已被封禁，请联系客服')
+    }
+
+    // Update login metadata
+    try {
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: {
+          lastLoginAt: new Date().toISOString(),
+          loginCount: ((user.loginCount ?? 0) as number) + 1,
+        } as never,
+        overrideAccess: true,
+      })
+    } catch {
+      /* ignore metadata update failures */
+    }
+
     const response = NextResponse.json(success({
-      user: result.user as User,
+      user,
       token: result.token,
       message: '登录成功',
     }))

@@ -303,14 +303,14 @@ async function main() {
         role: 'user',
         credits: 100,
         _verified: true,
-      },
+      } as never,
     })
     console.log(`[seed-demos] created test user: ${testEmail} / ${testPassword} (100 credits)`)
   } else {
     await payload.update({
       collection: 'users',
       id: existingUser.docs[0].id,
-      data: { credits: 100, _verified: true },
+      data: { credits: 100, _verified: true } as never,
     })
     console.log(`[seed-demos] test user already exists, reset credits to 100`)
   }

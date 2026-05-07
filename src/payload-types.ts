@@ -90,7 +90,15 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    users: {
+      creditOrdersJoin: 'credit-orders';
+      creditTransactionsJoin: 'credit-transactions';
+      macroExchangesJoin: 'macro-exchanges';
+      ticketsJoin: 'tickets';
+      notificationsJoin: 'notifications';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -154,6 +162,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * 注册用户管理。支持按角色、状态筛选，点击查看完整档案。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -165,12 +175,47 @@ export interface User {
    * 只有超级管理员可以修改角色
    */
   role: 'super-admin' | 'operator' | 'support' | 'user';
-  oauthProvider?: ('google' | 'github') | null;
-  oauthId?: string | null;
+  /**
+   * 停用或封禁后用户无法登录前台
+   */
+  status: 'active' | 'suspended' | 'banned';
   /**
    * 新用户默认 20 积分
    */
   credits?: number | null;
+  lastLoginAt?: string | null;
+  loginCount?: number | null;
+  /**
+   * 仅后台可见，不对用户展示
+   */
+  staffNote?: string | null;
+  oauthProvider?: ('google' | 'github') | null;
+  oauthId?: string | null;
+  creditOrdersJoin?: {
+    docs?: (number | CreditOrder)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  creditTransactionsJoin?: {
+    docs?: (number | CreditTransaction)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  macroExchangesJoin?: {
+    docs?: (number | MacroExchange)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  ticketsJoin?: {
+    docs?: (number | Ticket)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  notificationsJoin?: {
+    docs?: (number | Notification)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -250,48 +295,94 @@ export interface Media {
   };
 }
 /**
+ * 充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "classes".
+ * via the `definition` "credit-orders".
  */
-export interface Class {
+export interface CreditOrder {
   id: number;
-  slug: string;
-  nameZh: string;
-  nameEn: string;
+  orderNumber: string;
+  user: number | User;
   /**
-   * 例如 #C69B6D
+   * 财务数据不可修改
    */
-  color: string;
-  icon?: (number | null) | Media;
-  sort?: number | null;
+  amount: number;
+  currency: 'CNY' | 'USD';
+  /**
+   * 财务数据不可修改
+   */
+  creditsGranted: number;
+  status: 'pending' | 'paid' | 'failed';
+  /**
+   * DodoPayments checkout session ID
+   */
+  dodoCheckoutId?: string | null;
+  paidAt?: string | null;
+  /**
+   * 调试用，请勿手动修改
+   */
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * 积分流水。仅由系统程序化创建，所有字段只读，用作对账依据。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specs".
+ * via the `definition` "credit-transactions".
  */
-export interface Spec {
+export interface CreditTransaction {
   id: number;
-  slug: string;
-  nameZh: string;
-  nameEn: string;
-  class: number | Class;
-  role: 'tank' | 'healer' | 'melee-dps' | 'ranged-dps';
-  sort?: number | null;
+  /**
+   * 系统自动生成的列表显示标题
+   */
+  label?: string | null;
+  user: number | User;
+  /**
+   * 正数=增加，负数=减少
+   */
+  amount: number;
+  balanceAfter: number;
+  type: 'register_bonus' | 'recharge' | 'exchange' | 'renew' | 'refund' | 'admin_adjust';
+  relatedOrder?: (number | null) | CreditOrder;
+  relatedExchange?: (number | null) | MacroExchange;
+  reason?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * 宏兑换记录。每条记录表示一个用户用积分解锁了某个宏。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "versions".
+ * via the `definition` "macro-exchanges".
  */
-export interface Version {
+export interface MacroExchange {
   id: number;
-  label: string;
-  codename?: string | null;
-  releasedAt?: string | null;
-  isCurrent?: boolean | null;
+  user: number | User;
+  macro: number | Macro;
+  /**
+   * 兑换后不可修改，避免破坏对账
+   */
+  creditsSpent: number;
+  grantedAt?: string | null;
+  /**
+   * 留空 = 永久有效
+   */
+  expiresAt?: string | null;
+  autoRenew?: boolean | null;
+  /**
+   * 设置后该兑换记录将不再授予访问权限
+   */
+  revokedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -396,6 +487,93 @@ export interface Macro {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "classes".
+ */
+export interface Class {
+  id: number;
+  slug: string;
+  nameZh: string;
+  nameEn: string;
+  /**
+   * 例如 #C69B6D
+   */
+  color: string;
+  icon?: (number | null) | Media;
+  sort?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specs".
+ */
+export interface Spec {
+  id: number;
+  slug: string;
+  nameZh: string;
+  nameEn: string;
+  class: number | Class;
+  role: 'tank' | 'healer' | 'melee-dps' | 'ranged-dps';
+  sort?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "versions".
+ */
+export interface Version {
+  id: number;
+  label: string;
+  codename?: string | null;
+  releasedAt?: string | null;
+  isCurrent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 用户提交的客服工单。员工可指派、回复、变更优先级和状态。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  subject: string;
+  user: number | User;
+  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  priority?: ('low' | 'normal' | 'high' | 'urgent') | null;
+  category?: ('refund' | 'usage' | 'account' | 'feedback' | 'other') | null;
+  relatedMacro?: (number | null) | Macro;
+  relatedOrder?: (number | null) | CreditOrder;
+  assignee?: (number | null) | User;
+  closedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 站内通知。可按系统、订单、工单、促销分类。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: number;
+  recipient: number | User;
+  title: string;
+  body?: string | null;
+  /**
+   * 点击通知后跳转的站内链接
+   */
+  link?: string | null;
+  category?: ('system' | 'order' | 'ticket' | 'promotion') | null;
+  read?: boolean | null;
+  readAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * 新手教程与使用指南。weight 越小越靠前。
@@ -537,118 +715,6 @@ export interface CreditPackage {
   createdAt: string;
 }
 /**
- * 充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "credit-orders".
- */
-export interface CreditOrder {
-  id: number;
-  orderNumber: string;
-  user: number | User;
-  /**
-   * 财务数据不可修改
-   */
-  amount: number;
-  currency: 'CNY' | 'USD';
-  /**
-   * 财务数据不可修改
-   */
-  creditsGranted: number;
-  status: 'pending' | 'paid' | 'failed';
-  /**
-   * DodoPayments checkout session ID
-   */
-  dodoCheckoutId?: string | null;
-  paidAt?: string | null;
-  /**
-   * 调试用，请勿手动修改
-   */
-  meta?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * 宏兑换记录。每条记录表示一个用户用积分解锁了某个宏。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "macro-exchanges".
- */
-export interface MacroExchange {
-  id: number;
-  user: number | User;
-  macro: number | Macro;
-  /**
-   * 兑换后不可修改，避免破坏对账
-   */
-  creditsSpent: number;
-  grantedAt?: string | null;
-  /**
-   * 留空 = 永久有效
-   */
-  expiresAt?: string | null;
-  autoRenew?: boolean | null;
-  /**
-   * 设置后该兑换记录将不再授予访问权限
-   */
-  revokedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * 积分流水。仅由系统程序化创建，所有字段只读，用作对账依据。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "credit-transactions".
- */
-export interface CreditTransaction {
-  id: number;
-  /**
-   * 系统自动生成的列表显示标题
-   */
-  label?: string | null;
-  user: number | User;
-  /**
-   * 正数=增加，负数=减少
-   */
-  amount: number;
-  balanceAfter: number;
-  type: 'register_bonus' | 'recharge' | 'exchange' | 'renew' | 'refund' | 'admin_adjust';
-  relatedOrder?: (number | null) | CreditOrder;
-  relatedExchange?: (number | null) | MacroExchange;
-  reason?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * 用户提交的客服工单。员工可指派、回复、变更优先级和状态。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tickets".
- */
-export interface Ticket {
-  id: number;
-  subject: string;
-  user: number | User;
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
-  priority?: ('low' | 'normal' | 'high' | 'urgent') | null;
-  category?: ('refund' | 'usage' | 'account' | 'feedback' | 'other') | null;
-  relatedMacro?: (number | null) | Macro;
-  relatedOrder?: (number | null) | CreditOrder;
-  assignee?: (number | null) | User;
-  closedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * 工单消息。每条消息可标记为内部备注（用户不可见）。
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -688,27 +754,6 @@ export interface TicketMessage {
    * ⚠️ 警告：勾选后该消息只有客服之间可见，绝不会发送给提交工单的用户。请仔细确认！
    */
   isInternalNote?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * 站内通知。可按系统、订单、工单、促销分类。
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "notifications".
- */
-export interface Notification {
-  id: number;
-  recipient: number | User;
-  title: string;
-  body?: string | null;
-  /**
-   * 点击通知后跳转的站内链接
-   */
-  link?: string | null;
-  category?: ('system' | 'order' | 'ticket' | 'promotion') | null;
-  read?: boolean | null;
-  readAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -917,9 +962,18 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   avatar?: T;
   role?: T;
+  status?: T;
+  credits?: T;
+  lastLoginAt?: T;
+  loginCount?: T;
+  staffNote?: T;
   oauthProvider?: T;
   oauthId?: T;
-  credits?: T;
+  creditOrdersJoin?: T;
+  creditTransactionsJoin?: T;
+  macroExchangesJoin?: T;
+  ticketsJoin?: T;
+  notificationsJoin?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

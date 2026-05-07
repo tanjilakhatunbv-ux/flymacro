@@ -22,6 +22,8 @@ function getCandidateSecrets(payload: { config?: { secret?: string }; secret?: s
  * Resolves the currently authenticated user from the Payload auth cookie.
  * Bypasses payload.auth() which may fail silently in certain Vercel / Payload 3
  * configurations, and instead manually verifies the JWT + queries the DB.
+ *
+ * Suspended or banned users are treated as unauthenticated.
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
@@ -53,7 +55,13 @@ export async function getCurrentUser(): Promise<User | null> {
       depth: 0,
     })
 
-    return (user as User | undefined) ?? null
+    const userDoc = user as User | undefined
+    if (!userDoc) return null
+
+    // Reject suspended or banned users
+    if (userDoc.status !== 'active') return null
+
+    return userDoc
   } catch {
     return null
   }

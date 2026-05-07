@@ -988,9 +988,9 @@ async function upsertVersion(payload: any, label: string, data: any) {
 async function upsertByEmail(payload: any, email: string, data: any) {
   const found = await payload.find({ collection: 'users', where: { email: { equals: email } }, limit: 1, depth: 0 })
   if (found.docs.length > 0) {
-    return payload.update({ collection: 'users', id: found.docs[0].id, data })
+    return payload.update({ collection: 'users', id: found.docs[0].id, data: data as never })
   }
-  return payload.create({ collection: 'users', data })
+  return payload.create({ collection: 'users', data: data as never })
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1030,12 +1030,12 @@ async function main() {
   for (const u of TEST_USERS) {
     const existing = await payload.find({ collection: 'users', where: { email: { equals: u.email } }, limit: 1, depth: 0 })
     if (existing.docs.length > 0) {
-      await payload.update({ collection: 'users', id: existing.docs[0].id, data: { credits: u.credits, _verified: true } })
+      await payload.update({ collection: 'users', id: existing.docs[0].id, data: { credits: u.credits, _verified: true } as never })
       console.log(`[seed-full] updated user: ${u.email} (credits=${u.credits})`)
     } else {
       await payload.create({
         collection: 'users',
-        data: { email: u.email, password: u.password, name: u.name, role: u.role, credits: u.credits, _verified: true },
+        data: { email: u.email, password: u.password, name: u.name, role: u.role, credits: u.credits, _verified: true } as never,
       })
       console.log(`[seed-full] created user: ${u.email} / ${u.password} (${u.role}, ${u.credits} credits)`)
     }

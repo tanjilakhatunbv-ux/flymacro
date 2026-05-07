@@ -14,6 +14,7 @@ export async function GET() {
       name: user.name,
       role: user.role,
       credits: user.credits,
+      status: user.status,
     }),
   )
 }

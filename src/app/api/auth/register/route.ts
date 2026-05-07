@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         name: name || undefined,
         role: 'user',
         credits: 20,
-      },
+      } as never,
       overrideAccess: true,
     })
   } catch (err) {
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
             role: 'user',
             credits: 20,
             _verified: true,
-          },
+          } as never,
           overrideAccess: true,
         })
       } catch (innerErr) {

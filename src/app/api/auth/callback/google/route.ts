@@ -128,7 +128,7 @@ export async function GET(req: Request) {
           oauthProvider: 'google',
           oauthId: googleUser.id,
           _verified: true,
-        },
+        } as never,
         overrideAccess: true,
       })
     } else {
@@ -141,7 +141,7 @@ export async function GET(req: Request) {
           oauthProvider: 'google',
           oauthId: googleUser.id,
           _verified: true,
-        },
+        } as never,
         overrideAccess: true,
       })
     }
@@ -153,8 +153,36 @@ export async function GET(req: Request) {
     )
   }
 
-  // Generate JWT directly — no temporary password needed
   const userDoc = user as User
+
+  // Check account status
+  if (userDoc.status === 'suspended') {
+    return NextResponse.redirect(
+      new URL('/login?error=oauth&message=account_suspended', req.url),
+    )
+  }
+  if (userDoc.status === 'banned') {
+    return NextResponse.redirect(
+      new URL('/login?error=oauth&message=account_banned', req.url),
+    )
+  }
+
+  // Update login metadata
+  try {
+    await payload.update({
+      collection: 'users',
+      id: userDoc.id,
+      data: {
+        lastLoginAt: new Date().toISOString(),
+        loginCount: ((userDoc.loginCount ?? 0) as number) + 1,
+      } as never,
+      overrideAccess: true,
+    })
+  } catch {
+    /* ignore metadata update failures */
+  }
+
+  // Generate JWT directly — no temporary password needed
   const payloadSecret = (payload as { secret?: string }).secret ?? ''
   const jwtToken = signJwt(
     {

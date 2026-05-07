@@ -6,8 +6,10 @@ export const Users: CollectionConfig = {
   labels: { singular: '用户', plural: '用户' },
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['email', 'name', 'role', 'createdAt'],
+    defaultColumns: ['email', 'name', 'role', 'credits', '_verified', 'status', 'lastLoginAt', 'createdAt'],
     group: '账号',
+    listSearchableFields: ['email', 'name'],
+    description: '注册用户管理。支持按角色、状态筛选，点击查看完整档案。',
   },
   auth: {
     tokenExpiration: 60 * 60 * 24 * 7,
@@ -63,6 +65,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'user',
+      label: '角色',
       options: [
         { label: '超级管理员', value: 'super-admin' },
         { label: '运营', value: 'operator' },
@@ -74,6 +77,55 @@ export const Users: CollectionConfig = {
       },
       admin: {
         description: '只有超级管理员可以修改角色',
+      },
+    },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'active',
+      label: '账号状态',
+      options: [
+        { label: '正常', value: 'active' },
+        { label: '停用', value: 'suspended' },
+        { label: '已封禁', value: 'banned' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: '停用或封禁后用户无法登录前台',
+      },
+    },
+    {
+      name: 'credits',
+      type: 'number',
+      defaultValue: 20,
+      min: 0,
+      label: '当前积分',
+      admin: { position: 'sidebar', description: '新用户默认 20 积分' },
+    },
+    {
+      name: 'lastLoginAt',
+      type: 'date',
+      label: '最后登录时间',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        date: { pickerAppearance: 'dayAndTime' },
+      },
+    },
+    {
+      name: 'loginCount',
+      type: 'number',
+      defaultValue: 0,
+      label: '登录次数',
+      admin: { position: 'sidebar', readOnly: true },
+    },
+    {
+      name: 'staffNote',
+      type: 'textarea',
+      label: '客服备注',
+      admin: {
+        description: '仅后台可见，不对用户展示',
       },
     },
     {
@@ -93,12 +145,54 @@ export const Users: CollectionConfig = {
       admin: { readOnly: true, position: 'sidebar' },
     },
     {
-      name: 'credits',
-      type: 'number',
-      defaultValue: 20,
-      min: 0,
-      label: '当前积分',
-      admin: { position: 'sidebar', description: '新用户默认 20 积分' },
+      type: 'tabs',
+      tabs: [
+        {
+          label: '财务记录',
+          fields: [
+            {
+              name: 'creditOrdersJoin',
+              type: 'join',
+              collection: 'credit-orders',
+              on: 'user',
+              label: '充值订单',
+            },
+            {
+              name: 'creditTransactionsJoin',
+              type: 'join',
+              collection: 'credit-transactions',
+              on: 'user',
+              label: '积分流水',
+            },
+          ],
+        },
+        {
+          label: '业务记录',
+          fields: [
+            {
+              name: 'macroExchangesJoin',
+              type: 'join',
+              collection: 'macro-exchanges',
+              on: 'user',
+              label: '宏兑换记录',
+            },
+            {
+              name: 'ticketsJoin',
+              type: 'join',
+              collection: 'tickets',
+              on: 'user',
+              label: '提交工单',
+            },
+            {
+              name: 'notificationsJoin',
+              type: 'join',
+              collection: 'notifications',
+              on: 'recipient',
+              label: '站内通知',
+            },
+          ],
+        },
+      ],
     },
   ],
   timestamps: true,
