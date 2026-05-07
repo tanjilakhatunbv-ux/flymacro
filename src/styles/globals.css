@@ -2255,4 +2255,132 @@ main { min-height: calc(100vh - 200px); }
 }
 .credit-notice-body p { margin-bottom: 0.5rem; }
 
+/* ============================================================
+   Plugin Downloads
+   ============================================================ */
+.plugin-download-section {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.plugin-download-meta {
+  font-family: var(--font-decor);
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.plugin-version {
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+
+.plugin-date {
+  color: var(--text-dim);
+}
+
+.plugin-changelog {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  white-space: pre-wrap;
+}
+
+.plugin-download-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.plugin-link-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.plugin-password {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--gold);
+  background: rgba(255, 209, 0, 0.08);
+  border: 1px solid var(--border-soft);
+  padding: 0.4rem 0.8rem;
+  border-radius: 2px;
+}
+
+.plugin-unavailable {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.plugin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.plugin-version-card {
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.75rem 2rem;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.plugin-version-card:hover {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 24px rgba(255, 209, 0, 0.08);
+}
+
+.plugin-version-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.plugin-version-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--gold-bright);
+  margin: 0;
+}
+
+.plugin-version-date {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.plugin-version-changelog {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0 0 1.25rem;
+  white-space: pre-wrap;
+}
+
+.plugin-version-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.plugin-version-actions .file-size {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-left: 0.4rem;
+  opacity: 0.85;
+}
+
 @import './skeleton.css';

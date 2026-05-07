@@ -4,6 +4,7 @@ import { HeaderAuth } from './HeaderAuth'
 const navItems = [
   { href: '/', label: '首页' },
   { href: '/macros', label: '宏库' },
+  { href: '/plugins', label: '插件' },
   { href: '/guide', label: '教程' },
   { href: '/blog', label: '公告' },
   { href: '/about', label: '关于' },

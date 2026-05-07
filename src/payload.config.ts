@@ -24,6 +24,8 @@ import { CreditTransactions } from './collections/CreditTransactions'
 import { Tickets } from './collections/Tickets'
 import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
+import { PluginFiles } from './collections/PluginFiles'
+import { PluginReleases } from './collections/PluginReleases'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -74,6 +76,8 @@ export default buildConfig({
     Tickets,
     TicketMessages,
     Notifications,
+    PluginFiles,
+    PluginReleases,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor({}),
@@ -103,6 +107,15 @@ export default buildConfig({
             collections: {
               media: {
                 prefix: 'media',
+                disablePayloadAccessControl: true,
+                generateFileURL: ({ filename, prefix }) => {
+                  const publicUrl = process.env.S3_PUBLIC_URL || ''
+                  const path = prefix ? `${prefix}/${filename}` : filename
+                  return `${publicUrl}/${path}`
+                },
+              },
+              'plugin-files': {
+                prefix: 'plugin-files',
                 disablePayloadAccessControl: true,
                 generateFileURL: ({ filename, prefix }) => {
                   const publicUrl = process.env.S3_PUBLIC_URL || ''

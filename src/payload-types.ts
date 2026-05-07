@@ -83,6 +83,8 @@ export interface Config {
     tickets: Ticket;
     'ticket-messages': TicketMessage;
     notifications: Notification;
+    'plugin-files': PluginFile;
+    'plugin-releases': PluginRelease;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -106,6 +108,8 @@ export interface Config {
     tickets: TicketsSelect<false> | TicketsSelect<true>;
     'ticket-messages': TicketMessagesSelect<false> | TicketMessagesSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    'plugin-files': PluginFilesSelect<false> | PluginFilesSelect<true>;
+    'plugin-releases': PluginReleasesSelect<false> | PluginReleasesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -709,6 +713,65 @@ export interface Notification {
   createdAt: string;
 }
 /**
+ * 插件文件上传库，支持 .zip 等压缩包格式。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugin-files".
+ */
+export interface PluginFile {
+  id: number;
+  description?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * 插件版本管理：上传文件或提供云盘链接。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugin-releases".
+ */
+export interface PluginRelease {
+  id: number;
+  /**
+   * 例如 v1.2.0
+   */
+  version: string;
+  changelog?: string | null;
+  /**
+   * 格式 YYYY-MM-DD
+   */
+  publishedAt: string;
+  /**
+   * 发布后前台可见
+   */
+  isPublished?: boolean | null;
+  deliveryMode: 'file' | 'link';
+  /**
+   * 上传 .zip 等插件压缩包
+   */
+  pluginFile?: (number | null) | PluginFile;
+  /**
+   * 例如百度网盘、夸克网盘等分享链接
+   */
+  cloudUrl?: string | null;
+  /**
+   * 如有提取码请填写
+   */
+  cloudPassword?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -795,6 +858,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'notifications';
         value: number | Notification;
+      } | null)
+    | ({
+        relationTo: 'plugin-files';
+        value: number | PluginFile;
+      } | null)
+    | ({
+        relationTo: 'plugin-releases';
+        value: number | PluginRelease;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1172,6 +1243,41 @@ export interface NotificationsSelect<T extends boolean = true> {
   category?: T;
   read?: T;
   readAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugin-files_select".
+ */
+export interface PluginFilesSelect<T extends boolean = true> {
+  description?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugin-releases_select".
+ */
+export interface PluginReleasesSelect<T extends boolean = true> {
+  version?: T;
+  changelog?: T;
+  publishedAt?: T;
+  isPublished?: T;
+  deliveryMode?: T;
+  pluginFile?: T;
+  cloudUrl?: T;
+  cloudPassword?: T;
   updatedAt?: T;
   createdAt?: T;
 }

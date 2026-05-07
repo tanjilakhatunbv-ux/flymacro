@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getPayload } from '../../lib/payload'
+import { getCachedLatestPublishedPlugin, getPluginDownloadInfo } from '../../lib/plugins'
 import { MacroCard } from '../../components/MacroCard'
+import { PluginDownloadSection } from '../../components/PluginDownloadSection'
 import { classNames as classNameDict, classSlugs } from '../../lib/wow'
 import type { Macro, Class } from '../../payload-types'
 
@@ -9,7 +11,7 @@ export const revalidate = 60
 
 async function loadHomeData() {
   const payload = await getPayload()
-  const [featured, classesList, allMacros] = await Promise.all([
+  const [featured, classesList, allMacros, latestPlugin] = await Promise.all([
     payload.find({
       collection: 'macros',
       where: {
@@ -30,6 +32,7 @@ async function loadHomeData() {
       depth: 0,
       select: { classes: true },
     }),
+    getCachedLatestPublishedPlugin(),
   ])
 
   // Build id -> slug lookup
@@ -57,12 +60,14 @@ async function loadHomeData() {
     featured: featured.docs as Macro[],
     classes: classesList.docs as Class[],
     counts,
+    latestPlugin,
   }
 }
 
 export default async function HomePage() {
-  const { featured, classes, counts } = await loadHomeData()
+  const { featured, classes, counts, latestPlugin } = await loadHomeData()
   const classBySlug = new Map(classes.map((c) => [c.slug, c] as const))
+  const pluginDownloadInfo = getPluginDownloadInfo(latestPlugin)
 
   return (
     <>
@@ -81,6 +86,23 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {latestPlugin && (
+        <section className="section section-alt">
+          <div className="container-page">
+            <h2>插件下载</h2>
+            <div className="section-divider" aria-hidden="true">
+              <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
+            </div>
+            <PluginDownloadSection
+              version={latestPlugin.version}
+              publishedAt={latestPlugin.publishedAt}
+              changelog={latestPlugin.changelog}
+              downloadInfo={pluginDownloadInfo}
+            />
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="container-page">
