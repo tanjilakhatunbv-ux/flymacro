@@ -44,7 +44,7 @@ const stripCodeForUnpurchased: FieldHook = async ({ value, req, data }) => {
       depth: 0,
     })
     if (found.docs.length > 0) return value
-  } catch (_) {
+  } catch {
     /* ignore */
   }
   return null

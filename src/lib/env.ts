@@ -67,7 +67,6 @@ function validateEnv() {
 
   if (!parsed.success) {
     const errors = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
-    // eslint-disable-next-line no-console
     console.error('❌ Invalid environment variables:\n  ' + errors.join('\n  '))
     throw new Error(`Environment validation failed: ${errors.length} error(s)`)
   }

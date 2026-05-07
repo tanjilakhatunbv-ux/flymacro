@@ -11,9 +11,9 @@ export function isMedia(value: unknown): value is Media {
 
 export function previewUrl(
   media: number | Media | undefined,
-  opts: { size?: 'thumbnail' | 'card' | 'hero' | 'original' } = {},
+  // size option removed — currently not implemented
 ): string | undefined {
-  const { size = 'original' } = opts
+  // size currently unused
 
   if (!media) return undefined
   if (typeof media === 'number') return undefined

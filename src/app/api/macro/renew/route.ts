@@ -110,7 +110,7 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json(success({ credits: newCredits, expiresAt: newExpiresAt }))
-  } catch (err) {
+  } catch (_err) {
     return internalError('服务器内部错误')
   }
 }

@@ -1,6 +1,5 @@
 import type { Macro } from '../payload-types'
 
-type TagValue = string | number | null | undefined
 
 export function extractTagValues(field: Macro['tags']): string[] {
   if (!Array.isArray(field)) return []

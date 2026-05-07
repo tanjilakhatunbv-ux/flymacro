@@ -59,7 +59,7 @@ export async function generateStaticParams() {
       limit: 200,
       depth: 0,
     })
-    return result.docs.map((m: any) => ({ slug: m.slug }))
+    return result.docs.map((m: { slug: string }) => ({ slug: m.slug }))
   } catch {
     return []
   }

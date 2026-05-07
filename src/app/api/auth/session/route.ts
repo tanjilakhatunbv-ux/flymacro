@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
-import { success, internalError } from '../../../../lib/api-response'
+import { success } from '../../../../lib/api-response'
 
 export async function GET() {
   const user = await getCurrentUser()

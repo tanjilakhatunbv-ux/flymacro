@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Macro, Class, Spec, Version } from '../payload-types'
+import type { Macro } from '../payload-types'
 import { ClassTag, SpecTag, VersionTag, TierTag } from './Tags'
 import { previewUrl } from '../lib/media'
 import { extractTagValues } from '../lib/macro-utils'

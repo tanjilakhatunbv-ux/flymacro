@@ -87,9 +87,9 @@ export function MacroDetailActions({
             <span className="code-footer-text">
               复制全部内容，粘贴到游戏宏编辑器（按 ESC 输入 /macro），保存即可使用。
             </span>
-            <a href="/guide/how-to-use-macro" className="code-footer-link">
+            <Link href="/guide/how-to-use-macro" className="code-footer-link">
               使用指南
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -41,7 +41,7 @@ export async function GET(req: Request) {
         env: process.env.NODE_ENV,
       },
     })
-  } catch (err) {
+  } catch (_err) {
     return internalError('Debug endpoint failed')
   }
 }

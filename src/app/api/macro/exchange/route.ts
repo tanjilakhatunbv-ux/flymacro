@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, conflict, internalError } from '../../../../lib/api-response'
-import type { Macro, User } from '../../../../payload-types'
+import type { Macro } from '../../../../payload-types'
 
 export async function POST(req: Request) {
   try {
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
       expiresAt,
       autoRenew: macro.autoRenewable ?? false,
     }))
-  } catch (err) {
+  } catch (_err) {
     return internalError('服务器内部错误')
   }
 }

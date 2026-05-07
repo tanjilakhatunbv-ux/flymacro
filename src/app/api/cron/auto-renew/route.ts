@@ -159,7 +159,7 @@ export async function GET(req: Request) {
       renewed,
       failed,
     }))
-  } catch (err) {
+  } catch (_err) {
     return internalError('Failed to process auto-renew')
   }
 }
