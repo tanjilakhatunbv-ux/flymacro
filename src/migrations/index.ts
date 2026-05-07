@@ -5,6 +5,7 @@ import * as migration_20260507_add_macro_seo_and_credit_fields from './20260507_
 import * as migration_20260507_update_premium_macro_price from './20260507_update_premium_macro_price';
 import * as migration_20260507_add_plugin_collections from './20260507_add_plugin_collections';
 import * as migration_20260507_add_user_status_and_joins from './20260507_add_user_status_and_joins';
+import * as migration_20260508_sync_audit_logs_and_rels from './20260508_sync_audit_logs_and_rels';
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20260507_add_user_status_and_joins.up,
     down: migration_20260507_add_user_status_and_joins.down,
     name: '20260507_add_user_status_and_joins'
+  },
+  {
+    up: migration_20260508_sync_audit_logs_and_rels.up,
+    down: migration_20260508_sync_audit_logs_and_rels.down,
+    name: '20260508_sync_audit_logs_and_rels'
   },
 ];
