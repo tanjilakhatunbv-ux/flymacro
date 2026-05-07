@@ -2,15 +2,19 @@ import { unstable_cache } from 'next/cache'
 import { getPayload } from './payload'
 
 export async function getLatestPublishedPlugin() {
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'plugin-releases',
-    where: { isPublished: { equals: true } },
-    sort: '-publishedAt',
-    limit: 1,
-    depth: 1,
-  })
-  return (result.docs[0] ?? null) as any
+  try {
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: 'plugin-releases',
+      where: { isPublished: { equals: true } },
+      sort: '-publishedAt',
+      limit: 1,
+      depth: 1,
+    })
+    return (result.docs[0] ?? null) as any
+  } catch {
+    return null
+  }
 }
 
 export const getCachedLatestPublishedPlugin = unstable_cache(
@@ -20,15 +24,19 @@ export const getCachedLatestPublishedPlugin = unstable_cache(
 )
 
 export async function getPublishedPlugins() {
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'plugin-releases',
-    where: { isPublished: { equals: true } },
-    sort: '-publishedAt',
-    limit: 100,
-    depth: 1,
-  })
-  return result.docs as any[]
+  try {
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: 'plugin-releases',
+      where: { isPublished: { equals: true } },
+      sort: '-publishedAt',
+      limit: 100,
+      depth: 1,
+    })
+    return result.docs as any[]
+  } catch {
+    return []
+  }
 }
 
 export const getCachedPublishedPlugins = unstable_cache(
