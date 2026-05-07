@@ -76,13 +76,24 @@ const findMacros = unstable_cache(
       page,
       limit: PAGE_SIZE,
       depth: 1,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        tier: true,
+        price: true,
+        durationDays: true,
+        summary: true,
+        previewImg: true,
+        classes: true,
+        specs: true,
+        versions: true,
+        tags: true,
+        publishedAt: true,
+        _status: true,
+      },
     })
     const docs = result.docs as Macro[]
-    for (const m of docs) {
-      if (m) {
-        m.codeContent = null
-      }
-    }
     return {
       docs,
       totalPages: result.totalPages ?? 1,

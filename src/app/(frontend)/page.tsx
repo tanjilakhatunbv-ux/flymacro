@@ -28,6 +28,7 @@ async function loadHomeData() {
       where: { _status: { equals: 'published' } },
       limit: 1000,
       depth: 0,
+      select: { classes: true },
     }),
   ])
 

@@ -2,71 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================================
-   FlyMacro - World of Warcraft Inspired Theme
-   Style: Dark Fantasy / Gold Embossed / Item Tooltip
-   Ported from Hugo project
-   ============================================================ */
+@import './tokens.css';
 
-/* ----- Design Tokens ----- */
-:root {
-  /* Surfaces (warm dark) */
-  --bg-base:        #0a0807;
-  --bg-deep:        #050403;
-  --bg-surface:     #15110d;
-  --bg-elevated:    #1f1812;
-  --bg-parchment:   #2a201a;
-
-  /* Gold metalwork */
-  --gold:           #c9aa6a;
-  --gold-bright:    #ffd100;
-  --gold-dim:       #8c7339;
-  --gold-deep:      #5e4a23;
-
-  /* Borders */
-  --border:         #3a2f24;
-  --border-strong:  #5a4632;
-  --border-gold:    #8c7339;
-
-  /* Text (warm parchment) */
-  --text:           #f4e6c8;
-  --text-muted:     #a89880;
-  --text-dim:       #75695a;
-  --text-bright:    #ffffff;
-
-  /* Item quality (Blizzard standard) */
-  --q-poor:         #9d9d9d;
-  --q-common:       #ffffff;
-  --q-uncommon:     #1eff00;
-  --q-rare:         #0070dd;
-  --q-epic:         #a335ee;
-  --q-legendary:    #ff8000;
-  --q-artifact:     #e6cc80;
-
-  /* Status */
-  --health:         #22c55e;
-  --mana:           #3b82f6;
-  --rage:           #c41e3a;
-  --warning:        #f97316;
-
-  /* Effects */
-  --glow-gold:      0 0 12px rgba(255, 209, 0, 0.35);
-  --glow-soft:      0 0 24px rgba(201, 170, 106, 0.25);
-  --shadow-deep:    0 12px 32px rgba(0, 0, 0, 0.6);
-  --shadow-frame:   0 4px 16px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 209, 0, 0.08);
-
-  /* Typography — unified sans-serif stack, no serif/Song typeface */
-  --font-main:      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-mono:      'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-
-  /* Legacy aliases kept for backward compat — all point to the same unified font */
-  --font-hero:      var(--font-main);
-  --font-display:   var(--font-main);
-  --font-caps:      var(--font-main);
-  --font-decor:     var(--font-main);
-  --font-body:      var(--font-main);
-  --font-serif:     var(--font-main);
-}
 
 @layer base {
   html { color-scheme: dark; scroll-behavior: smooth; }
@@ -2318,57 +2255,4 @@ main { min-height: calc(100vh - 200px); }
 }
 .credit-notice-body p { margin-bottom: 0.5rem; }
 
-/* ============================================================
-   Skeleton Loading States
-   ============================================================ */
-.skeleton-pulse {
-  animation: skeleton-pulse 1.6s ease-in-out infinite;
-  background: var(--bg-elevated);
-  border-radius: 3px;
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.9; }
-}
-
-.skeleton-chip {
-  width: 64px;
-  height: 28px;
-}
-.skeleton-chip-wide {
-  width: 120px;
-  height: 28px;
-}
-.skeleton-img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 3px 3px 0 0;
-}
-.skeleton-tag {
-  width: 48px;
-  height: 20px;
-}
-.skeleton-title {
-  width: 70%;
-  height: 18px;
-  margin-bottom: 0.5rem;
-}
-.skeleton-line {
-  width: 100%;
-  height: 12px;
-  margin-bottom: 0.35rem;
-}
-.skeleton-line-short {
-  width: 60%;
-  height: 12px;
-  margin-bottom: 0.35rem;
-}
-.skeleton-price {
-  width: 56px;
-  height: 14px;
-}
-.skeleton-price-short {
-  width: 40px;
-  height: 14px;
-}
+@import './skeleton.css';
