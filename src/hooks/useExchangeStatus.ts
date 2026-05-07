@@ -62,9 +62,10 @@ export function useExchangeStatus(macroId: number, codeContent?: string | null) 
     const sessionValid = cachedSession && isCacheValid(cachedSession.ts)
 
     if (sessionValid && cachedSession.user) {
+      const isStaff = ['super-admin', 'operator', 'support'].includes(cachedSession.user.role ?? '')
       setStatus({
         loggedIn: true,
-        isStaff: false,
+        isStaff,
         exchange: null,
         userCredits: cachedSession.user.credits ?? 0,
       })

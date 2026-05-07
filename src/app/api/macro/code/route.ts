@@ -24,6 +24,10 @@ export async function GET(req: Request) {
 
   const payload = await getPayload()
 
+  // Build a minimal req so the afterRead hook on codeContent sees the current user
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockReq = { user } as any
+
   // Staff can always see code
   if (isStaffRole(user)) {
     const macro = await payload
@@ -31,6 +35,7 @@ export async function GET(req: Request) {
         collection: 'macros',
         id,
         depth: 0,
+        req: mockReq,
       })
       .catch(() => null) as Macro | null
     if (!macro) {
@@ -68,6 +73,7 @@ export async function GET(req: Request) {
       collection: 'macros',
       id,
       depth: 0,
+      req: mockReq,
     })
     .catch(() => null) as Macro | null
 
