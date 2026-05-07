@@ -15,8 +15,11 @@ export const AuditLogs: CollectionConfig = {
     read: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'super-admin') return true
-      // 运营/客服只能查看自己产生的日志
-      return { operator: { equals: user.id } }
+      if (user.role === 'operator' || user.role === 'support') {
+        // 运营/客服只能查看自己产生的日志
+        return { operator: { equals: user.id } }
+      }
+      return false
     },
     create: () => false,
     update: () => false,

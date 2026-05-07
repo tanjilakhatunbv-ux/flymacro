@@ -1,5 +1,5 @@
-import type { CollectionConfig } from 'payload'
-import { isOwnerOrSuperAdmin, isSuperAdminField } from '../lib/access'
+import type { CollectionConfig, Where } from 'payload'
+import { isSuperAdminField } from '../lib/access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -43,7 +43,19 @@ export const Users: CollectionConfig = {
       if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
       return { id: { equals: user.id } }
     },
-    update: isOwnerOrSuperAdmin,
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'super-admin') return true
+      if (user.role === 'operator' || user.role === 'support') {
+        return {
+          or: [
+            { id: { equals: user.id } },
+            { role: { equals: 'user' } },
+          ],
+        } as Where
+      }
+      return { id: { equals: user.id } }
+    },
     delete: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'super-admin') return true
@@ -203,6 +215,44 @@ export const Users: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [
+      async ({ req, data, originalDoc, operation }) => {
+        const me = req.user as { role?: string; id: string | number } | null
+        if (!me) return
+
+        const isStaff = me.role === 'operator' || me.role === 'support'
+        if (!isStaff) return
+
+        if (operation === 'create') {
+          const dataRole = (data as Record<string, unknown>).role
+          if (dataRole && dataRole !== 'user') {
+            throw new Error('无权创建/修改非普通用户角色')
+          }
+          return
+        }
+
+        if (operation !== 'update' || !originalDoc) return
+
+        const isSelf = originalDoc.id === me.id
+        const targetIsUser = originalDoc.role === 'user'
+
+        // staff 不能修改其他 staff 的资料
+        if (!isSelf && !targetIsUser) {
+          throw new Error('无权修改该用户资料')
+        }
+
+        // staff 不能修改其他用户的密码
+        if (!isSelf && (data as Record<string, unknown>).password) {
+          throw new Error('无权修改其他用户的密码')
+        }
+
+        // staff 不能修改任何人的角色
+        const dataRole = (data as Record<string, unknown>).role
+        if (dataRole && dataRole !== originalDoc.role) {
+          throw new Error('无权创建/修改非普通用户角色')
+        }
+      },
+    ],
     afterChange: [
       async ({ req, operation, doc, previousDoc }) => {
         if (!req.user) return

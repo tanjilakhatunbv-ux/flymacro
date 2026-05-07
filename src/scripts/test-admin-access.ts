@@ -27,6 +27,7 @@ const TESTS: { collection: string; ops: ('read' | 'create' | 'update' | 'delete'
   { collection: 'classes', ops: ['read', 'create', 'update', 'delete'] },
   { collection: 'specs', ops: ['read', 'create', 'update', 'delete'] },
   { collection: 'versions', ops: ['read', 'create', 'update', 'delete'] },
+  { collection: 'audit-logs', ops: ['read', 'create', 'update', 'delete'] },
 ]
 
 // Expected permissions matrix (simplified)
@@ -35,7 +36,7 @@ const EXPECTED: Record<string, Record<string, boolean>> = {
   'users-read': { 'super-admin': true, operator: true, support: true, user: true },
   'users-create': { 'super-admin': true, operator: true, support: true, user: true },
   'users-update': { 'super-admin': true, operator: true, support: true, user: true },
-  'users-delete': { 'super-admin': true, operator: false, support: false, user: false },
+  'users-delete': { 'super-admin': true, operator: true, support: true, user: false },
 
   // macros: publishedOrStaff, only operator+ manage
   'macros-read': { 'super-admin': true, operator: true, support: true, user: true },
@@ -122,6 +123,12 @@ const EXPECTED: Record<string, Record<string, boolean>> = {
   'versions-create': { 'super-admin': true, operator: true, support: false, user: false },
   'versions-update': { 'super-admin': true, operator: true, support: false, user: false },
   'versions-delete': { 'super-admin': true, operator: true, support: false, user: false },
+
+  // audit-logs: system-only, read restricted by operator
+  'audit-logs-read': { 'super-admin': true, operator: true, support: true, user: false },
+  'audit-logs-create': { 'super-admin': false, operator: false, support: false, user: false },
+  'audit-logs-update': { 'super-admin': false, operator: false, support: false, user: false },
+  'audit-logs-delete': { 'super-admin': true, operator: false, support: false, user: false },
 }
 
 async function main() {
