@@ -215,9 +215,6 @@ export const Macros: CollectionConfig = {
       labels: { singular: '标签', plural: '标签' },
       admin: {
         description: '便于前台筛选和聚合，例如：单体输出、群体输出、保命、控场、自我治疗',
-        components: {
-          RowLabel: '@/components/admin/RowLabels/TagRowLabel#TagRowLabel',
-        },
       },
       fields: [{ name: 'value', type: 'text', required: true }],
     },

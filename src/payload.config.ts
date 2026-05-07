@@ -48,17 +48,6 @@ export default buildConfig({
       description: '魔兽世界宏库管理后台',
       icons: [],
     },
-    components: {
-      graphics: {
-        Logo: '@/components/admin/Logo#Logo',
-        Icon: '@/components/admin/Logo#Icon',
-      },
-      views: {
-        dashboard: {
-          Component: '@/components/admin/Dashboard#Dashboard',
-        },
-      },
-    },
     dateFormat: 'yyyy-MM-dd HH:mm',
     timezones: {
       defaultTimezone: 'Asia/Shanghai',
