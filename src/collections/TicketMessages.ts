@@ -47,11 +47,11 @@ export const TicketMessages: CollectionConfig = {
     create: async ({ req: { user, payload }, data }) => {
       if (!user) return false
       if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
-      const ticketId = (data as any)?.ticket
+      const ticketId = (data as { ticket?: number | string })?.ticket
       if (!ticketId) return false
       try {
         const ticket = await payload.findByID({ collection: 'tickets', id: ticketId, depth: 0 })
-        return (ticket as any)?.user === user.id
+        return (ticket as { user?: number | string | { id: number | string } } | null)?.user === user.id
       } catch {
         return false
       }

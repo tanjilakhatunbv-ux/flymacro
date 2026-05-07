@@ -1,4 +1,4 @@
-import type { Access, FieldAccess } from 'payload'
+import type { Access, FieldAccess, Where } from 'payload'
 
 export type UserRole = 'super-admin' | 'operator' | 'support' | 'user'
 
@@ -24,10 +24,10 @@ export const publishedOrStaff: Access = ({ req: { user } }) => {
   if (hasRole(user as AnyUser | null, 'super-admin', 'operator', 'support')) return true
   return {
     and: [
-      { _status: { equals: 'published' } },
+      { _status: { equals: 'published' } as const },
       { publishedAt: { less_than_equal: new Date().toISOString() } },
     ],
-  } as any
+  } as Where
 }
 
 export const isOwnerOrStaff: Access = ({ req: { user } }) => {
