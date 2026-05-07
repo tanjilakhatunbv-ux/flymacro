@@ -24,9 +24,11 @@ const richTextToPreview = (body: unknown, limit = 40): string => {
 }
 
 const buildMessageLabel = (data: Record<string, unknown> | undefined): string => {
-  const senderType = (data?.senderType as string) ?? 'user'
-  const isInternal = data?.isInternalNote ? '【内部】' : ''
-  const preview = richTextToPreview(data?.body) || '(空消息)'
+  if (!data) return '[system] (空消息)'
+
+  const senderType = typeof data.senderType === 'string' ? data.senderType : 'user'
+  const isInternal = data.isInternalNote === true ? '【内部】' : ''
+  const preview = richTextToPreview(data.body) || '(空消息)'
   return `${isInternal}[${senderType}] ${preview}`
 }
 

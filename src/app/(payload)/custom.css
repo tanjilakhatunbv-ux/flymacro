@@ -1,1 +1,8 @@
 /* Custom Payload admin theme overrides — intentionally empty to use default theme. */
+
+/* Fix Chinese font rendering in Payload admin (Windows compatibility) */
+html,
+body,
+[data-theme] {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
