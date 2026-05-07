@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from '../../../../lib/payload'
 import { RichText } from '../../../../components/RichText'
+import { BackLink } from '../../../../components/BackLink'
 import type { Article } from '../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
@@ -52,6 +53,7 @@ export default async function BlogDetailPage({ params }: { params: Params }) {
   if (!article) notFound()
   return (
     <div className="container-page page-single">
+      <BackLink href="/blog">返回文章列表</BackLink>
       <article className="macro-detail">
         <header className="detail-header">
           <h1>{article.title}</h1>

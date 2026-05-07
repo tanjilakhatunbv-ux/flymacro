@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getPayload } from '../../../lib/payload'
+import { FALLBACK_GUIDES } from '../../../lib/guide-fallbacks'
 import type { Guide } from '../../../payload-types'
 
 export const metadata: Metadata = {
@@ -19,7 +20,22 @@ export default async function GuideListPage() {
     limit: 100,
     depth: 0,
   })
-  const guides = result.docs as Guide[]
+  const dbGuides = result.docs as Guide[]
+
+  // Merge fallback guides that don't already exist in the database
+  const dbSlugs = new Set(dbGuides.map((g) => g.slug))
+  const fallbackEntries = Object.entries(FALLBACK_GUIDES)
+    .filter(([slug]) => !dbSlugs.has(slug))
+    .map(([slug, data]) => ({
+      id: `fallback-${slug}`,
+      slug,
+      title: data.title,
+      summary: data.summary,
+      createdAt: '',
+      updatedAt: '',
+    })) as unknown as Guide[]
+
+  const guides = [...dbGuides, ...fallbackEntries]
 
   return (
     <div className="container-page page-list">

@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import { RichText } from '../../../../../components/RichText'
+import { BackLink } from '../../../../../components/BackLink'
 import { TicketReplyForm } from '../../../../../components/TicketForms'
 import type { Ticket, TicketMessage } from '../../../../../payload-types'
 
@@ -54,11 +54,7 @@ export default async function TicketDetailPage({ params }: { params: Params }) {
 
   return (
     <>
-      <div style={{ marginBottom: '0.75rem' }}>
-        <Link href="/account/tickets" style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-          ← 返回工单列表
-        </Link>
-      </div>
+      <BackLink href="/account/tickets">返回工单列表</BackLink>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
         <div>
           <h1 style={{ marginBottom: '0.5rem' }}>{ticket.subject}</h1>

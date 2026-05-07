@@ -6,6 +6,7 @@ import { unstable_cache } from 'next/cache'
 import { getPayload } from '../../../../lib/payload'
 import { ClassTag, SpecTag, VersionTag, TierTag } from '../../../../components/Tags'
 import { RichText } from '../../../../components/RichText'
+import { BackLink } from '../../../../components/BackLink'
 import { MacroDetailActions } from '../../../../components/MacroDetailActions'
 import { VideoEmbed } from '../../../../components/VideoEmbed'
 import { MacroJsonLd } from '../../../../components/MacroJsonLd'
@@ -133,6 +134,7 @@ export default async function MacroDetailPage({
 
   return (
     <div className="container-page page-single">
+      <BackLink href="/macros">返回宏列表</BackLink>
       <MacroJsonLd macro={macro} />
       <article className="macro-detail" data-tier={macro.tier}>
         <header className="detail-header">
