@@ -33,10 +33,12 @@ const getLookupTables = unstable_cache(
     ])
 
     const tagSet = new Set<string>()
-    for (const m of allMacrosRes.docs as Array<{ tags?: Array<{ value?: string }> }>) {
+    for (const m of allMacrosRes.docs as Macro[]) {
       for (const t of m.tags ?? []) {
-        const v = t?.value?.trim()
-        if (v) tagSet.add(v)
+        if (typeof t === 'object' && t !== null && 'value' in t) {
+          const v = (t as { value?: string }).value?.trim()
+          if (v) tagSet.add(v)
+        }
       }
     }
 
@@ -77,9 +79,11 @@ const findMacros = unstable_cache(
       depth: 1,
     })
     const docs = result.docs as Macro[]
-    docs.forEach((m: any) => {
-      if (m) m.codeContent = null
-    })
+    for (const m of docs) {
+      if (m) {
+        ;(m as Macro & { codeContent?: unknown }).codeContent = null
+      }
+    }
     return {
       docs,
       totalPages: result.totalPages ?? 1,

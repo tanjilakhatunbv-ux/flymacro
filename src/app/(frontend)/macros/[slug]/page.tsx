@@ -10,36 +10,13 @@ import { BackLink } from '../../../../components/BackLink'
 import { MacroDetailActions } from '../../../../components/MacroDetailActions'
 import { VideoEmbed } from '../../../../components/VideoEmbed'
 import { MacroJsonLd } from '../../../../components/MacroJsonLd'
-import type { Macro, Class, Spec, Version, Media } from '../../../../payload-types'
+import { isMedia, previewUrl } from '../../../../lib/media'
+import { extractTagValues } from '../../../../lib/macro-utils'
+import type { Macro, Class, Spec, Version } from '../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
 
 export const revalidate = 3600
-
-function isMedia(v: unknown): v is Media {
-  return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
-}
-
-function previewUrl(macro: Macro): string | null {
-  const img = macro.previewImg
-  if (!isMedia(img)) return null
-  return img.sizes?.hero?.url ?? img.url ?? null
-}
-
-function extractTagValues(macro: Macro): string[] {
-  const arr = (macro as unknown as { tags?: Array<{ value?: string | null } | null> | null }).tags
-  if (!Array.isArray(arr)) return []
-  const seen = new Set<string>()
-  const out: string[] = []
-  for (const item of arr) {
-    const v = item?.value?.trim()
-    if (v && !seen.has(v)) {
-      seen.add(v)
-      out.push(v)
-    }
-  }
-  return out
-}
 
 function pickSeoOgUrl(macro: Macro): string | null {
   const seo = (macro as unknown as { seo?: { ogImage?: unknown } }).seo
@@ -65,7 +42,7 @@ const findMacroBySlugCached = unstable_cache(
     const macro = (result.docs[0] as Macro | undefined) ?? null
     // Never leak codeContent from SSR cache — it is always fetched client-side after auth check
     if (macro) {
-      ;(macro as any).codeContent = null
+      ;(macro as Macro & { codeContent?: unknown }).codeContent = null
     }
     return macro
   },
@@ -128,9 +105,10 @@ export default async function MacroDetailPage({
   const macro = await findMacroBySlugCached(slug)
   if (!macro) notFound()
 
-  const img = previewUrl(macro)
-  const tagValues = extractTagValues(macro)
-  const demoVideoUrl = (macro as unknown as { demoVideoUrl?: string | null }).demoVideoUrl ?? null
+  const img = previewUrl(macro.previewImg ?? undefined)
+  const tagValues = extractTagValues(macro.tags)
+  const demoVideoUrl =
+    typeof macro.demoVideoUrl === 'string' ? macro.demoVideoUrl : null
 
   return (
     <div className="container-page page-single">

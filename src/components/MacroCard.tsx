@@ -1,38 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Macro, Class, Spec, Version, Media } from '../payload-types'
+import type { Macro, Class, Spec, Version } from '../payload-types'
 import { ClassTag, SpecTag, VersionTag, TierTag } from './Tags'
-
-function isMedia(v: unknown): v is Media {
-  return !!v && typeof v === 'object' && 'url' in (v as Record<string, unknown>)
-}
-
-function previewUrl(macro: Macro): string | null {
-  const img = macro.previewImg
-  if (!isMedia(img)) return null
-  const card = img.sizes?.card?.url
-  return card ?? img.url ?? null
-}
-
-function extractTagValues(macro: Macro): string[] {
-  const arr = (macro as unknown as { tags?: Array<{ value?: string | null } | null> | null }).tags
-  if (!Array.isArray(arr)) return []
-  const seen = new Set<string>()
-  const out: string[] = []
-  for (const item of arr) {
-    const v = item?.value?.trim()
-    if (v && !seen.has(v)) {
-      seen.add(v)
-      out.push(v)
-    }
-  }
-  return out
-}
+import { previewUrl } from '../lib/media'
+import { extractTagValues } from '../lib/macro-utils'
 
 export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: boolean }) {
   const img = previewUrl(macro)
   const durationText = (macro.durationDays ?? 0) === 0 ? '永久' : `${macro.durationDays}天`
-  const tagValues = extractTagValues(macro)
+  const tagValues = extractTagValues(macro.tags)
   const visibleTags = tagValues.slice(0, 3)
   const extraTagCount = Math.max(0, tagValues.length - visibleTags.length)
 

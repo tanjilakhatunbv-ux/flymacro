@@ -1,72 +1,68 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
+import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
+import { success, badRequest, unauthorized, forbidden, internalError } from '../../../../lib/api-response'
+import type { User } from '../../../../payload-types'
 
 export async function POST(req: Request) {
-  console.log('[login] endpoint called')
+  const ip = getClientIP(req)
+  const limit = rateLimit(`login:${ip}`, { max: 5, windowMs: 60_000 })
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁，请稍后再试', code: 'rate_limited' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } },
+    )
+  }
 
   let body: { email?: string; password?: string }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ message: '请求体格式错误' }, { status: 400 })
+    return badRequest('请求体格式错误', 'invalid_json')
   }
 
   const { email, password } = body
-  console.log('[login] email:', email)
 
   if (!email || !password) {
-    return NextResponse.json({ message: '请填写邮箱和密码' }, { status: 400 })
+    return badRequest('请填写邮箱和密码', 'missing_credentials')
   }
 
   try {
     const payload = await getPayload()
 
-    // Use Payload Local API login — validates password and returns a token.
     const result = await payload.login({
       collection: 'users',
       data: { email, password },
       depth: 0,
     })
 
-    console.log('[login] payload.login result:', result ? 'success' : 'null')
-
     if (!result || !result.token) {
-      console.log('[login] invalid credentials')
-      return NextResponse.json({ message: '邮箱或密码错误' }, { status: 401 })
+      return unauthorized('invalid_credentials')
     }
 
-    // Build response and manually set the auth cookie.
-    const response = NextResponse.json({
-      user: result.user,
+    const response = NextResponse.json(success({
+      user: result.user as User,
       token: result.token,
       message: '登录成功',
-    })
+    }))
 
-    const maxAge = 60 * 60 * 24 * 7 // 7 days
     response.cookies.set('payload-token', result.token, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge,
+      maxAge: 60 * 60 * 24 * 7,
     })
 
-    console.log('[login] cookie set, user:', (result.user as any)?.email)
     return response
-  } catch (err: any) {
-    console.error('[login] ERROR:', err.message, err.stack)
-
-    const msg = err.message?.toLowerCase?.() || ''
+  } catch (err) {
+    const msg = err instanceof Error ? err.message.toLowerCase() : ''
     if (msg.includes('invalid') || msg.includes('credentials')) {
-      return NextResponse.json({ message: '邮箱或密码错误' }, { status: 401 })
+      return unauthorized('invalid_credentials')
     }
     if (msg.includes('not verified') || msg.includes('verify')) {
-      return NextResponse.json({ message: '邮箱尚未激活，请检查验证邮件' }, { status: 403 })
+      return forbidden('email_not_verified')
     }
-
-    return NextResponse.json(
-      { message: '服务器内部错误：' + err.message },
-      { status: 500 },
-    )
+    return internalError('登录失败，请稍后重试')
   }
 }

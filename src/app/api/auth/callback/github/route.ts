@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import crypto from 'crypto'
 import {
   isGitHubOAuthConfigured,
   exchangeGitHubCode,
@@ -8,6 +7,8 @@ import {
   fetchGitHubUserEmail,
 } from '../../../../../lib/oauth'
 import { getPayload } from '../../../../../lib/payload'
+import { signJwt } from '../../../../../lib/jwt'
+import type { User } from '../../../../../payload-types'
 
 export async function GET(req: Request) {
   if (!isGitHubOAuthConfigured()) {
@@ -151,38 +152,18 @@ export async function GET(req: Request) {
     )
   }
 
-  // Login via internal API to get JWT
-  const tempPassword = crypto.randomUUID()
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: { password: tempPassword } as never,
-    overrideAccess: true,
-  })
-
-  const loginResp = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/users/login`,
+  // Generate JWT directly — no temporary password needed
+  const userDoc = user as User
+  const payloadSecret = (payload as { secret?: string }).secret ?? ''
+  const jwtToken = signJwt(
     {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: user.email, password: tempPassword }),
+      id: userDoc.id,
+      email: userDoc.email,
+      collection: 'users',
     },
+    payloadSecret,
+    { expiresInSeconds: 60 * 60 * 24 * 7 },
   )
-
-  if (!loginResp.ok) {
-    return NextResponse.redirect(
-      new URL('/login?error=oauth&message=login_failed', req.url),
-    )
-  }
-
-  const loginData = (await loginResp.json()) as { token?: string }
-  const jwtToken = loginData.token
-
-  if (!jwtToken) {
-    return NextResponse.redirect(
-      new URL('/login?error=oauth&message=no_token', req.url),
-    )
-  }
 
   const response = NextResponse.redirect(
     new URL(parsedState.returnUrl, req.url),

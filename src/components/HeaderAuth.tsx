@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { UserMenu } from './UserMenu'
 
+type UserRole = 'super-admin' | 'operator' | 'support' | 'user'
+
 type User = {
   id: string | number
   email: string
   name: string | null
-  role: string
+  role: UserRole
   credits: number
 }
 
@@ -102,7 +104,7 @@ export function HeaderAuth() {
     <UserMenu
       email={user.email}
       name={user.name ?? null}
-      role={user.role as any}
+      role={user.role}
       unread={unread}
       credits={user.credits ?? 0}
     />

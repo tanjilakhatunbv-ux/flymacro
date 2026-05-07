@@ -76,23 +76,24 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
           )}
         </form>
 
-        <div className="filters" role="tablist" aria-label="按档次筛选">
-          <button type="button" className={`filter-btn ${tier === 'all' ? 'active' : ''}`} onClick={() => setParams({ tier: null })}>全部</button>
-          <button type="button" className={`filter-btn ${tier === 'regular' ? 'active' : ''}`} onClick={() => setParams({ tier: 'regular' })}>普通</button>
-          <button type="button" className={`filter-btn ${tier === 'premium' ? 'active' : ''}`} onClick={() => setParams({ tier: 'premium' })}>高级</button>
+        <div className="filters" role="group" aria-label="按档次筛选">
+          <button type="button" className={`filter-btn ${tier === 'all' ? 'active' : ''}`} onClick={() => setParams({ tier: null })} aria-pressed={tier === 'all'}>全部</button>
+          <button type="button" className={`filter-btn ${tier === 'regular' ? 'active' : ''}`} onClick={() => setParams({ tier: 'regular' })} aria-pressed={tier === 'regular'}>普通</button>
+          <button type="button" className={`filter-btn ${tier === 'premium' ? 'active' : ''}`} onClick={() => setParams({ tier: 'premium' })} aria-pressed={tier === 'premium'}>高级</button>
         </div>
       </div>
 
       <div className="filter-strip">
         <span className="filter-strip-label">职业</span>
         <div className="filter-strip-tags">
-          <button type="button" className={`tag-link ${!classSlug ? 'active' : ''}`} onClick={() => setParams({ class: null, spec: null })}>全部</button>
+          <button type="button" className={`tag-link ${!classSlug ? 'active' : ''}`} onClick={() => setParams({ class: null, spec: null })} aria-pressed={!classSlug}>全部</button>
           {classes.map((c) => (
             <button
               key={c.slug}
               type="button"
               className={`tag-link ${classSlug === c.slug ? 'active' : ''}`}
               onClick={() => setParams({ class: c.slug, spec: null })}
+              aria-pressed={classSlug === c.slug}
             >
               {c.nameZh}
             </button>
@@ -104,13 +105,14 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
         <div className="filter-strip">
           <span className="filter-strip-label">专精</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!specSlug ? 'active' : ''}`} onClick={() => setParams({ spec: null })}>全部</button>
+            <button type="button" className={`tag-link ${!specSlug ? 'active' : ''}`} onClick={() => setParams({ spec: null })} aria-pressed={!specSlug}>全部</button>
             {visibleSpecs.map((s) => (
               <button
                 key={s.slug}
                 type="button"
                 className={`tag-link ${specSlug === s.slug ? 'active' : ''}`}
                 onClick={() => setParams({ spec: s.slug })}
+                aria-pressed={specSlug === s.slug}
               >
                 {s.nameZh}
               </button>
@@ -123,13 +125,14 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
         <div className="filter-strip">
           <span className="filter-strip-label">版本</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!versionLabel ? 'active' : ''}`} onClick={() => setParams({ version: null })}>全部</button>
+            <button type="button" className={`tag-link ${!versionLabel ? 'active' : ''}`} onClick={() => setParams({ version: null })} aria-pressed={!versionLabel}>全部</button>
             {versions.map((v) => (
               <button
                 key={String(v.id)}
                 type="button"
                 className={`tag-link ${versionLabel === v.label ? 'active' : ''}`}
                 onClick={() => setParams({ version: v.label })}
+                aria-pressed={versionLabel === v.label}
               >
                 {v.label}
               </button>
@@ -142,13 +145,14 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
         <div className="filter-strip">
           <span className="filter-strip-label">标签</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!tagValue ? 'active' : ''}`} onClick={() => setParams({ tag: null })}>全部</button>
+            <button type="button" className={`tag-link ${!tagValue ? 'active' : ''}`} onClick={() => setParams({ tag: null })} aria-pressed={!tagValue}>全部</button>
             {tags.map((t) => (
               <button
                 key={t}
                 type="button"
                 className={`tag-link ${tagValue === t ? 'active' : ''}`}
                 onClick={() => setParams({ tag: t })}
+                aria-pressed={tagValue === t}
               >
                 #{t}
               </button>

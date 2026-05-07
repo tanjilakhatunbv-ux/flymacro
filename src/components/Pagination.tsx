@@ -29,13 +29,11 @@ export function Pagination({
 
   return (
     <nav className="pagination" aria-label="分页">
-      <Link
-        href={buildHref(Math.max(1, currentPage - 1))}
-        aria-disabled={currentPage <= 1}
-        className={`page-link ${currentPage <= 1 ? 'is-disabled' : ''}`}
-      >
-        上一页
-      </Link>
+      {currentPage <= 1 ? (
+        <span className="page-link is-disabled" aria-disabled="true">上一页</span>
+      ) : (
+        <Link href={buildHref(currentPage - 1)} className="page-link">上一页</Link>
+      )}
       {start > 1 && (
         <>
           <Link href={buildHref(1)} className="page-link">1</Link>
@@ -58,13 +56,11 @@ export function Pagination({
           <Link href={buildHref(totalPages)} className="page-link">{totalPages}</Link>
         </>
       )}
-      <Link
-        href={buildHref(Math.min(totalPages, currentPage + 1))}
-        aria-disabled={currentPage >= totalPages}
-        className={`page-link ${currentPage >= totalPages ? 'is-disabled' : ''}`}
-      >
-        下一页
-      </Link>
+      {currentPage >= totalPages ? (
+        <span className="page-link is-disabled" aria-disabled="true">下一页</span>
+      ) : (
+        <Link href={buildHref(currentPage + 1)} className="page-link">下一页</Link>
+      )}
     </nav>
   )
 }

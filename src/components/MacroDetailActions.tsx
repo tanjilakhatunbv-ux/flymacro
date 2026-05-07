@@ -21,12 +21,17 @@ const SESSION_CACHE_KEY = 'flymacro_session_v2'
 const EXCHANGE_CACHE_KEY = (macroId: number | string) => `flymacro_macro_${macroId}_v2`
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
-function readSessionCache(): { user: { credits: number } | null; ts: number } | null {
+interface SessionUser {
+  id: number | string
+  credits: number
+}
+
+function readSessionCache(): { user: SessionUser | null; ts: number } | null {
   if (typeof sessionStorage === 'undefined') return null
   try {
     const raw = sessionStorage.getItem(SESSION_CACHE_KEY)
     if (!raw) return null
-    const parsed = JSON.parse(raw)
+    const parsed = JSON.parse(raw) as { user: SessionUser | null; ts: number }
     return { user: parsed.user, ts: parsed.ts }
   } catch {
     return null
@@ -38,14 +43,14 @@ function readExchangeCache(macroId: number | string): { status: ExchangeStatus; 
   try {
     const raw = sessionStorage.getItem(EXCHANGE_CACHE_KEY(macroId))
     if (!raw) return null
-    const parsed = JSON.parse(raw)
+    const parsed = JSON.parse(raw) as ExchangeStatus & { cachedUserId?: number | string | null; ts: number }
     // Reject old-format cache without user isolation (v1 caches)
     if (!('cachedUserId' in parsed)) {
       return null
     }
     // Invalidate cache if it belongs to a different user
     const cachedSession = readSessionCache()
-    const currentUserId = cachedSession?.user ? (cachedSession.user as any).id : null
+    const currentUserId = cachedSession?.user?.id ?? null
     if (parsed.cachedUserId != null && String(parsed.cachedUserId) !== String(currentUserId)) {
       return null
     }
@@ -59,7 +64,7 @@ function writeExchangeCache(macroId: number | string, status: ExchangeStatus) {
   if (typeof sessionStorage === 'undefined') return
   try {
     const cachedSession = readSessionCache()
-    const currentUserId = cachedSession?.user ? (cachedSession.user as any).id : null
+    const currentUserId = cachedSession?.user?.id ?? null
     sessionStorage.setItem(
       EXCHANGE_CACHE_KEY(macroId),
       JSON.stringify({ ...status, cachedUserId: currentUserId, ts: Date.now() }),
@@ -100,7 +105,7 @@ export function MacroDetailActions({
         loggedIn: true,
         isStaff: false,
         exchange: null,
-        userCredits: (cachedSession.user.credits as number) ?? 0,
+        userCredits: cachedSession.user.credits ?? 0,
       })
       setLoading(false)
     } else if (sessionValid && !cachedSession.user) {

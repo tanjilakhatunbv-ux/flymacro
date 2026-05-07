@@ -69,6 +69,7 @@ export const CreditOrders: CollectionConfig = {
       name: 'dodoCheckoutId',
       type: 'text',
       index: true,
+      unique: true,
       label: 'DodoPayments 会话 ID',
       admin: { readOnly: true, description: 'DodoPayments checkout session ID' },
     },

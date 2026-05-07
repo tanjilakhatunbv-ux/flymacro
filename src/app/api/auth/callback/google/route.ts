@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import crypto from 'crypto'
 import {
   isGoogleOAuthConfigured,
   exchangeGoogleCode,
   fetchGoogleUserInfo,
 } from '../../../../../lib/oauth'
 import { getPayload } from '../../../../../lib/payload'
+import { signJwt } from '../../../../../lib/jwt'
+import type { User } from '../../../../../payload-types'
 
 export async function GET(req: Request) {
   if (!isGoogleOAuthConfigured()) {
@@ -94,7 +95,6 @@ export async function GET(req: Request) {
   // Find existing user by OAuth ID or email
   let user = null
 
-  // Try find by oauthProvider + oauthId
   const byOAuth = await payload.find({
     collection: 'users',
     where: {
@@ -111,7 +111,6 @@ export async function GET(req: Request) {
   if (byOAuth.docs.length > 0) {
     user = byOAuth.docs[0]
   } else {
-    // Try find by email
     const byEmail = await payload.find({
       collection: 'users',
       where: { email: { equals: googleUser.email.toLowerCase() } },
@@ -122,7 +121,6 @@ export async function GET(req: Request) {
 
     if (byEmail.docs.length > 0) {
       user = byEmail.docs[0]
-      // Link OAuth to existing user
       await payload.update({
         collection: 'users',
         id: user.id,
@@ -130,11 +128,10 @@ export async function GET(req: Request) {
           oauthProvider: 'google',
           oauthId: googleUser.id,
           _verified: true,
-        } as never,
+        },
         overrideAccess: true,
       })
     } else {
-      // Create new user
       user = await payload.create({
         collection: 'users',
         data: {
@@ -156,82 +153,19 @@ export async function GET(req: Request) {
     )
   }
 
-  // Generate Payload JWT and set cookie
-  const token = await payload.login({
-    collection: 'users',
-    data: {
-      email: user.email,
-      password: '', // OAuth users have no password
-    },
-  })
-
-  // Actually, payload.login requires password. Let's generate the token manually.
-  // Or better: use the auth strategy approach. But for now, let's use a workaround.
-  // We can call the internal auth to generate a token.
-
-  // Alternative: use payload's auth operation directly
-  const authResult = await payload.auth({
-    headers: new Headers(),
-  })
-
-  // Hmm, we need to set the cookie. Let's use a different approach:
-  // Call the local auth operation to get a token, then set it as cookie.
-
-  // Actually, the cleanest way is to use the same mechanism Payload uses for login.
-  // Let's call the auth endpoints REST API internally with the user credentials.
-  // But OAuth users don't have passwords...
-
-  // Workaround: generate a temporary password for OAuth users or use a custom token.
-  // Actually, let's use Payload's internal `jwtSign` or the auth operation.
-
-  // For Payload v3, we can use `req.payload.auth` but we don't have req.
-  // Let's use a simpler approach: call the REST API login endpoint.
-  // But we don't have password...
-
-  // Best approach: create a custom API route that directly sets the JWT cookie.
-  // We need to import the jwtSign from Payload.
-
-  // Actually, let me use a different approach:
-  // Call the internal auth strategy to generate a token.
-
-  // For now, let's use a simple workaround:
-  // 1. Update the user to set a random password
-  // 2. Login with that password
-  // 3. Set the cookie
-
-  const tempPassword = crypto.randomUUID()
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: { password: tempPassword } as never,
-    overrideAccess: true,
-  })
-
-  const loginResp = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/api/users/login`,
+  // Generate JWT directly — no temporary password needed
+  const userDoc = user as User
+  const payloadSecret = (payload as { secret?: string }).secret ?? ''
+  const jwtToken = signJwt(
     {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: user.email, password: tempPassword }),
+      id: userDoc.id,
+      email: userDoc.email,
+      collection: 'users',
     },
+    payloadSecret,
+    { expiresInSeconds: 60 * 60 * 24 * 7 },
   )
 
-  if (!loginResp.ok) {
-    return NextResponse.redirect(
-      new URL('/login?error=oauth&message=login_failed', req.url),
-    )
-  }
-
-  const loginData = (await loginResp.json()) as { token?: string }
-  const jwtToken = loginData.token
-
-  if (!jwtToken) {
-    return NextResponse.redirect(
-      new URL('/login?error=oauth&message=no_token', req.url),
-    )
-  }
-
-  // Set cookie and redirect
   const response = NextResponse.redirect(
     new URL(parsedState.returnUrl, req.url),
   )
@@ -241,10 +175,9 @@ export async function GET(req: Request) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 7,
   })
 
-  // Clear oauth state cookie
   response.cookies.delete('oauth-state')
 
   return response
