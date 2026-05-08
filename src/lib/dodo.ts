@@ -2,7 +2,7 @@ const apiKey = process.env.DODO_API_KEY
 const mode = process.env.DODO_MODE || 'test_mode'
 
 const baseUrl =
-  mode === 'live_mode'
+  mode === 'live'
     ? 'https://live.dodopayments.com'
     : 'https://test.dodopayments.com'
 

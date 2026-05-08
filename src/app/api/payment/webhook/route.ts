@@ -193,6 +193,20 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
 
   const creditsGranted = pkg?.creditsGranted ?? Math.floor(amount)
 
+  // Check for existing order with same session id to prevent duplicate webhooks
+  if (sessionId) {
+    const existing = await payload.find({
+      collection: 'credit-orders',
+      where: { dodoCheckoutId: { equals: sessionId } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    if (existing.docs.length > 0) {
+      throw new DuplicateWebhookError()
+    }
+  }
+
   // Attempt to create credit order — unique constraint on dodoCheckoutId prevents duplicates
   let order: { id: number }
   try {

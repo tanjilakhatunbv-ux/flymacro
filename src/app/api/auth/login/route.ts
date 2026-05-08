@@ -44,10 +44,10 @@ export async function POST(req: Request) {
 
     // Check account status
     if (user.status === 'suspended') {
-      return forbidden('account_suspended', '账号已被停用，请联系客服')
+      return forbidden('账号已被停用，请联系客服', 'account_suspended')
     }
     if (user.status === 'banned') {
-      return forbidden('account_banned', '账号已被封禁，请联系客服')
+      return forbidden('账号已被封禁，请联系客服', 'account_banned')
     }
 
     // Update login metadata
@@ -82,11 +82,11 @@ export async function POST(req: Request) {
     return response
   } catch (err) {
     const msg = err instanceof Error ? err.message.toLowerCase() : ''
-    if (msg.includes('invalid') || msg.includes('credentials')) {
+    if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('密码') || msg.includes('incorrect')) {
       return unauthorized('invalid_credentials')
     }
-    if (msg.includes('not verified') || msg.includes('verify')) {
-      return forbidden('email_not_verified')
+    if (msg.includes('not verified') || msg.includes('verify') || msg.includes('验证')) {
+      return forbidden('邮箱未验证，请先完成邮箱验证', 'email_not_verified')
     }
     return internalError('登录失败，请稍后重试')
   }

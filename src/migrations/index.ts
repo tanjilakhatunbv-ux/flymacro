@@ -7,6 +7,8 @@ import * as migration_20260507_add_plugin_collections from './20260507_add_plugi
 import * as migration_20260507_add_user_status_and_joins from './20260507_add_user_status_and_joins';
 import * as migration_20260508_sync_audit_logs_and_rels from './20260508_sync_audit_logs_and_rels';
 import * as migration_20260508_add_credit_transactions_label from './20260508_add_credit_transactions_label';
+import * as migration_20260508_add_site_settings from './20260508_add_site_settings';
+import * as migration_20260508_add_credit_orders_checkout_unique from './20260508_add_credit_orders_checkout_unique';
 
 export const migrations = [
   {
@@ -53,5 +55,15 @@ export const migrations = [
     up: migration_20260508_add_credit_transactions_label.up,
     down: migration_20260508_add_credit_transactions_label.down,
     name: '20260508_add_credit_transactions_label'
+  },
+  {
+    up: migration_20260508_add_site_settings.up,
+    down: migration_20260508_add_site_settings.down,
+    name: '20260508_add_site_settings'
+  },
+  {
+    up: migration_20260508_add_credit_orders_checkout_unique.up,
+    down: migration_20260508_add_credit_orders_checkout_unique.down,
+    name: '20260508_add_credit_orders_checkout_unique'
   },
 ];

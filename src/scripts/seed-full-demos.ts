@@ -1082,7 +1082,7 @@ async function main() {
         specs: specIds,
         versions: versionIds,
         tags: m.tags.map((t) => ({ value: t })),
-        seo: m.seo ?? null,
+        ...(m.seo ? { seo: m.seo } : {}),
         demoVideoUrl: m.demoVideoUrl ?? null,
         publishedAt: new Date().toISOString(),
         _status: 'published',
@@ -1262,20 +1262,21 @@ async function main() {
         data: {
           user: normalUser.id,
           subject: '兑换的宏代码显示不完整',
-          description: '我兑换了战士武器爆发宏，但是代码区域只显示了前10行，后面都是空的。请帮忙检查一下。',
           status: 'open',
-          priority: 'medium',
+          priority: 'normal',
+          category: 'usage',
         } as any,
       })
       console.log(`[seed-full] created ticket: ${(ticket as any).subject}`)
 
-      // 用户回复
+      // 用户首条说明
       await payload.create({
         collection: 'ticket-messages',
         data: {
           ticket: (ticket as any).id,
           sender: normalUser.id,
-          body: '补充一下，我用的是Chrome浏览器，版本是120。刷新页面也没有用。',
+          senderType: 'user',
+          body: lexicalBody('我兑换了战士武器爆发宏，但是代码区域只显示了前10行，后面都是空的。请帮忙检查一下。我用的是Chrome浏览器，版本是120。刷新页面也没有用。'),
           isInternalNote: false,
         } as any,
       })
@@ -1288,7 +1289,8 @@ async function main() {
           data: {
             ticket: (ticket as any).id,
             sender: supportUser.id,
-            body: '排查记录：用户账户正常，兑换记录存在，宏代码字段有内容。可能是前端渲染问题，已转交技术团队。',
+            senderType: 'staff',
+            body: lexicalBody('排查记录：用户账户正常，兑换记录存在，宏代码字段有内容。可能是前端渲染问题，已转交技术团队。'),
             isInternalNote: true,
           } as any,
         })
