@@ -104,17 +104,21 @@ export async function POST(req: Request) {
         return internalError(innerMsg)
       }
 
-      await payload.create({
-        collection: 'credit-transactions',
-        data: {
-          user: user.id,
-          amount: 20,
-          balanceAfter: 20,
-          type: 'register_bonus',
-          reason: '新用户注册奖励',
-        },
-        overrideAccess: true,
-      })
+      try {
+        await payload.create({
+          collection: 'credit-transactions',
+          data: {
+            user: user.id,
+            amount: 20,
+            balanceAfter: 20,
+            type: 'register_bonus',
+            reason: '新用户注册奖励',
+          },
+          overrideAccess: true,
+        })
+      } catch {
+        /* ignore credit transaction creation failure */
+      }
 
       return NextResponse.json(success({
         warning: '账号已创建（邮箱验证暂时跳过，发件域名配置中）。请直接登录。',
@@ -124,17 +128,21 @@ export async function POST(req: Request) {
     return internalError(msg)
   }
 
-  await payload.create({
-    collection: 'credit-transactions',
-    data: {
-      user: user.id,
-      amount: 20,
-      balanceAfter: 20,
-      type: 'register_bonus',
-      reason: '新用户注册奖励',
-    },
-    overrideAccess: true,
-  })
+  try {
+    await payload.create({
+      collection: 'credit-transactions',
+      data: {
+        user: user.id,
+        amount: 20,
+        balanceAfter: 20,
+        type: 'register_bonus',
+        reason: '新用户注册奖励',
+      },
+      overrideAccess: true,
+    })
+  } catch {
+    /* ignore credit transaction creation failure so registration still succeeds */
+  }
 
   return NextResponse.json(success({ ok: true }))
 }
