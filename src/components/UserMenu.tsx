@@ -44,7 +44,7 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
     try {
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 5000)
-      await fetch('/api/users/logout', {
+      await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'same-origin',
         signal: controller.signal,
