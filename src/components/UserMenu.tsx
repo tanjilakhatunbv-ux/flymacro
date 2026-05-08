@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { clearSessionCache } from '../lib/session-cache'
 
 type Role = 'super-admin' | 'operator' | 'support' | 'user'
 
@@ -15,7 +15,6 @@ type Props = {
 }
 
 export function UserMenu({ email, name, role, unread, credits }: Props) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
@@ -40,15 +39,23 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
 
   async function handleLogout() {
     setLoggingOut(true)
+    clearSessionCache()
+
     try {
-      await fetch('/api/users/logout', { method: 'POST', credentials: 'same-origin' })
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 5000)
+      await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        signal: controller.signal,
+      })
+      clearTimeout(timeout)
     } catch {
-      /* ignore */
-    } finally {
-      setOpen(false)
-      router.push('/')
-      router.refresh()
+      /* ignore network errors */
     }
+
+    setOpen(false)
+    window.location.href = '/'
   }
 
   const display = name || email.split('@')[0]

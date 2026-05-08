@@ -29,3 +29,10 @@ export function writeSessionCache(user: CachedUser | null, opts?: { unread?: num
 export function isCacheValid(ts: number): boolean {
   return Date.now() - ts < CACHE_TTL_MS
 }
+
+export function clearSessionCache() {
+  if (typeof sessionStorage === 'undefined') return
+  try {
+    sessionStorage.removeItem(SESSION_CACHE_KEY)
+  } catch {}
+}
