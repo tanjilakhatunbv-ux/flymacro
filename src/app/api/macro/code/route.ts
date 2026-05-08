@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
   // Build a minimal req so the afterRead hook on codeContent sees the current user
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mockReq = { user } as any
+  const mockReq = { user, payload } as any
 
   // Staff can always see code
   if (isStaffRole(user)) {

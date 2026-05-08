@@ -6,6 +6,7 @@ import {
   InlineToolbarFeature,
 } from '@payloadcms/richtext-lexical'
 import { isOperatorOrAbove, publishedOrStaff } from '../lib/access'
+import { getPayload } from '../lib/payload'
 
 const slugify = (s: string) =>
   s
@@ -26,7 +27,8 @@ const stripCodeForUnpurchased: FieldHook = async ({ value, req, data }) => {
   }
   if (!req.user) return null
   try {
-    const found = await req.payload.find({
+    const payload = req.payload ?? await getPayload()
+    const found = await payload.find({
       collection: 'macro-exchanges',
       where: {
         and: [
@@ -44,8 +46,8 @@ const stripCodeForUnpurchased: FieldHook = async ({ value, req, data }) => {
       depth: 0,
     })
     if (found.docs.length > 0) return value
-  } catch {
-    /* ignore */
+  } catch (err) {
+    console.error('[stripCodeForUnpurchased] hook error:', err)
   }
   return null
 }

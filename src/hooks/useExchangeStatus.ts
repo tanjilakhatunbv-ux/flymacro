@@ -53,6 +53,7 @@ export function useExchangeStatus(macroId: number, codeContent?: string | null) 
   const [status, setStatus] = useState<ExchangeStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [fetchedCode, setFetchedCode] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -112,7 +113,9 @@ export function useExchangeStatus(macroId: number, codeContent?: string | null) 
           writeExchangeCache(macroId, freshStatus)
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('[useExchangeStatus] exchange-status fetch error:', err)
+      })
       .finally(() => {
         if (!signal.aborted) setLoading(false)
       })
@@ -135,12 +138,18 @@ export function useExchangeStatus(macroId: number, codeContent?: string | null) 
         const payload = d.data ?? d
         if (payload && !payload.error && payload.code) {
           setFetchedCode(payload.code)
+          setFetchError(null)
+        } else if (payload?.error) {
+          setFetchError(payload.message || payload.error || '加载失败')
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('[useExchangeStatus] code fetch error:', err)
+        setFetchError('网络错误，请刷新页面重试')
+      })
 
     return () => controller.abort()
   }, [status, codeContent, fetchedCode, macroId])
 
-  return { status, loading, fetchedCode }
+  return { status, loading, fetchedCode, fetchError }
 }

@@ -22,7 +22,7 @@ export function MacroDetailActions({
   autoRenewable: boolean
   codeContent: string | null | undefined
 }) {
-  const { status, loading, fetchedCode } = useExchangeStatus(macroId, codeContent)
+  const { status, loading, fetchedCode, fetchError } = useExchangeStatus(macroId, codeContent)
 
   const effectiveStatus = status ?? {
     loggedIn: false,
@@ -70,7 +70,11 @@ export function MacroDetailActions({
           <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-bright)', marginBottom: '1.25rem' }}>
             宏命令
           </h3>
-          {(codeContent || fetchedCode) ? (
+          {fetchError ? (
+            <p style={{ color: 'var(--error)', fontSize: '0.85rem' }}>
+              {fetchError}，请刷新页面重试或联系客服。
+            </p>
+          ) : (codeContent || fetchedCode) ? (
             <CodeBlock code={codeContent || fetchedCode || ''} language="lua" />
           ) : (
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>加载中…</p>
