@@ -1,8 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
+import { Link, usePathname } from '@/i18n/routing'
 import { HeaderAuth } from './HeaderAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
 
@@ -17,10 +16,6 @@ function isActive(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname()
   const t = useTranslations('nav')
-  const locale = useLocale()
-
-  // Strip locale prefix for active state matching
-  const pathWithoutLocale = locale === 'zh' ? pathname : pathname.replace(/^\/en/, '') || '/'
 
   return (
     <header className="site-header">
@@ -29,19 +24,16 @@ export function Header() {
           FlyMacro
         </Link>
         <nav className="site-nav" aria-label="主导航">
-          {navKeys.map((key, i) => {
-            const href = locale === 'zh' ? navHrefs[i] : `/en${navHrefs[i]}`
-            return (
-              <Link
-                key={key}
-                href={href}
-                className={isActive(pathWithoutLocale, navHrefs[i]) ? 'nav-active' : undefined}
-                aria-current={isActive(pathWithoutLocale, navHrefs[i]) ? 'page' : undefined}
-              >
-                {t(key)}
-              </Link>
-            )
-          })}
+          {navKeys.map((key, i) => (
+            <Link
+              key={key}
+              href={navHrefs[i]}
+              className={isActive(pathname, navHrefs[i]) ? 'nav-active' : undefined}
+              aria-current={isActive(pathname, navHrefs[i]) ? 'page' : undefined}
+            >
+              {t(key)}
+            </Link>
+          ))}
           <LanguageSwitcher />
           <HeaderAuth />
         </nav>

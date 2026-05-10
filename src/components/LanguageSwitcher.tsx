@@ -2,9 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useLocale } from 'next-intl'
+import { usePathname, useRouter } from '@/i18n/routing'
 
 export function LanguageSwitcher() {
   const locale = useLocale()
+  const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -20,12 +23,7 @@ export function LanguageSwitcher() {
 
   function switchTo(target: string) {
     setOpen(false)
-    const currentPath = window.location.pathname
-    if (target === 'en') {
-      window.location.href = `/en${currentPath}`
-    } else {
-      window.location.href = currentPath.replace(/^\/en/, '') || '/'
-    }
+    router.replace(pathname, { locale: target })
   }
 
   const label = locale === 'zh' ? '中文' : 'EN'
