@@ -2,17 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { HeaderAuth } from './HeaderAuth'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
-const navItems = [
-  { href: '/', label: '首页' },
-  { href: '/macros', label: '宏库' },
-  { href: '/plugins', label: '插件' },
-  { href: '/guide', label: '教程' },
-  { href: '/news', label: '新闻' },
-  { href: '/blog', label: '公告' },
-  { href: '/about', label: '关于' },
-]
+const navKeys = ['home', 'macros', 'plugins', 'guide', 'news', 'blog', 'about'] as const
+const navHrefs = ['/', '/macros', '/plugins', '/guide', '/news', '/blog', '/about'] as const
 
 function isActive(pathname: string, href: string) {
   if (href === '/') return pathname === '/'
@@ -21,6 +16,11 @@ function isActive(pathname: string, href: string) {
 
 export function Header() {
   const pathname = usePathname()
+  const t = useTranslations('nav')
+  const locale = useLocale()
+
+  // Strip locale prefix for active state matching
+  const pathWithoutLocale = locale === 'zh' ? pathname : pathname.replace(/^\/en/, '') || '/'
 
   return (
     <header className="site-header">
@@ -29,16 +29,20 @@ export function Header() {
           FlyMacro
         </Link>
         <nav className="site-nav" aria-label="主导航">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={isActive(pathname, item.href) ? 'nav-active' : undefined}
-              aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navKeys.map((key, i) => {
+            const href = locale === 'zh' ? navHrefs[i] : `/en${navHrefs[i]}`
+            return (
+              <Link
+                key={key}
+                href={href}
+                className={isActive(pathWithoutLocale, navHrefs[i]) ? 'nav-active' : undefined}
+                aria-current={isActive(pathWithoutLocale, navHrefs[i]) ? 'page' : undefined}
+              >
+                {t(key)}
+              </Link>
+            )
+          })}
+          <LanguageSwitcher />
           <HeaderAuth />
         </nav>
       </div>
