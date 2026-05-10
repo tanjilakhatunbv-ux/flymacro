@@ -27,6 +27,7 @@ import { Notifications } from './collections/Notifications'
 import { PluginFiles } from './collections/PluginFiles'
 import { PluginReleases } from './collections/PluginReleases'
 import { AuditLogs } from './collections/AuditLogs'
+import { News } from './collections/News'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -80,6 +81,7 @@ export default buildConfig({
     PluginFiles,
     PluginReleases,
     AuditLogs,
+    News,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor({}),

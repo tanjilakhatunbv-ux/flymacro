@@ -9,6 +9,7 @@ const navItems = [
   { href: '/macros', label: '宏库' },
   { href: '/plugins', label: '插件' },
   { href: '/guide', label: '教程' },
+  { href: '/news', label: '新闻' },
   { href: '/blog', label: '公告' },
   { href: '/about', label: '关于' },
 ]

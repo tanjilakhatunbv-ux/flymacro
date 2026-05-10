@@ -14,7 +14,8 @@
     "seed": "tsx --env-file=.env src/scripts/seed.ts",
     "seed:demos": "tsx --env-file=.env src/scripts/seed-demos.ts",
     "seed:full": "tsx --env-file=.env src/scripts/seed-full-demos.ts",
-    "migrate:content": "tsx --env-file=.env src/scripts/migrate-content.ts"
+    "migrate:content": "tsx --env-file=.env src/scripts/migrate-content.ts",
+    "seed:news": "tsx --env-file=.env src/scripts/seed-news.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.0.0",
