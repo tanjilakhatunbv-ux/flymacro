@@ -1,41 +1,19 @@
 import type { Metadata } from 'next'
-import { getPayload } from '../../../lib/payload'
-import { RichText } from '../../../components/RichText'
-import type { Page } from '../../../payload-types'
 
 export const metadata: Metadata = {
   title: '关于 FlyMacro',
-  description: '关于 FlyMacro：站点、团队与服务条款。',
+  description: 'FlyMacro — 魔兽世界合法插件下载、宏命令编写工具与高级宏产品购买平台。',
 }
 
-export const revalidate = 300
-
-async function findAboutPage(): Promise<Page | null> {
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'pages',
-    where: { and: [{ slug: { equals: 'about' } }, { _status: { equals: 'published' } }] },
-    limit: 1,
-    depth: 0,
-  })
-  return (r.docs[0] as Page | undefined) ?? null
-}
-
-export default async function AboutPage() {
-  const page = await findAboutPage()
-
+export default function AboutPage() {
   return (
     <div className="container-page page-single">
       <article className="macro-detail">
         <header className="detail-header">
-          <h1>{page?.title ?? '关于 FlyMacro'}</h1>
+          <h1>关于 FlyMacro</h1>
         </header>
         <div className="detail-content">
-          {page?.body ? (
-            <RichText content={page.body} />
-          ) : (
-            <FallbackAbout />
-          )}
+          <FallbackAbout />
         </div>
       </article>
     </div>
