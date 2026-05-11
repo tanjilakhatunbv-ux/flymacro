@@ -6,7 +6,7 @@ import { Link } from '@/i18n/routing'
 import { UserMenu } from './UserMenu'
 import { readSessionCache, writeSessionCache, isCacheValid } from '../lib/session-cache'
 
-type UserRole = 'super-admin' | 'operator' | 'support' | 'user'
+type UserRole = 'admin' | 'operator' | 'user'
 
 type User = {
   id: string | number

@@ -69,5 +69,5 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export function isStaffRole(user: User | null): boolean {
   if (!user) return false
-  return user.role === 'super-admin' || user.role === 'operator' || user.role === 'support'
+  return user.role === 'admin' || user.role === 'operator'
 }

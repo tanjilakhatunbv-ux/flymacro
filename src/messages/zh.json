@@ -414,9 +414,8 @@
     "emailStatus": "邮箱状态",
     "verified": "已验证",
     "unverified": "未验证",
-    "roleSuperAdmin": "超级管理员",
+    "roleAdmin": "管理员",
     "roleOperator": "运营",
-    "roleSupport": "客服",
     "roleUser": "普通用户"
   },
   "exchanges" : {

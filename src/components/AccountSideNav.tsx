@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
-type Role = 'super-admin' | 'operator' | 'support' | 'user'
+type Role = 'admin' | 'operator' | 'user'
 
 const itemKeys = [
   { href: '/account', labelKey: 'overview' },
@@ -20,7 +20,7 @@ const itemKeys = [
 export function AccountSideNav({ role, unreadCount }: { role: Role; unreadCount: number }) {
   const pathname = usePathname()
   const t = useTranslations('sideNav')
-  const isStaff = role === 'super-admin' || role === 'operator' || role === 'support'
+  const isStaff = role === 'admin' || role === 'operator'
 
   return (
     <aside className="account-side" aria-label={t('navAria')}>

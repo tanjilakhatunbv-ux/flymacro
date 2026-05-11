@@ -138,14 +138,14 @@ async function ensureSuperAdmin(payload: any) {
     depth: 0,
   })
   if (found.docs.length > 0) {
-    console.log(`[seed] super-admin already exists: ${email}`)
+    console.log(`[seed] admin already exists: ${email}`)
     return
   }
   await payload.create({
     collection: 'users',
-    data: { email, password, name: '超级管理员', role: 'super-admin', _verified: true },
+    data: { email, password, name: '管理员', role: 'admin', _verified: true },
   })
-  console.log(`[seed] created super-admin: ${email} / ${password}`)
+  console.log(`[seed] created admin: ${email} / ${password}`)
   console.log(`[seed] >>> 请尽快登录 /admin 修改密码 <<<`)
 }
 

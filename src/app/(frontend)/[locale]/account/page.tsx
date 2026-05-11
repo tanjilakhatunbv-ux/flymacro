@@ -125,12 +125,10 @@ export default async function AccountHome({ params }: { params: Params }) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function roleLabel(role: string, t: any): string {
   switch (role) {
-    case 'super-admin':
-      return t('roleSuperAdmin')
+    case 'admin':
+      return t('roleAdmin')
     case 'operator':
       return t('roleOperator')
-    case 'support':
-      return t('roleSupport')
     default:
       return t('roleUser')
   }

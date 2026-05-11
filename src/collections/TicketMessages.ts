@@ -44,12 +44,12 @@ export const TicketMessages: CollectionConfig = {
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       return { sender: { equals: user.id } }
     },
     create: async ({ req: { user, payload }, data }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       const ticketId = (data as { ticket?: number | string })?.ticket
       if (!ticketId) return false
       try {

@@ -19,7 +19,7 @@ export const PluginReleases: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => {
-      if (hasRole(user as AnyUser | null, 'super-admin', 'operator', 'support')) return true
+      if (hasRole(user as AnyUser | null, 'admin', 'operator')) return true
       return { isPublished: { equals: true } }
     },
     create: isOperatorOrAbove,

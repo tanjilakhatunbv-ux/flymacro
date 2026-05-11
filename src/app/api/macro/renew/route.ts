@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const ownerId = typeof exchange.user === 'object' ? exchange.user.id : exchange.user
-    if (ownerId !== user.id && !['super-admin', 'operator', 'support'].includes(user.role ?? '')) {
+    if (ownerId !== user.id && !['admin', 'operator'].includes(user.role ?? '')) {
       return forbidden('无权操作此兑换记录', 'forbidden')
     }
 

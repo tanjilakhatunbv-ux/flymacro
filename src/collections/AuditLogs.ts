@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isSuperAdmin } from '../lib/access'
+import { isAdmin } from '../lib/access'
 
 export const AuditLogs: CollectionConfig = {
   slug: 'audit-logs',
@@ -14,16 +14,15 @@ export const AuditLogs: CollectionConfig = {
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin') return true
-      if (user.role === 'operator' || user.role === 'support') {
-        // 运营/客服只能查看自己产生的日志
+      if (user.role === 'admin') return true
+      if (user.role === 'operator') {
         return { operator: { equals: user.id } }
       }
       return false
     },
     create: () => false,
     update: () => false,
-    delete: isSuperAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
@@ -41,6 +40,10 @@ export const AuditLogs: CollectionConfig = {
         { label: '创建订单', value: 'create_order' },
         { label: '更新订单', value: 'update_order' },
         { label: '删除订单', value: 'delete_order' },
+        { label: '积分调整', value: 'adjust_credits' },
+        { label: '状态变更', value: 'change_status' },
+        { label: '重置密码', value: 'reset_password' },
+        { label: '批量操作', value: 'bulk_action' },
         { label: '其他', value: 'other' },
       ],
     },
@@ -81,6 +84,14 @@ export const AuditLogs: CollectionConfig = {
       name: 'ip',
       type: 'text',
       label: 'IP地址',
+    },
+    {
+      name: 'metadata',
+      type: 'json',
+      label: '结构化数据',
+      admin: {
+        description: '额外结构化信息，如积分调整金额、批量操作用户列表等',
+      },
     },
   ],
   timestamps: true,

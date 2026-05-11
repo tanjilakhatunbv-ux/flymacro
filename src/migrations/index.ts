@@ -10,6 +10,8 @@ import * as migration_20260508_add_credit_transactions_label from './20260508_ad
 import * as migration_20260508_add_site_settings from './20260508_add_site_settings';
 import * as migration_20260508_add_credit_orders_checkout_unique from './20260508_add_credit_orders_checkout_unique';
 import * as migration_20260511_add_news_collection from './20260511_add_news_collection';
+import * as migration_20260511_consolidate_roles from './20260511_consolidate_roles';
+import * as migration_20260511_add_audit_metadata from './20260511_add_audit_metadata';
 
 export const migrations = [
   {
@@ -71,5 +73,15 @@ export const migrations = [
     up: migration_20260511_add_news_collection.up,
     down: migration_20260511_add_news_collection.down,
     name: '20260511_add_news_collection'
+  },
+  {
+    up: migration_20260511_consolidate_roles.up,
+    down: migration_20260511_consolidate_roles.down,
+    name: '20260511_consolidate_roles'
+  },
+  {
+    up: migration_20260511_add_audit_metadata.up,
+    down: migration_20260511_add_audit_metadata.down,
+    name: '20260511_add_audit_metadata'
   },
 ];

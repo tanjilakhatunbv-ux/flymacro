@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isSuperAdminField } from '../lib/access'
+import { isAdminField } from '../lib/access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -40,13 +40,13 @@ export const Users: CollectionConfig = {
     create: () => true,
     read: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       return { id: { equals: user.id } }
     },
     update: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin') return true
-      if (user.role === 'operator' || user.role === 'support') {
+      if (user.role === 'admin') return true
+      if (user.role === 'operator') {
         return {
           or: [
             { id: { equals: user.id } },
@@ -58,14 +58,14 @@ export const Users: CollectionConfig = {
     },
     delete: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin') return true
-      if (user.role === 'operator' || user.role === 'support') {
+      if (user.role === 'admin') return true
+      if (user.role === 'operator') {
         return { role: { equals: 'user' } }
       }
       return false
     },
     admin: ({ req: { user } }) =>
-      !!user && (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support'),
+      !!user && (user.role === 'admin' || user.role === 'operator'),
   },
   fields: [
     {
@@ -86,16 +86,15 @@ export const Users: CollectionConfig = {
       defaultValue: 'user',
       label: '角色',
       options: [
-        { label: '超级管理员', value: 'super-admin' },
+        { label: '管理员', value: 'admin' },
         { label: '运营', value: 'operator' },
-        { label: '客服', value: 'support' },
         { label: '普通用户', value: 'user' },
       ],
       access: {
-        update: isSuperAdminField,
+        update: isAdminField,
       },
       admin: {
-        description: '只有超级管理员可以修改角色',
+        description: '只有管理员可以修改角色',
       },
     },
     {
@@ -112,6 +111,9 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: '停用或封禁后用户无法登录前台',
+        components: {
+          Field: '@/components/admin/StatusField#StatusField',
+        },
       },
     },
     {
@@ -120,7 +122,13 @@ export const Users: CollectionConfig = {
       defaultValue: 20,
       min: 0,
       label: '当前积分',
-      admin: { position: 'sidebar', description: '新用户默认 20 积分' },
+      admin: {
+        position: 'sidebar',
+        description: '新用户默认 20 积分',
+        components: {
+          Field: '@/components/admin/CreditsField#CreditsField',
+        },
+      },
     },
     {
       name: 'lastLoginAt',
@@ -162,6 +170,16 @@ export const Users: CollectionConfig = {
       type: 'text',
       label: 'OAuth ID',
       admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      name: 'resetPassword',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/admin/ResetPasswordButton#ResetPasswordButton',
+        },
+      },
     },
     {
       type: 'tabs',
@@ -220,7 +238,7 @@ export const Users: CollectionConfig = {
         const me = req.user as { role?: string; id: string | number } | null
         if (!me) return
 
-        const isStaff = me.role === 'operator' || me.role === 'support'
+        const isStaff = me.role === 'operator'
         if (!isStaff) return
 
         if (operation === 'create') {

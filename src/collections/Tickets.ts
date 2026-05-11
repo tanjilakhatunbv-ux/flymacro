@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, isOwnerOrStaff, isSuperAdmin } from '../lib/access'
+import { isAuthenticated, isOwnerOrStaff, isAdmin } from '../lib/access'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -16,10 +16,10 @@ export const Tickets: CollectionConfig = {
     create: isAuthenticated,
     update: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       return { user: { equals: user.id } }
     },
-    delete: isSuperAdmin,
+    delete: isAdmin,
   },
   fields: [
     { name: 'subject', type: 'text', required: true, label: '主题' },
@@ -91,11 +91,11 @@ export const Tickets: CollectionConfig = {
       relationTo: 'users',
       label: '指派给',
       filterOptions: () => ({
-        role: { in: ['super-admin', 'operator', 'support'] },
+        role: { in: ['admin', 'operator'] },
       }),
       access: {
         update: ({ req: { user } }) =>
-          !!user && (user.role === 'super-admin' || user.role === 'operator'),
+          !!user && (user.role === 'admin' || user.role === 'operator'),
       },
     },
     {

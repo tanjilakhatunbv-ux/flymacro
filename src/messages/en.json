@@ -414,9 +414,8 @@
     "emailStatus": "Email Status",
     "verified": "Verified",
     "unverified": "Unverified",
-    "roleSuperAdmin": "Super Admin",
+    "roleAdmin": "Admin",
     "roleOperator": "Operator",
-    "roleSupport": "Support",
     "roleUser": "User"
   },
   "exchanges": {

@@ -176,9 +176,9 @@ export interface User {
   name?: string | null;
   avatar?: (number | null) | Media;
   /**
-   * 只有超级管理员可以修改角色
+   * 只有管理员可以修改角色
    */
-  role: 'super-admin' | 'operator' | 'support' | 'user';
+  role: 'admin' | 'operator' | 'user';
   /**
    * 停用或封禁后用户无法登录前台
    */
@@ -838,6 +838,10 @@ export interface AuditLog {
     | 'create_order'
     | 'update_order'
     | 'delete_order'
+    | 'adjust_credits'
+    | 'change_status'
+    | 'reset_password'
+    | 'bulk_action'
     | 'other';
   collection: string;
   docId?: string | null;
@@ -862,6 +866,18 @@ export interface AuditLog {
   operator: number | User;
   reason?: string | null;
   ip?: string | null;
+  /**
+   * 额外结构化信息，如积分调整金额、批量操作用户列表等
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1443,6 +1459,7 @@ export interface AuditLogsSelect<T extends boolean = true> {
   operator?: T;
   reason?: T;
   ip?: T;
+  metadata?: T;
   updatedAt?: T;
   createdAt?: T;
 }

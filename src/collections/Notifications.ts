@@ -14,13 +14,13 @@ export const Notifications: CollectionConfig = {
   access: {
     read: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator' || user.role === 'support') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       return { recipient: { equals: user.id } }
     },
     create: isOperatorOrAbove,
     update: ({ req: { user } }) => {
       if (!user) return false
-      if (user.role === 'super-admin' || user.role === 'operator') return true
+      if (user.role === 'admin' || user.role === 'operator') return true
       return { recipient: { equals: user.id } }
     },
     delete: isSuperAdmin,

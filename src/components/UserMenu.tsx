@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { clearSessionCache } from '../lib/session-cache'
 
-type Role = 'super-admin' | 'operator' | 'support' | 'user'
+type Role = 'admin' | 'operator' | 'user'
 
 type Props = {
   email: string
@@ -63,7 +63,7 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
 
   const display = name || email.split('@')[0]
   const initial = (display[0] || '?').toUpperCase()
-  const isStaff = role === 'super-admin' || role === 'operator' || role === 'support'
+  const isStaff = role === 'admin' || role === 'operator'
 
   return (
     <div className="user-menu" ref={ref}>

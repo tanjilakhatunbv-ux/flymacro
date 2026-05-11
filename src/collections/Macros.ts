@@ -22,7 +22,7 @@ const ensureSlug: FieldHook = ({ value, data }) => {
 }
 
 const stripCodeForUnpurchased: FieldHook = async ({ value, req, data }) => {
-  if (req.user && (req.user.role === 'super-admin' || req.user.role === 'operator' || req.user.role === 'support')) {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'operator')) {
     return value
   }
   if (!req.user) return null
