@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { clearSessionCache } from '../lib/session-cache'
 
 type Role = 'super-admin' | 'operator' | 'support' | 'user'
@@ -18,6 +19,8 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
   const [open, setOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
+  const t = useTranslations('nav')
+  const tAcct = useTranslations('account')
 
   useEffect(() => {
     if (!open) return
@@ -77,11 +80,11 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
         <span className="user-display">{display}</span>
         {credits > 0 && (
           <span style={{ fontSize: '0.7rem', color: 'var(--gold-bright)', marginLeft: 4 }}>
-            {credits} 积分
+            {tAcct('creditsDisplay', { credits })}
           </span>
         )}
         {unread > 0 && (
-          <span className="user-badge" aria-label={`${unread} 条未读通知`}>
+          <span className="user-badge" aria-label={tAcct('unreadNotifications', { count: unread })}>
             {unread > 99 ? '99+' : unread}
           </span>
         )}
@@ -93,29 +96,29 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
             <div className="user-menu-mail">{email}</div>
           </div>
           <Link role="menuitem" href="/account" onClick={() => setOpen(false)}>
-            个人中心
+            {tAcct('center')}
           </Link>
           <Link role="menuitem" href="/account/credits" onClick={() => setOpen(false)}>
-            充值积分
+            {tAcct('credits')}
           </Link>
           <Link role="menuitem" href="/account/exchanges" onClick={() => setOpen(false)}>
-            我的兑换
+            {tAcct('exchanges')}
           </Link>
           <Link role="menuitem" href="/account/orders" onClick={() => setOpen(false)}>
-            充值记录
+            {tAcct('orders')}
           </Link>
           <Link role="menuitem" href="/account/tickets" onClick={() => setOpen(false)}>
-            我的工单
+            {tAcct('tickets')}
           </Link>
           <Link role="menuitem" href="/account/notifications" onClick={() => setOpen(false)}>
-            通知
+            {tAcct('notifications')}
             {unread > 0 && <span className="user-menu-pip">{unread}</span>}
           </Link>
           {isStaff && (
             <>
               <div className="user-menu-sep" role="separator" />
               <Link role="menuitem" href="/admin" onClick={() => setOpen(false)}>
-                运营后台
+                {tAcct('adminPanel')}
               </Link>
             </>
           )}
@@ -127,7 +130,7 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
             onClick={handleLogout}
             disabled={loggingOut}
           >
-            {loggingOut ? '退出中…' : '退出登录'}
+            {loggingOut ? t('loggingOut') : t('logout')}
           </button>
         </div>
       )}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { PluginDownloadInfo } from '../lib/plugins'
 
 interface Props {
@@ -24,6 +25,7 @@ function formatFileSize(bytes?: number) {
 }
 
 export function PluginVersionCard({ version, publishedAt, changelog, downloadInfo }: Props) {
+  const t = useTranslations('plugins')
   return (
     <article className="plugin-version-card">
       <div className="plugin-version-header">
@@ -44,7 +46,7 @@ export function PluginVersionCard({ version, publishedAt, changelog, downloadInf
             className="btn btn-primary"
             download={downloadInfo.fileName}
           >
-            下载插件
+            {t('downloadPlugin')}
             {downloadInfo.fileSize && (
               <span className="file-size">({formatFileSize(downloadInfo.fileSize)})</span>
             )}
@@ -59,18 +61,18 @@ export function PluginVersionCard({ version, publishedAt, changelog, downloadInf
               rel="noopener noreferrer"
               className="btn btn-primary"
             >
-              前往云盘下载
+              {t('cloudDownload')}
             </a>
             {downloadInfo.password && (
               <span className="plugin-password">
-                提取码：{downloadInfo.password}
+                {t('password', { password: downloadInfo.password })}
               </span>
             )}
           </div>
         )}
 
         {!downloadInfo && (
-          <span className="plugin-unavailable">暂无下载资源</span>
+          <span className="plugin-unavailable">{t('noDownload')}</span>
         )}
       </div>
     </article>

@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 export function CodeBlock({ code, language = 'lua' }: { code: string; language?: string }) {
+  const t = useTranslations('codeBlock')
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -18,7 +20,7 @@ export function CodeBlock({ code, language = 'lua' }: { code: string; language?:
   return (
     <div className="code-block-wrapper">
       <button type="button" className="code-copy-btn" onClick={handleCopy}>
-        {copied ? '已复制' : '复制'}
+        {copied ? t('copied') : t('copy')}
       </button>
       <div className="code-scroll-area">
         <pre tabIndex={0}>

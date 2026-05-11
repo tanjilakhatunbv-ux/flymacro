@@ -1,13 +1,17 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import type { Macro } from '../payload-types'
 import { ClassTag, SpecTag, VersionTag, TierTag } from './Tags'
 import { previewUrl } from '../lib/media'
 import { extractTagValues } from '../lib/macro-utils'
 
 export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: boolean }) {
+  const t = useTranslations('macroCard')
   const img = previewUrl(macro)
-  const durationText = (macro.durationDays ?? 0) === 0 ? '永久' : `${macro.durationDays}天`
+  const durationText = (macro.durationDays ?? 0) === 0 ? t('permanent') : t('days', { days: macro.durationDays })
   const tagValues = extractTagValues(macro.tags)
   const visibleTags = tagValues.slice(0, 3)
   const extraTagCount = Math.max(0, tagValues.length - visibleTags.length)
@@ -24,12 +28,12 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
             style={{ objectFit: 'cover' }}
             loading="lazy"
           />
-          {isExchanged && <span className="card-badge owned">已兑换</span>}
+          {isExchanged && <span className="card-badge owned">{t('exchanged')}</span>}
         </Link>
       ) : (
         <Link href={`/macros/${macro.slug}`} className="card-img card-img--empty" aria-hidden="true">
           <span className="card-img-placeholder">{macro.title.charAt(0)}</span>
-          {isExchanged && <span className="card-badge owned">已兑换</span>}
+          {isExchanged && <span className="card-badge owned">{t('exchanged')}</span>}
         </Link>
       )}
       <div className="card-body">
@@ -50,7 +54,7 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
         </h3>
         {macro.summary && <p className="summary">{macro.summary}</p>}
         {visibleTags.length > 0 && (
-          <div className="tag-chip-list" aria-label="标签">
+          <div className="tag-chip-list" aria-label="Tags">
             {visibleTags.map((t) => (
               <Link
                 key={t}
@@ -64,9 +68,9 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
           </div>
         )}
         <div className="card-footer">
-          <span className="card-price">{macro.price ?? 0} 积分</span>
+          <span className="card-price">{t('credits', { price: macro.price ?? 0 })}</span>
           <span className="card-duration">{durationText}</span>
-          {isExchanged && <span className="card-status">已拥有</span>}
+          {isExchanged && <span className="card-status">{t('owned')}</span>}
         </div>
       </div>
     </article>

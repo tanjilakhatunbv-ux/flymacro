@@ -16,7 +16,8 @@ type NewsItem = {
 
 export const revalidate = 300
 
-export default async function NewsListPage() {
+export default async function NewsListPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   const t = await getTranslations('news')
   let articles: NewsItem[] = []
   try {
@@ -63,7 +64,7 @@ export default async function NewsListPage() {
                     {a.category && <span className="tag spec">{getCategoryLabel(t, a.category)}</span>}
                     {a.publishedAt && (
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        {formatDate(a.publishedAt)}
+                        {formatDate(a.publishedAt, locale)}
                       </span>
                     )}
                   </div>
@@ -102,9 +103,9 @@ function getCategoryLabel(t: any, c: string): string {
   }
 }
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   try {
-    return new Date(dateStr).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
   } catch {
     return dateStr
   }

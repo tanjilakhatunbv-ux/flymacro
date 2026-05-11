@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import type { PluginDownloadInfo } from '../lib/plugins'
 
 interface Props {
@@ -19,10 +20,11 @@ function formatDate(dateStr?: string) {
 }
 
 export function PluginDownloadSection({ version, publishedAt, changelog, downloadInfo, showHistoryLink = true }: Props) {
+  const t = useTranslations('plugins')
   return (
     <div className="plugin-download-section">
       <div className="plugin-download-meta">
-        <span className="plugin-version">最新版本 {version}</span>
+        <span className="plugin-version">{t('latestVersion', { version })}</span>
         {publishedAt && (
           <span className="plugin-date">· {formatDate(publishedAt)}</span>
         )}
@@ -39,7 +41,7 @@ export function PluginDownloadSection({ version, publishedAt, changelog, downloa
             className="btn btn-primary"
             download={downloadInfo.fileName}
           >
-            下载插件
+            {t('downloadPlugin')}
           </a>
         )}
 
@@ -51,23 +53,23 @@ export function PluginDownloadSection({ version, publishedAt, changelog, downloa
               rel="noopener noreferrer"
               className="btn btn-primary"
             >
-              前往云盘下载
+              {t('cloudDownload')}
             </a>
             {downloadInfo.password && (
               <span className="plugin-password">
-                提取码：{downloadInfo.password}
+                {t('password', { password: downloadInfo.password })}
               </span>
             )}
           </div>
         )}
 
         {!downloadInfo && (
-          <span className="plugin-unavailable">暂无下载资源</span>
+          <span className="plugin-unavailable">{t('noDownload')}</span>
         )}
 
         {showHistoryLink && (
           <Link href="/plugins" className="btn">
-            查看历史版本
+            {t('viewHistory')}
           </Link>
         )}
       </div>

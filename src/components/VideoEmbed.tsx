@@ -1,7 +1,11 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 type ParsedEmbed =
-  | { kind: 'youtube'; src: string; title: string }
-  | { kind: 'bilibili'; src: string; title: string }
-  | { kind: 'mp4'; src: string; title: string }
+  | { kind: 'youtube'; src: string }
+  | { kind: 'bilibili'; src: string }
+  | { kind: 'mp4'; src: string }
   | null
 
 const MP4_RE = /\.(mp4|webm|ogg)(\?.*)?$/i
@@ -15,7 +19,7 @@ function parseEmbed(raw: string | null | undefined): ParsedEmbed {
   try {
     parsed = new URL(url)
   } catch {
-    if (MP4_RE.test(url)) return { kind: 'mp4', src: url, title: '演示视频' }
+    if (MP4_RE.test(url)) return { kind: 'mp4', src: url }
     return null
   }
 
@@ -31,7 +35,7 @@ function parseEmbed(raw: string | null | undefined): ParsedEmbed {
       id = parsed.searchParams.get('v')
     }
     if (id) {
-      return { kind: 'youtube', src: `https://www.youtube.com/embed/${id}`, title: 'YouTube 演示视频' }
+      return { kind: 'youtube', src: `https://www.youtube.com/embed/${id}` }
     }
   }
 
@@ -44,17 +48,16 @@ function parseEmbed(raw: string | null | undefined): ParsedEmbed {
       return {
         kind: 'bilibili',
         src: `https://player.bilibili.com/player.html?${param}&page=1&high_quality=1&danmaku=0`,
-        title: 'B站 演示视频',
       }
     }
   }
 
   if (host.includes('player.bilibili.com')) {
-    return { kind: 'bilibili', src: url, title: 'B站 演示视频' }
+    return { kind: 'bilibili', src: url }
   }
 
   if (MP4_RE.test(parsed.pathname)) {
-    return { kind: 'mp4', src: url, title: '演示视频' }
+    return { kind: 'mp4', src: url }
   }
 
   return null
@@ -62,15 +65,18 @@ function parseEmbed(raw: string | null | undefined): ParsedEmbed {
 
 export function VideoEmbed({ url }: { url?: string | null }) {
   const embed = parseEmbed(url)
+  const t = useTranslations('video')
   if (!embed) return null
+
+  const title = embed.kind === 'youtube' ? t('youtubeDemo') : embed.kind === 'bilibili' ? t('bilibiliDemo') : t('demoVideo')
 
   if (embed.kind === 'mp4') {
     return (
       <figure className="video-embed-wrap">
         <div className="video-embed">
-          <video controls preload="metadata" src={embed.src} aria-label={embed.title} />
+          <video controls preload="metadata" src={embed.src} aria-label={title} />
         </div>
-        <figcaption className="video-embed-caption">演示视频</figcaption>
+        <figcaption className="video-embed-caption">{t('demoVideo')}</figcaption>
       </figure>
     )
   }
@@ -80,7 +86,7 @@ export function VideoEmbed({ url }: { url?: string | null }) {
       <div className="video-embed">
         <iframe
           src={embed.src}
-          title={embed.title}
+          title={title}
           loading="lazy"
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
@@ -88,7 +94,7 @@ export function VideoEmbed({ url }: { url?: string | null }) {
         />
       </div>
       <figcaption className="video-embed-caption">
-        {embed.kind === 'youtube' ? 'YouTube · 演示视频' : 'Bilibili · 演示视频'}
+        {embed.kind === 'youtube' ? `YouTube · ${t('demoVideo')}` : `Bilibili · ${t('demoVideo')}`}
       </figcaption>
     </figure>
   )

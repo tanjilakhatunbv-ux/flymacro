@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useTranslations } from 'next-intl'
 import { updateProfileAction, changePasswordAction, type ProfileActionState } from '../../../../../lib/user-actions'
 
 export const dynamic = 'force-dynamic'
@@ -10,22 +11,23 @@ const profileInitial: ProfileActionState = {}
 const passwordInitial: ProfileActionState = {}
 
 export default function SettingsPage() {
+  const t = useTranslations('settings')
   const [profileState, profileAction] = useActionState(updateProfileAction, profileInitial)
   const [passwordState, passwordAction] = useActionState(changePasswordAction, passwordInitial)
 
   return (
     <>
-      <h1>账号设置</h1>
-      <p className="lead">管理你的个人资料与账号安全。</p>
+      <h1>{t('heading')}</h1>
+      <p className="lead">{t('subtitle')}</p>
 
       <section className="ticket-form" style={{ marginBottom: '2.5rem' }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--gold)', marginBottom: '1rem' }}>
-          修改昵称
+          {t('changeNickname')}
         </h3>
         <form action={profileAction}>
           <label>
-            <span>昵称</span>
-            <input name="name" type="text" maxLength={50} placeholder="显示在页面上的名字" />
+            <span>{t('nicknameField')}</span>
+            <input name="name" type="text" maxLength={50} placeholder={t('nicknamePlaceholder')} />
             {profileState.fieldErrors?.name && (
               <span className="auth-field-err">{profileState.fieldErrors.name}</span>
             )}
@@ -34,33 +36,33 @@ export default function SettingsPage() {
             <div className="auth-error" role="alert">{profileState.error}</div>
           )}
           {profileState.ok && (
-            <div className="auth-success" role="status">昵称已保存。</div>
+            <div className="auth-success" role="status">{t('nicknameSaved')}</div>
           )}
-          <SubmitBtn label="保存昵称" pendingLabel="保存中…" />
+          <SubmitBtn label={t('saveNickname')} pendingLabel={t('saving')} />
         </form>
       </section>
 
       <section className="ticket-form">
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--gold)', marginBottom: '1rem' }}>
-          修改密码
+          {t('changePassword')}
         </h3>
         <form action={passwordAction}>
           <label>
-            <span>当前密码</span>
+            <span>{t('currentPassword')}</span>
             <input name="oldPassword" type="password" required autoComplete="current-password" />
             {passwordState.fieldErrors?.oldPassword && (
               <span className="auth-field-err">{passwordState.fieldErrors.oldPassword}</span>
             )}
           </label>
           <label>
-            <span>新密码</span>
+            <span>{t('newPassword')}</span>
             <input name="newPassword" type="password" required minLength={8} autoComplete="new-password" />
             {passwordState.fieldErrors?.newPassword && (
               <span className="auth-field-err">{passwordState.fieldErrors.newPassword}</span>
             )}
           </label>
           <label>
-            <span>确认新密码</span>
+            <span>{t('confirmNewPassword')}</span>
             <input name="confirmPassword" type="password" required autoComplete="new-password" />
             {passwordState.fieldErrors?.confirmPassword && (
               <span className="auth-field-err">{passwordState.fieldErrors.confirmPassword}</span>
@@ -70,9 +72,9 @@ export default function SettingsPage() {
             <div className="auth-error" role="alert">{passwordState.error}</div>
           )}
           {passwordState.ok && (
-            <div className="auth-success" role="status">密码已修改，下次登录请使用新密码。</div>
+            <div className="auth-success" role="status">{t('passwordChanged')}</div>
           )}
-          <SubmitBtn label="修改密码" pendingLabel="修改中…" />
+          <SubmitBtn label={t('changePasswordButton')} pendingLabel={t('changing')} />
         </form>
       </section>
     </>

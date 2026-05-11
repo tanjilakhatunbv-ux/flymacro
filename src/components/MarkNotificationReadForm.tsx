@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useTranslations } from 'next-intl'
 import { markNotificationReadAction } from '../lib/notification-actions'
 
 export function MarkNotificationReadForm({ id }: { id: string }) {
@@ -18,6 +19,7 @@ export function MarkNotificationReadForm({ id }: { id: string }) {
 
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const t = useTranslations('notifications')
   return (
     <button
       type="submit"
@@ -39,7 +41,7 @@ function SubmitButton() {
         e.currentTarget.style.background = 'transparent'
       }}
     >
-      {pending ? '…' : '标记已读'}
+      {pending ? '…' : t('markRead')}
     </button>
   )
 }

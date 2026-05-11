@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useSearchParams, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 export function Pagination({
   currentPage,
@@ -10,6 +11,7 @@ export function Pagination({
   currentPage: number
   totalPages: number
 }) {
+  const t = useTranslations('pagination')
   const pathname = usePathname()
   const params = useSearchParams()
 
@@ -28,11 +30,11 @@ export function Pagination({
   for (let i = start; i <= end; i++) pages.push(i)
 
   return (
-    <nav className="pagination" aria-label="分页">
+    <nav className="pagination" aria-label={t('aria')}>
       {currentPage <= 1 ? (
-        <span className="page-link is-disabled" aria-disabled="true">上一页</span>
+        <span className="page-link is-disabled" aria-disabled="true">{t('prev')}</span>
       ) : (
-        <Link href={buildHref(currentPage - 1)} className="page-link">上一页</Link>
+        <Link href={buildHref(currentPage - 1)} className="page-link">{t('prev')}</Link>
       )}
       {start > 1 && (
         <>
@@ -57,9 +59,9 @@ export function Pagination({
         </>
       )}
       {currentPage >= totalPages ? (
-        <span className="page-link is-disabled" aria-disabled="true">下一页</span>
+        <span className="page-link is-disabled" aria-disabled="true">{t('next')}</span>
       ) : (
-        <Link href={buildHref(currentPage + 1)} className="page-link">下一页</Link>
+        <Link href={buildHref(currentPage + 1)} className="page-link">{t('next')}</Link>
       )}
     </nav>
   )

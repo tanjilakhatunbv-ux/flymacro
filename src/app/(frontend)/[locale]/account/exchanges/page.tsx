@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import { ExchangeRenewButton } from '../../../../../components/ExchangeRenewButton'
@@ -7,11 +8,17 @@ import type { MacroExchange } from '../../../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: '我的兑换 — FlyMacro',
+type Params = Promise<{ locale: string }>
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'exchanges' })
+  return { title: t('title') }
 }
 
-export default async function ExchangesPage() {
+export default async function ExchangesPage({ params }: { params: Params }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'exchanges' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -30,14 +37,14 @@ export default async function ExchangesPage() {
 
   return (
     <>
-      <h1>我的兑换</h1>
-      <p className="lead">这里展示你已兑换的宏及有效期，可随时查看代码或续费。</p>
+      <h1>{t('heading')}</h1>
+      <p className="lead">{t('subtitle')}</p>
 
       {exchanges.length === 0 ? (
         <div className="account-empty">
-          <p>你还没有兑换过任何宏。</p>
+          <p>{t('empty')}</p>
           <Link href="/macros" className="btn btn-primary">
-            去宏库选购
+            {t('goShop')}
           </Link>
         </div>
       ) : (
@@ -58,33 +65,33 @@ export default async function ExchangesPage() {
                         {macro.title}
                       </Link>
                     ) : (
-                      '未知宏'
+                      t('unknownMacro')
                     )}
                   </span>
                   <span className="status-pill" data-status={expired ? 'failed' : 'paid'}>
-                    {expired ? '已过期' : e.expiresAt ? '有效中' : '永久'}
+                    {expired ? t('expired') : e.expiresAt ? t('active') : t('permanent')}
                   </span>
                 </div>
                 <div className="row">
                   <span className="ticket-meta">
-                    花费 {e.creditsSpent} 积分
+                    {t('costCredits', { credits: e.creditsSpent })}
                   </span>
                   <span className="ticket-meta">
                     {daysLeft !== null
                       ? expired
-                        ? '已过期'
-                        : `剩余 ${daysLeft} 天`
-                      : '永久有效'}
-                    {e.autoRenew && !expired && ' · 自动续费'}
+                        ? t('expired')
+                        : t('remaining', { days: daysLeft })
+                      : t('permanentValid')}
+                    {e.autoRenew && !expired && ` · ${t('autoRenew')}`}
                   </span>
                 </div>
                 <div className="row">
                   <span className="ticket-meta">
-                    兑换于 {formatDate(e.grantedAt ?? e.createdAt)}
+                    {t('exchangedAt')} {formatDate(e.grantedAt ?? e.createdAt)}
                   </span>
                   {e.expiresAt && (
                     <span className="ticket-meta">
-                      过期于 {formatDate(e.expiresAt)}
+                      {t('expiresAt')} {formatDate(e.expiresAt)}
                     </span>
                   )}
                 </div>

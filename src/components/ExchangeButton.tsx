@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useExchange } from '../hooks/useExchange'
 
 export function ExchangeButton({
@@ -15,6 +16,7 @@ export function ExchangeButton({
   mode?: 'exchange' | 'renew'
   exchangeId?: number | string
 }) {
+  const t = useTranslations('exchange')
   const { execute, error, isPending, insufficient } = useExchange({
     mode,
     price,
@@ -40,13 +42,13 @@ export function ExchangeButton({
       >
         {isPending
           ? mode === 'renew'
-            ? '续费中…'
-            : '兑换中…'
+            ? t('renewing')
+            : t('exchanging')
           : insufficient
-            ? `积分不足 (${userCredits}/${price})`
+            ? t('insufficientCredits')
             : mode === 'renew'
-              ? `续费 ${price} 积分`
-              : `兑换 ${price} 积分`}
+              ? t('renewPrice', { price })
+              : t('exchangePrice', { price })}
       </button>
       {error && (
         <div style={{ marginTop: '0.75rem', padding: '0.6rem 0.8rem', background: 'rgba(220, 50, 50, 0.12)', border: '1px solid rgba(220, 50, 50, 0.35)', borderRadius: '4px', color: '#ff6b6b', fontSize: '0.85rem', textAlign: 'center' }}>

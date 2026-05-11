@@ -2,22 +2,24 @@
 
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useTranslations } from 'next-intl'
 import { createTicketAction, replyToTicketAction, type TicketActionState } from '../lib/ticket-actions'
 
 const initial: TicketActionState = {}
 
 export function TicketCreateForm() {
   const [state, action] = useActionState(createTicketAction, initial)
+  const t = useTranslations('ticket')
 
   return (
     <form action={action} className="ticket-form">
       <label>
-        <span>主题</span>
+        <span>{t('subjectField')}</span>
         <input
           name="subject"
           required
           maxLength={120}
-          placeholder="简要描述你的问题"
+          placeholder={t('subjectPlaceholder')}
           aria-invalid={!!state.fieldErrors?.subject}
         />
         {state.fieldErrors?.subject && <span className="auth-field-err">{state.fieldErrors.subject}</span>}
@@ -25,34 +27,34 @@ export function TicketCreateForm() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <label>
-          <span>分类</span>
+          <span>{t('categoryField')}</span>
           <select name="category" defaultValue="">
-            <option value="">未指定</option>
-            <option value="refund">退款申请</option>
-            <option value="usage">宏使用问题</option>
-            <option value="account">账号问题</option>
-            <option value="feedback">建议反馈</option>
-            <option value="other">其他</option>
+            <option value="">{t('unspecified')}</option>
+            <option value="refund">{t('categoryRefund')}</option>
+            <option value="usage">{t('categoryMacro')}</option>
+            <option value="account">{t('categoryAccount')}</option>
+            <option value="feedback">{t('categoryFeedback')}</option>
+            <option value="other">{t('categoryOther')}</option>
           </select>
         </label>
         <label>
-          <span>优先级</span>
+          <span>{t('priorityField')}</span>
           <select name="priority" defaultValue="normal">
-            <option value="low">低</option>
-            <option value="normal">普通</option>
-            <option value="high">高</option>
-            <option value="urgent">紧急</option>
+            <option value="low">{t('priorityLow')}</option>
+            <option value="normal">{t('priorityNormal')}</option>
+            <option value="high">{t('priorityHigh')}</option>
+            <option value="urgent">{t('priorityUrgent')}</option>
           </select>
         </label>
       </div>
 
       <label>
-        <span>详细描述</span>
+        <span>{t('descriptionField')}</span>
         <textarea
           name="body"
           required
           maxLength={5000}
-          placeholder="详细描述问题、复现步骤、出现时间等。如涉及订单或宏，可在主题中注明编号。"
+          placeholder={t('descriptionPlaceholder')}
           aria-invalid={!!state.fieldErrors?.body}
         />
         {state.fieldErrors?.body && <span className="auth-field-err">{state.fieldErrors.body}</span>}
@@ -64,18 +66,19 @@ export function TicketCreateForm() {
         </div>
       )}
 
-      <SubmitBtn label="提交工单" pendingLabel="提交中…" />
+      <SubmitBtn label={t('submitTicket')} pendingLabel={t('submitting')} />
     </form>
   )
 }
 
 export function TicketReplyForm({ ticketId, disabled }: { ticketId: string | number; disabled?: boolean }) {
   const [state, action] = useActionState(replyToTicketAction, initial)
+  const t = useTranslations('ticket')
 
   if (disabled) {
     return (
       <p className="auth-help" style={{ marginTop: '1.5rem' }}>
-        工单已关闭，如需继续沟通请提交新工单。
+        {t('closedNotice')}
       </p>
     )
   }
@@ -84,12 +87,12 @@ export function TicketReplyForm({ ticketId, disabled }: { ticketId: string | num
     <form action={action} className="ticket-form" style={{ marginTop: '1.75rem' }}>
       <input type="hidden" name="ticketId" value={String(ticketId)} />
       <label>
-        <span>追加回复</span>
+        <span>{t('addReply')}</span>
         <textarea
           name="body"
           required
           maxLength={5000}
-          placeholder="补充信息或回应客服…"
+          placeholder={t('replyPlaceholder')}
           aria-invalid={!!state.fieldErrors?.body}
         />
         {state.fieldErrors?.body && <span className="auth-field-err">{state.fieldErrors.body}</span>}
@@ -99,7 +102,7 @@ export function TicketReplyForm({ ticketId, disabled }: { ticketId: string | num
           {state.error}
         </div>
       )}
-      <SubmitBtn label="发送回复" pendingLabel="发送中…" />
+      <SubmitBtn label={t('sendReply')} pendingLabel={t('sending')} />
     </form>
   )
 }

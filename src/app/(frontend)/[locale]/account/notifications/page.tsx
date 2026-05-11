@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import { MarkAllReadButton } from '../../../../../components/NotificationButtons'
@@ -8,11 +9,17 @@ import type { Notification } from '../../../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: '通知中心 — FlyMacro',
+type Params = Promise<{ locale: string }>
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'notifications' })
+  return { title: t('title') }
 }
 
-export default async function NotificationsPage() {
+export default async function NotificationsPage({ params }: { params: Params }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'notifications' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -30,16 +37,16 @@ export default async function NotificationsPage() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>通知中心</h1>
+        <h1>{t('heading')}</h1>
         {notifications.some((n) => !n.read) && (
           <MarkAllReadButton />
         )}
       </div>
-      <p className="lead">来自系统和客服的最新消息。</p>
+      <p className="lead">{t('subtitle')}</p>
 
       {notifications.length === 0 ? (
         <div className="account-empty">
-          <p>没有通知。</p>
+          <p>{t('empty')}</p>
         </div>
       ) : (
         <div className="notif-list">

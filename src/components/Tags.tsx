@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import type { Class, Spec, Version } from '../payload-types'
 import { classLabel, specLabel } from '../lib/wow'
 
@@ -27,5 +30,6 @@ export function VersionTag({ value }: { value: MaybeRef<Version> }) {
 }
 
 export function TierTag({ tier }: { tier: 'regular' | 'premium' }) {
-  return <span className={`tag tier-${tier}`}>{tier === 'regular' ? '普通宏' : '高级宏'}</span>
+  const tTier = useTranslations('tier')
+  return <span className={`tag tier-${tier}`}>{tTier(tier)}</span>
 }

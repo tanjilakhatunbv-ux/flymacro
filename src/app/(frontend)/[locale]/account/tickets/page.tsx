@@ -1,16 +1,23 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import type { Ticket } from '../../../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: '我的工单 — FlyMacro',
+type Params = Promise<{ locale: string }>
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'ticket' })
+  return { title: t('myTickets') }
 }
 
-export default async function TicketsPage() {
+export default async function TicketsPage({ params }: { params: Params }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'ticket' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -27,39 +34,39 @@ export default async function TicketsPage() {
 
   return (
     <>
-      <h1>我的工单</h1>
-      <p className="lead">在这里查看你提交的所有工单及客服回复进度。</p>
+      <h1>{t('myTickets')}</h1>
+      <p className="lead">{t('subtitle')}</p>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <Link href="/account/tickets/new" className="btn btn-primary">
-          提交新工单
+          {t('newTicket')}
         </Link>
       </div>
 
       {tickets.length === 0 ? (
         <div className="account-empty">
-          <p>你还没有提交过任何工单。</p>
+          <p>{t('empty')}</p>
           <Link href="/account/tickets/new" className="btn btn-primary">
-            提交第一个工单
+            {t('firstTicket')}
           </Link>
         </div>
       ) : (
         <div style={{ border: '1px solid var(--border-soft)', borderRadius: 3 }}>
-          {tickets.map((t) => (
-            <Link key={t.id} href={`/account/tickets/${t.id}`} className="ticket-list-item">
+          {tickets.map((tk) => (
+            <Link key={tk.id} href={`/account/tickets/${tk.id}`} className="ticket-list-item">
               <div className="row">
-                <span className="ticket-subject">{t.subject}</span>
-                <span className="status-pill" data-status={t.status}>
-                  {statusLabel(t.status)}
+                <span className="ticket-subject">{tk.subject}</span>
+                <span className="status-pill" data-status={tk.status}>
+                  {statusLabel(tk.status, t)}
                 </span>
               </div>
               <div className="row">
                 <span className="ticket-meta">
-                  {t.category ? `${categoryLabel(t.category)} · ` : ''}
-                  {priorityLabel(t.priority ?? 'normal')}
+                  {tk.category ? `${categoryLabel(tk.category, t)} · ` : ''}
+                  {priorityLabel(tk.priority ?? 'normal', t)}
                 </span>
                 <span className="ticket-meta">
-                  最后更新 {formatDate(t.updatedAt)}
+                  {t('lastUpdate')} {formatDate(tk.updatedAt)}
                 </span>
               </div>
             </Link>
@@ -70,27 +77,30 @@ export default async function TicketsPage() {
   )
 }
 
-function statusLabel(s: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function statusLabel(s: string, t: any): string {
   return (
     {
-      open: '待处理',
-      'in-progress': '处理中',
-      resolved: '已解决',
-      closed: '已关闭',
+      open: t('statusPending'),
+      'in-progress': t('statusProcessing'),
+      resolved: t('statusResolved'),
+      closed: t('statusClosed'),
     } as Record<string, string>
   )[s] ?? s
 }
-function priorityLabel(p: string): string {
-  return ({ low: '低', normal: '普通', high: '高', urgent: '紧急' } as Record<string, string>)[p] ?? p
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function priorityLabel(p: string, t: any): string {
+  return ({ low: t('priorityLow'), normal: t('priorityNormal'), high: t('priorityHigh'), urgent: t('priorityUrgent') } as Record<string, string>)[p] ?? p
 }
-function categoryLabel(c: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function categoryLabel(c: string, t: any): string {
   return (
     {
-      refund: '退款申请',
-      usage: '宏使用问题',
-      account: '账号问题',
-      feedback: '建议反馈',
-      other: '其他',
+      refund: t('categoryRefund'),
+      usage: t('categoryMacro'),
+      account: t('categoryAccount'),
+      feedback: t('categoryFeedback'),
+      other: t('categoryOther'),
     } as Record<string, string>
   )[c] ?? c
 }

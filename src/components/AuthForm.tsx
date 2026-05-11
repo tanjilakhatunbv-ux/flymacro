@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/routing'
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset'
 
@@ -17,6 +18,7 @@ type FieldError = { field?: string; message: string }
 
 export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSiteKey }: Props) {
   const router = useRouter()
+  const t = useTranslations('auth')
   const [pending, startTransition] = useTransition()
   const [errors, setErrors] = useState<FieldError[]>([])
   const [success, setSuccess] = useState<string | null>(null)
@@ -33,15 +35,15 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
     const name = String(fd.get('name') ?? '').trim()
 
     if (mode === 'register' && password !== passwordConfirm) {
-      setErrors([{ field: 'passwordConfirm', message: '两次输入的密码不一致' }])
+      setErrors([{ field: 'passwordConfirm', message: t('passwordMismatch') }])
       return
     }
     if (mode === 'register' && password.length < 8) {
-      setErrors([{ field: 'password', message: '密码至少 8 位' }])
+      setErrors([{ field: 'password', message: t('passwordTooShort') }])
       return
     }
     if (mode === 'register' && turnstileSiteKey && !turnstileToken) {
-      setErrors([{ message: '请先完成人机验证' }])
+      setErrors([{ message: t('captchaRequired') }])
       return
     }
 
@@ -54,7 +56,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           name,
           token: resetToken,
           turnstileToken,
-        })
+        }, t)
         if (!resp.ok) {
           setErrors(resp.errors)
           return
@@ -67,16 +69,16 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           if ('warning' in resp && resp.warning) {
             setSuccess(resp.warning)
           } else {
-            setSuccess('注册成功，我们已向你的邮箱发送验证邮件，请前往激活后再登录。')
+            setSuccess(t('registerSuccess'))
           }
         } else if (mode === 'forgot') {
-          setSuccess('如果该邮箱存在，我们已发送重置链接，请检查邮箱（包括垃圾邮件文件夹）。')
+          setSuccess(t('resetSent'))
         } else if (mode === 'reset') {
-          setSuccess('密码已重置，请用新密码登录。')
+          setSuccess(t('resetDone'))
           setTimeout(() => router.push('/login'), 1500)
         }
       } catch (err) {
-        setErrors([{ message: err instanceof Error ? err.message : '请求失败，请稍后再试' }])
+        setErrors([{ message: err instanceof Error ? err.message : t('requestFailed') }])
       }
     })
   }
@@ -84,12 +86,12 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
   return (
     <form onSubmit={handleSubmit} className="auth-form">
       {(mode === 'login' || mode === 'register' || mode === 'forgot') && (
-        <FieldRow label="邮箱" name="email" type="email" required errors={errors} />
+        <FieldRow label={t('emailField')} name="email" type="email" required errors={errors} />
       )}
-      {mode === 'register' && <FieldRow label="昵称（可选）" name="name" type="text" errors={errors} />}
+      {mode === 'register' && <FieldRow label={t('nicknameField')} name="name" type="text" errors={errors} />}
       {(mode === 'login' || mode === 'register' || mode === 'reset') && (
         <FieldRow
-          label={mode === 'reset' ? '新密码' : '密码'}
+          label={mode === 'reset' ? t('newPasswordField') : t('passwordField')}
           name="password"
           type="password"
           required
@@ -99,7 +101,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       )}
       {(mode === 'register' || mode === 'reset') && (
         <FieldRow
-          label="确认密码"
+          label={t('confirmPassword')}
           name="passwordConfirm"
           type="password"
           required
@@ -126,25 +128,25 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       )}
 
       <button type="submit" className="btn btn-primary auth-submit" disabled={pending}>
-        {pending ? '处理中…' : submitLabel(mode)}
+        {pending ? t('processing') : submitLabel(mode, t)}
       </button>
 
       <div className="auth-foot">
         {mode === 'login' && (
           <>
-            <Link href="/forgot-password">忘记密码？</Link>
+            <Link href="/forgot-password">{t('forgotLink')}</Link>
             <span aria-hidden="true">·</span>
-            <Link href="/register">没有账号？立即注册</Link>
+            <Link href="/register">{t('noAccount')}</Link>
           </>
         )}
         {mode === 'register' && (
           <>
-            <Link href="/login">已有账号？登录</Link>
+            <Link href="/login">{t('hasAccount')}</Link>
           </>
         )}
         {(mode === 'forgot' || mode === 'reset') && (
           <>
-            <Link href="/login">返回登录</Link>
+            <Link href="/login">{t('backToLogin')}</Link>
           </>
         )}
       </div>
@@ -152,11 +154,11 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
   )
 }
 
-function submitLabel(mode: Mode) {
-  if (mode === 'login') return '登 录'
-  if (mode === 'register') return '注 册'
-  if (mode === 'forgot') return '发送重置邮件'
-  return '重置密码'
+function submitLabel(mode: Mode, t: (key: string) => string) {
+  if (mode === 'login') return t('loginTitle')
+  if (mode === 'register') return t('registerTitle')
+  if (mode === 'forgot') return t('sending')
+  return t('resetTitle')
 }
 
 function FieldRow({
@@ -238,9 +240,9 @@ type AuthInput = {
 
 type AuthResult = { ok: true; warning?: string } | { ok: false; errors: FieldError[] }
 
-async function runAuth(mode: Mode, input: AuthInput): Promise<AuthResult> {
+async function runAuth(mode: Mode, input: AuthInput, t: (key: string) => string): Promise<AuthResult> {
   if (mode === 'login') {
-    return postJson('/api/auth/login', { email: input.email, password: input.password })
+    return postJson('/api/auth/login', { email: input.email, password: input.password }, t)
   }
   if (mode === 'register') {
     return postJson('/api/auth/register', {
@@ -248,21 +250,21 @@ async function runAuth(mode: Mode, input: AuthInput): Promise<AuthResult> {
       password: input.password,
       name: input.name || undefined,
       turnstileToken: input.turnstileToken || undefined,
-    })
+    }, t)
   }
   if (mode === 'forgot') {
-    return postJson('/api/users/forgot-password', { email: input.email })
+    return postJson('/api/users/forgot-password', { email: input.email }, t)
   }
   if (mode === 'reset') {
     return postJson('/api/users/reset-password', {
       token: input.token,
       password: input.password,
-    })
+    }, t)
   }
-  return { ok: false, errors: [{ message: '未知的表单类型' }] }
+  return { ok: false, errors: [{ message: t('unknownFormType') }] }
 }
 
-async function postJson(url: string, body: Record<string, unknown>): Promise<AuthResult> {
+async function postJson(url: string, body: Record<string, unknown>, t: (key: string) => string): Promise<AuthResult> {
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -276,46 +278,46 @@ async function postJson(url: string, body: Record<string, unknown>): Promise<Aut
   } catch {
     /* ignore */
   }
-  return { ok: false, errors: extractErrors(data, resp.status) }
+  return { ok: false, errors: extractErrors(data, resp.status, t) }
 }
 
-function extractErrors(data: unknown, status: number): FieldError[] {
+function extractErrors(data: unknown, status: number, t: (key: string) => string): FieldError[] {
   if (!data || typeof data !== 'object') {
-    return [{ message: defaultMessage(status) }]
+    return [{ message: defaultMessage(status, t) }]
   }
   const maybe = data as { errors?: unknown; message?: unknown; success?: boolean; error?: string }
   if (maybe.success === false && typeof maybe.error === 'string') {
-    return [{ message: translateMessage(maybe.error, status) }]
+    return [{ message: translateMessage(maybe.error, status, t) }]
   }
   if (Array.isArray(maybe.errors) && maybe.errors.length > 0) {
     return maybe.errors.map((e: unknown) => {
       if (typeof e === 'string') return { message: e }
       if (e && typeof e === 'object') {
         const obj = e as { field?: string; message?: string; name?: string }
-        return { field: obj.field, message: obj.message ?? obj.name ?? '请求失败' }
+        return { field: obj.field, message: obj.message ?? obj.name ?? t('requestFailed') }
       }
-      return { message: '请求失败' }
+      return { message: t('requestFailed') }
     })
   }
   if (typeof maybe.message === 'string') {
-    return [{ message: translateMessage(maybe.message, status) }]
+    return [{ message: translateMessage(maybe.message, status, t) }]
   }
-  return [{ message: defaultMessage(status) }]
+  return [{ message: defaultMessage(status, t) }]
 }
 
-function defaultMessage(status: number): string {
-  if (status === 401) return '邮箱或密码错误'
-  if (status === 403) return '账号未激活或没有权限'
-  if (status === 429) return '请求过于频繁，请稍后再试'
-  return '请求失败，请稍后再试'
+function defaultMessage(status: number, t: (key: string) => string): string {
+  if (status === 401) return t('wrongCredentials')
+  if (status === 403) return t('accountInactive')
+  if (status === 429) return t('tooManyRequests')
+  return t('requestFailedRetry')
 }
 
-function translateMessage(msg: string, status: number): string {
+function translateMessage(msg: string, status: number, t: (key: string) => string): string {
   const lc = msg.toLowerCase()
-  if (lc.includes('invalid') && lc.includes('credentials')) return '邮箱或密码错误'
-  if (lc.includes('email') && lc.includes('not verified')) return '邮箱尚未激活，请检查注册时收到的验证邮件'
-  if (lc.includes('locked')) return '账号已被锁定，请稍后再试或联系客服'
-  if (lc.includes('exists')) return '该邮箱已注册，请直接登录或使用「忘记密码」'
-  if (status === 401 || status === 403) return defaultMessage(status)
+  if (lc.includes('invalid') && lc.includes('credentials')) return t('wrongCredentials')
+  if (lc.includes('email') && lc.includes('not verified')) return t('emailNotActivated')
+  if (lc.includes('locked')) return t('accountLocked')
+  if (lc.includes('exists')) return t('emailRegistered')
+  if (status === 401 || status === 403) return defaultMessage(status, t)
   return msg
 }

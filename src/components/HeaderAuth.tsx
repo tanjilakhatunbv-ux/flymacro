@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/routing'
 import { UserMenu } from './UserMenu'
 import { readSessionCache, writeSessionCache, isCacheValid } from '../lib/session-cache'
 
@@ -16,6 +17,7 @@ type User = {
 }
 
 export function HeaderAuth() {
+  const t = useTranslations('nav')
   const [user, setUser] = useState<User | null | undefined>(undefined)
   const [unread, setUnread] = useState(0)
 
@@ -57,10 +59,10 @@ export function HeaderAuth() {
     return (
       <>
         <span className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
-          登录
+          {t('login')}
         </span>
         <span className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
-          注册
+          {t('register')}
         </span>
       </>
     )
@@ -70,10 +72,10 @@ export function HeaderAuth() {
     return (
       <>
         <Link href="/login" className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
-          登录
+          {t('login')}
         </Link>
         <Link href="/register" className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
-          注册
+          {t('register')}
         </Link>
       </>
     )

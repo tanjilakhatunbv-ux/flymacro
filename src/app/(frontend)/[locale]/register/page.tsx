@@ -1,16 +1,21 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { AuthForm } from '../../../../components/AuthForm'
 import { OAuthButtons } from '../../../../components/OAuthButtons'
 import { getCurrentUser } from '../../../../lib/auth'
 
-export const metadata: Metadata = {
-  title: '注册 — FlyMacro',
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth' })
+  return { title: `${t('registerTitle')} — FlyMacro` }
 }
 
 export const dynamic = 'force-dynamic'
 
-export default async function RegisterPage() {
+export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth' })
   const user = await getCurrentUser()
   if (user) redirect('/account')
 
@@ -20,19 +25,19 @@ export default async function RegisterPage() {
     <div className="container-page page-single">
       <article className="auth-card">
         <header className="detail-header">
-          <h1>注 册</h1>
-          <p className="detail-subtitle">创建 FlyMacro 账号，开始你的冒险</p>
+          <h1>{t('registerTitle')}</h1>
+          <p className="detail-subtitle">{t('registerSubtitle')}</p>
         </header>
         <div className="auth-body">
           <AuthForm mode="register" turnstileSiteKey={turnstileSiteKey || undefined} />
           <OAuthButtons />
           <p className="auth-help">
-            注册即表示你同意我们的
+            {t('termsAgree')}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/about" style={{ margin: '0 4px' }}>
-              服务条款与隐私政策
+              {t('termsLink')}
             </a>
-            。我们会向你的邮箱发送验证邮件以激活账号。
+            {t('termsAfter')}
           </p>
         </div>
       </article>

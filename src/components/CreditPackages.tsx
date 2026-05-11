@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import type { CreditPackage } from '../payload-types'
 
 export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage[]; loggedIn: boolean }) {
+  const t = useTranslations('creditPackages')
   const [pendingId, setPendingId] = useState<number | string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -23,18 +25,18 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
         })
         const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; message?: string }
         if (!resp.ok || !data.success) {
-          setError(data.error || data.message || '创建支付会话失败')
+          setError(data.error || data.message || t('sessionFailed'))
           setPendingId(null)
           return
         }
         if (data.data?.checkoutUrl) {
           window.location.href = data.data.checkoutUrl
         } else {
-          setError('未获得支付链接')
+          setError(t('noPaymentLink'))
           setPendingId(null)
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : '请求失败')
+        setError(e instanceof Error ? e.message : t('requestFailed'))
         setPendingId(null)
       }
     })
@@ -43,7 +45,7 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
   if (packages.length === 0) {
     return (
       <div className="account-empty">
-        <p>暂无可用充值档次。</p>
+        <p>{t('empty')}</p>
       </div>
     )
   }
@@ -60,7 +62,7 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
           return (
             <div key={pkg.id} className={`model-card ${badge && badge !== 'none' ? `badge-${badge}` : ''}`}>
               {badge && badge !== 'none' && (
-                <span className="package-badge">{badgeLabel(badge)}</span>
+                <span className="package-badge">{badgeLabel(badge, t)}</span>
               )}
               <div className="model-header">
                 <h4>{pkg.label}</h4>
@@ -72,10 +74,10 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
                 </div>
               </div>
               <div className="credit-granted-row">
-                到账 <strong>{pkg.creditsGranted}</strong> 积分
+                {t('creditsAmount', { amount: pkg.creditsGranted })}
                 {pkg.creditsGranted > (pkg.amount ?? 0) && (
                   <span className="credit-bonus">
-                    （赠 {pkg.creditsGranted - (pkg.amount ?? 0)} 积分）
+                    {t('bonusCredits', { amount: pkg.creditsGranted - (pkg.amount ?? 0) })}
                   </span>
                 )}
               </div>
@@ -91,11 +93,11 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
                     onClick={() => handleCheckout(pkg)}
                     disabled={isPending && pendingId === pkg.id}
                   >
-                    {isPending && pendingId === pkg.id ? '准备支付…' : '立即充值'}
+                    {isPending && pendingId === pkg.id ? t('preparing') : t('buyNow')}
                   </button>
                 ) : (
                   <Link href="/login?return=/account/credits" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }}>
-                    登录后充值
+                    {t('loginRequired')}
                   </Link>
                 )}
               </div>
@@ -110,11 +112,12 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
   )
 }
 
-function badgeLabel(badge: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function badgeLabel(badge: string, t: any): string {
   switch (badge) {
-    case 'hot': return '热卖'
-    case 'recommended': return '推荐'
-    case 'new': return '新品'
+    case 'hot': return t('hot')
+    case 'recommended': return t('recommended')
+    case 'new': return t('newTag')
     default: return ''
   }
 }

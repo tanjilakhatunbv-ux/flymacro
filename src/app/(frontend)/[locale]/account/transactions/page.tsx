@@ -1,15 +1,22 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import type { CreditTransaction } from '../../../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: '积分明细 — FlyMacro',
+type Params = Promise<{ locale: string }>
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'transactions' })
+  return { title: t('title') }
 }
 
-export default async function TransactionsPage() {
+export default async function TransactionsPage({ params }: { params: Params }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'transactions' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -26,12 +33,12 @@ export default async function TransactionsPage() {
 
   return (
     <>
-      <h1>积分明细</h1>
-      <p className="lead">查看每一笔积分变动，包括充值、兑换、续费和注册奖励。</p>
+      <h1>{t('heading')}</h1>
+      <p className="lead">{t('subtitle')}</p>
 
       {transactions.length === 0 ? (
         <div className="account-empty">
-          <p>暂无积分变动记录。</p>
+          <p>{t('empty')}</p>
         </div>
       ) : (
         <div style={{ border: '1px solid var(--border-soft)', borderRadius: 3 }}>
@@ -47,15 +54,15 @@ export default async function TransactionsPage() {
               fontWeight: 500,
             }}
           >
-            <span>时间</span>
-            <span>类型</span>
-            <span style={{ textAlign: 'right' }}>变动</span>
-            <span style={{ textAlign: 'right' }}>余额</span>
-            <span>备注</span>
+            <span>{t('timeField')}</span>
+            <span>{t('typeField')}</span>
+            <span style={{ textAlign: 'right' }}>{t('changeField')}</span>
+            <span style={{ textAlign: 'right' }}>{t('balanceField')}</span>
+            <span>{t('noteField')}</span>
           </div>
-          {transactions.map((t) => (
+          {transactions.map((tx) => (
             <div
-              key={t.id}
+              key={tx.id}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '140px 100px 80px 100px 1fr',
@@ -66,20 +73,20 @@ export default async function TransactionsPage() {
                 alignItems: 'center',
               }}
             >
-              <span style={{ color: 'var(--text-muted)' }}>{formatDate(t.createdAt)}</span>
-              <span>{typeLabel(t.type)}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{formatDate(tx.createdAt)}</span>
+              <span>{typeLabel(tx.type, t)}</span>
               <span
                 style={{
                   textAlign: 'right',
                   fontWeight: 600,
-                  color: t.amount > 0 ? 'var(--success)' : 'var(--danger)',
+                  color: tx.amount > 0 ? 'var(--success)' : 'var(--danger)',
                 }}
               >
-                {t.amount > 0 ? '+' : ''}
-                {t.amount}
+                {tx.amount > 0 ? '+' : ''}
+                {tx.amount}
               </span>
-              <span style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{t.balanceAfter}</span>
-              <span style={{ color: 'var(--text-muted)' }}>{t.reason || '-'}</span>
+              <span style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{tx.balanceAfter}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{tx.reason || '-'}</span>
             </div>
           ))}
         </div>
@@ -88,14 +95,15 @@ export default async function TransactionsPage() {
   )
 }
 
-function typeLabel(type: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function typeLabel(type: string, t: any): string {
   const map: Record<string, string> = {
-    register_bonus: '注册奖励',
-    recharge: '充值',
-    exchange: '兑换',
-    renew: '续费',
-    refund: '退款',
-    admin_adjust: '系统调整',
+    register_bonus: t('typeSignup'),
+    recharge: t('typeTopup'),
+    exchange: t('typeExchange'),
+    renew: t('typeRenew'),
+    refund: t('typeRefund'),
+    admin_adjust: t('typeAdjust'),
   }
   return map[type] ?? type
 }

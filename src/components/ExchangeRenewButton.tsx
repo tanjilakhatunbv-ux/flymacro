@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useExchange } from '../hooks/useExchange'
 
 export function ExchangeRenewButton({
@@ -11,6 +12,7 @@ export function ExchangeRenewButton({
   price: number
   onSuccess?: (data: { credits: number; expiresAt: string | null }) => void
 }) {
+  const t = useTranslations('exchange')
   const { execute, error, isPending } = useExchange({
     mode: 'renew',
     price,
@@ -26,7 +28,7 @@ export function ExchangeRenewButton({
         onClick={() => execute({ exchangeId })}
         disabled={isPending}
       >
-        {isPending ? '续费中…' : `续费 (${price} 积分)`}
+        {isPending ? t('renewing') : t('renewButton', { price })}
       </button>
       {error && <span className="auth-field-err" style={{ fontSize: '0.78rem' }}>{error}</span>}
     </div>

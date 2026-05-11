@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useTransition, useMemo, useState, useEffect } from 'react'
 
 type ClassRef = { id: number | string; slug: string; nameZh: string }
@@ -16,6 +17,7 @@ type MacroFiltersProps = {
 }
 
 export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersProps) {
+  const t = useTranslations('macroFilters')
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -67,26 +69,26 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
             type="search"
             value={qInput}
             onChange={(e) => setQInput(e.target.value)}
-            placeholder="搜索宏名称或简介..."
-            aria-label="搜索宏"
+            placeholder={t('searchPlaceholder')}
+            aria-label={t('searchAria')}
           />
-          <button type="submit" className="btn">搜索</button>
+          <button type="submit" className="btn">{t('search')}</button>
           {initialQ && (
-            <button type="button" className="btn btn-ghost" onClick={() => { setQInput(''); setParams({ q: null }) }}>清除</button>
+            <button type="button" className="btn btn-ghost" onClick={() => { setQInput(''); setParams({ q: null }) }}>{t('clear')}</button>
           )}
         </form>
 
-        <div className="filters" role="group" aria-label="按档次筛选">
-          <button type="button" className={`filter-btn ${tier === 'all' ? 'active' : ''}`} onClick={() => setParams({ tier: null })} aria-pressed={tier === 'all'}>全部</button>
-          <button type="button" className={`filter-btn ${tier === 'regular' ? 'active' : ''}`} onClick={() => setParams({ tier: 'regular' })} aria-pressed={tier === 'regular'}>普通</button>
-          <button type="button" className={`filter-btn ${tier === 'premium' ? 'active' : ''}`} onClick={() => setParams({ tier: 'premium' })} aria-pressed={tier === 'premium'}>高级</button>
+        <div className="filters" role="group" aria-label={t('tierFilter')}>
+          <button type="button" className={`filter-btn ${tier === 'all' ? 'active' : ''}`} onClick={() => setParams({ tier: null })} aria-pressed={tier === 'all'}>{t('all')}</button>
+          <button type="button" className={`filter-btn ${tier === 'regular' ? 'active' : ''}`} onClick={() => setParams({ tier: 'regular' })} aria-pressed={tier === 'regular'}>{t('regular')}</button>
+          <button type="button" className={`filter-btn ${tier === 'premium' ? 'active' : ''}`} onClick={() => setParams({ tier: 'premium' })} aria-pressed={tier === 'premium'}>{t('premium')}</button>
         </div>
       </div>
 
       <div className="filter-strip">
-        <span className="filter-strip-label">职业</span>
+        <span className="filter-strip-label">{t('classFilter')}</span>
         <div className="filter-strip-tags">
-          <button type="button" className={`tag-link ${!classSlug ? 'active' : ''}`} onClick={() => setParams({ class: null, spec: null })} aria-pressed={!classSlug}>全部</button>
+          <button type="button" className={`tag-link ${!classSlug ? 'active' : ''}`} onClick={() => setParams({ class: null, spec: null })} aria-pressed={!classSlug}>{t('all')}</button>
           {classes.map((c) => (
             <button
               key={c.slug}
@@ -103,9 +105,9 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
 
       {classSlug && visibleSpecs.length > 0 && (
         <div className="filter-strip">
-          <span className="filter-strip-label">专精</span>
+          <span className="filter-strip-label">{t('specFilter')}</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!specSlug ? 'active' : ''}`} onClick={() => setParams({ spec: null })} aria-pressed={!specSlug}>全部</button>
+            <button type="button" className={`tag-link ${!specSlug ? 'active' : ''}`} onClick={() => setParams({ spec: null })} aria-pressed={!specSlug}>{t('all')}</button>
             {visibleSpecs.map((s) => (
               <button
                 key={s.slug}
@@ -123,9 +125,9 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
 
       {versions.length > 0 && (
         <div className="filter-strip">
-          <span className="filter-strip-label">版本</span>
+          <span className="filter-strip-label">{t('versionFilter')}</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!versionLabel ? 'active' : ''}`} onClick={() => setParams({ version: null })} aria-pressed={!versionLabel}>全部</button>
+            <button type="button" className={`tag-link ${!versionLabel ? 'active' : ''}`} onClick={() => setParams({ version: null })} aria-pressed={!versionLabel}>{t('all')}</button>
             {versions.map((v) => (
               <button
                 key={String(v.id)}
@@ -143,9 +145,9 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
 
       {tags.length > 0 && (
         <div className="filter-strip">
-          <span className="filter-strip-label">标签</span>
+          <span className="filter-strip-label">{t('tagFilter')}</span>
           <div className="filter-strip-tags">
-            <button type="button" className={`tag-link ${!tagValue ? 'active' : ''}`} onClick={() => setParams({ tag: null })} aria-pressed={!tagValue}>全部</button>
+            <button type="button" className={`tag-link ${!tagValue ? 'active' : ''}`} onClick={() => setParams({ tag: null })} aria-pressed={!tagValue}>{t('all')}</button>
             {tags.map((t) => (
               <button
                 key={t}
@@ -165,9 +167,10 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
 }
 
 export function ClearFiltersLink() {
+  const t = useTranslations('macroFilters')
   return (
     <Link href="/macros" className="btn">
-      清除全部筛选
+      {t('clearAll')}
     </Link>
   )
 }

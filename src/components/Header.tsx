@@ -23,7 +23,7 @@ export function Header() {
         <Link href="/" className="site-logo" aria-label="FlyMacro">
           FlyMacro
         </Link>
-        <nav className="site-nav" aria-label="主导航">
+        <nav className="site-nav" aria-label={t('mainNav')}>
           {navKeys.map((key, i) => (
             <Link
               key={key}

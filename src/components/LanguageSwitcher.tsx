@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/routing'
 
 export function LanguageSwitcher() {
   const locale = useLocale()
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -41,7 +42,7 @@ export function LanguageSwitcher() {
           alignItems: 'center',
           gap: '0.3rem',
         }}
-        aria-label={locale === 'zh' ? 'Switch language' : '切换语言'}
+        aria-label={t('switchLang')}
       >
         <svg
           width="14"

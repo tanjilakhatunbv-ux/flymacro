@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useTranslations } from 'next-intl'
 import { markAllNotificationsReadAction } from '../lib/notification-actions'
 
 export function MarkAllReadButton() {
@@ -17,9 +18,10 @@ export function MarkAllReadButton() {
 
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const t = useTranslations('notifications')
   return (
     <button type="submit" className="btn" disabled={pending} style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}>
-      {pending ? '处理中…' : '全部已读'}
+      {pending ? t('processing') : t('markAllRead')}
     </button>
   )
 }

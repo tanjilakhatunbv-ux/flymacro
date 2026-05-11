@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { MacroCard } from './MacroCard'
 import { ClearFiltersLink } from './MacroFilters'
 import type { Macro } from '../payload-types'
@@ -12,6 +13,7 @@ export function MacroGridClient({
   macros: Macro[]
   totalDocs: number
 }) {
+  const t = useTranslations('macroGrid')
   const [exchangedIds, setExchangedIds] = useState<Set<number | string>>(new Set())
 
   useEffect(() => {
@@ -26,12 +28,12 @@ export function MacroGridClient({
 
   return (
     <>
-      <p className="page-content">共 {totalDocs} 个宏</p>
+      <p className="page-content">{t('totalCount', { count: totalDocs })}</p>
 
       {macros.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0' }}>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-            当前条件下暂无宏包。
+            {t('empty')}
           </p>
           <ClearFiltersLink />
         </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 
 export function PurchaseButton({
   macroSlug,
@@ -11,6 +12,7 @@ export function PurchaseButton({
   modelIndex: number
   modelName: string
 }) {
+  const t = useTranslations('creditPackages')
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -26,16 +28,16 @@ export function PurchaseButton({
         })
         const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; message?: string }
         if (!resp.ok || !data.success) {
-          setError(data.error || data.message || '支付请求失败')
+          setError(data.error || data.message || t('sessionFailed'))
           return
         }
         if (data.data?.checkoutUrl) {
           window.location.href = data.data.checkoutUrl
         } else {
-          setError('未获得支付链接')
+          setError(t('noPaymentLink'))
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : '请求失败')
+        setError(e instanceof Error ? e.message : t('requestFailed'))
       }
     })
   }
@@ -49,7 +51,7 @@ export function PurchaseButton({
         onClick={handleClick}
         disabled={pending}
       >
-        {pending ? '准备支付…' : `购买 ${modelName}`}
+        {pending ? t('preparing') : `${t('buyNow')} ${modelName}`}
       </button>
       {error && (
         <p className="auth-field-err" style={{ marginTop: '0.5rem', textAlign: 'center' }}>

@@ -17,7 +17,7 @@ type NewsItem = {
   body?: unknown
 }
 
-type Params = Promise<{ slug: string }>
+type Params = Promise<{ slug: string; locale: string }>
 
 export const revalidate = 300
 
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function NewsDetailPage({ params }: { params: Params }) {
-  const { slug } = await params
+  const { slug, locale } = await params
   const t = await getTranslations('news')
   const article = await findNewsCached(slug)
   if (!article) notFound()
@@ -80,7 +80,7 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
             {categoryText && <span className="tag spec">{categoryText}</span>}
             {article.publishedAt && (
               <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginLeft: '0.5rem' }}>
-                {formatDate(article.publishedAt)}
+                {formatDate(article.publishedAt, locale)}
               </span>
             )}
             {article.author && (
@@ -115,9 +115,9 @@ function getCategoryLabel(t: any, c: string): string {
   }
 }
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   try {
-    return new Date(dateStr).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
   } catch {
     return dateStr
   }

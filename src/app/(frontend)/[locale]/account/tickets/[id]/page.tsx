@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../../lib/auth'
 import { getPayload } from '../../../../../../lib/payload'
 import { RichText } from '../../../../../../components/RichText'
@@ -9,14 +10,17 @@ import type { Ticket, TicketMessage } from '../../../../../../payload-types'
 
 export const dynamic = 'force-dynamic'
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ id: string; locale: string }>
 
-export const metadata: Metadata = {
-  title: '工单详情 — FlyMacro',
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'ticket' })
+  return { title: t('detailTitle') }
 }
 
 export default async function TicketDetailPage({ params }: { params: Params }) {
-  const { id } = await params
+  const { id, locale } = await params
+  const t = await getTranslations({ locale, namespace: 'ticket' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -54,30 +58,30 @@ export default async function TicketDetailPage({ params }: { params: Params }) {
 
   return (
     <>
-      <BackLink href="/account/tickets">返回工单列表</BackLink>
+      <BackLink href="/account/tickets">{t('backToList')}</BackLink>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
         <div>
           <h1 style={{ marginBottom: '0.5rem' }}>{ticket.subject}</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-            #{ticket.id} · 提交于 {formatDate(ticket.createdAt)}
-            {ticket.priority && ticket.priority !== 'normal' ? ` · 优先级：${priorityLabel(ticket.priority)}` : ''}
+            #{ticket.id} · {t('submittedAt')} {formatDate(ticket.createdAt)}
+            {ticket.priority && ticket.priority !== 'normal' ? ` · ${t('priorityLabel')}：${priorityLabel(ticket.priority, t)}` : ''}
           </p>
         </div>
         <span className="status-pill" data-status={ticket.status}>
-          {statusLabel(ticket.status)}
+          {statusLabel(ticket.status, t)}
         </span>
       </div>
 
       <section className="ticket-thread">
         {messages.length === 0 ? (
           <div className="account-empty">
-            <p>这个工单暂无消息记录。</p>
+            <p>{t('noMessages')}</p>
           </div>
         ) : (
           messages.map((m) => (
             <article key={m.id} className="ticket-msg" data-sender={m.senderType}>
               <div className="ticket-msg-head">
-                <span>{m.senderType === 'staff' ? '客服' : '你'}</span>
+                <span>{m.senderType === 'staff' ? t('supportStaff') : t('you')}</span>
                 <span>{formatDate(m.createdAt)}</span>
               </div>
               <div className="ticket-msg-body">
@@ -93,11 +97,13 @@ export default async function TicketDetailPage({ params }: { params: Params }) {
   )
 }
 
-function statusLabel(s: string): string {
-  return ({ open: '待处理', 'in-progress': '处理中', resolved: '已解决', closed: '已关闭' } as Record<string, string>)[s] ?? s
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function statusLabel(s: string, t: any): string {
+  return ({ open: t('statusPending'), 'in-progress': t('statusProcessing'), resolved: t('statusResolved'), closed: t('statusClosed') } as Record<string, string>)[s] ?? s
 }
-function priorityLabel(p: string): string {
-  return ({ low: '低', normal: '普通', high: '高', urgent: '紧急' } as Record<string, string>)[p] ?? p
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function priorityLabel(p: string, t: any): string {
+  return ({ low: t('priorityLow'), normal: t('priorityNormal'), high: t('priorityHigh'), urgent: t('priorityUrgent') } as Record<string, string>)[p] ?? p
 }
 function formatDate(iso: string): string {
   const d = new Date(iso)

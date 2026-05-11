@@ -1,19 +1,24 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { AuthForm } from '../../../../components/AuthForm'
 import { OAuthButtons } from '../../../../components/OAuthButtons'
 import { getCurrentUser } from '../../../../lib/auth'
 
-export const metadata: Metadata = {
-  title: '登录 — FlyMacro',
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth' })
+  return { title: `${t('loginTitle')} — FlyMacro` }
 }
 
 export const dynamic = 'force-dynamic'
 
 type SearchParams = Promise<{ return?: string; error?: string; message?: string }>
 
-export default async function LoginPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function LoginPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: SearchParams }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth' })
   const sp = await searchParams
   const returnUrl = sanitizeReturnUrl(sp.return)
   const oauthError = sp.error === 'oauth' ? sp.message : undefined
@@ -24,8 +29,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
     <div className="container-page page-single">
       <article className="auth-card">
         <header className="detail-header">
-          <h1>登 录</h1>
-          <p className="detail-subtitle">欢迎回到 FlyMacro</p>
+          <h1>{t('loginTitle')}</h1>
+          <p className="detail-subtitle">{t('loginSubtitle')}</p>
         </header>
         <div className="auth-body">
           {oauthError && (
@@ -36,7 +41,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
           <AuthForm mode="login" returnUrl={returnUrl} />
           <OAuthButtons returnUrl={returnUrl} />
           <p className="auth-help">
-            管理员账号请前往
+            {t('adminLink')}
             <Link href="/admin" style={{ marginLeft: 4 }}>
               /admin
             </Link>

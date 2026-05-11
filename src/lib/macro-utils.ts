@@ -26,7 +26,7 @@ export function isMacroTier(
   return (macro.price ?? 0) >= 200
 }
 
-export function formatMacroPrice(price: number | undefined): string {
+export function formatMacroPrice(price: number | undefined, locale?: string): string {
   if (price === undefined || price === null) return '0'
-  return price.toLocaleString('zh-CN')
+  return price.toLocaleString(locale === 'en' ? 'en-US' : 'zh-CN')
 }

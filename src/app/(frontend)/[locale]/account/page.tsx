@@ -1,15 +1,22 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: '个人中心 — FlyMacro',
+type Params = Promise<{ locale: string }>
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'accountPage' })
+  return { title: t('title') }
 }
 
-export default async function AccountHome() {
+export default async function AccountHome({ params }: { params: Params }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'accountPage' })
   const user = await getCurrentUser()
   if (!user) return null
 
@@ -45,85 +52,86 @@ export default async function AccountHome() {
 
   return (
     <>
-      <h1>欢迎回来，{display}</h1>
-      <p className="lead">在这里管理你的积分、兑换、订单、工单与通知。</p>
+      <h1>{t('welcome', { name: display })}</h1>
+      <p className="lead">{t('subtitle')}</p>
 
       {!verified && (
         <div className="auth-error" role="alert" style={{ marginBottom: '1.5rem' }}>
           <p style={{ margin: 0 }}>
-            你的邮箱尚未验证。请前往邮箱点击注册时收到的验证链接。
+            {t('emailUnverified')}
           </p>
         </div>
       )}
 
       <section className="account-summary">
         <div className="account-card">
-          <h4>当前积分</h4>
+          <h4>{t('currentCredits')}</h4>
           <div className="num" style={{ color: 'var(--gold-bright)' }}>{credits}</div>
         </div>
         <div className="account-card">
-          <h4>已兑换宏</h4>
+          <h4>{t('exchangedMacros')}</h4>
           <div className="num">{exchanges.totalDocs}</div>
         </div>
         <div className="account-card">
-          <h4>充值订单</h4>
+          <h4>{t('paymentOrders')}</h4>
           <div className="num">{creditOrders.totalDocs}</div>
         </div>
         <div className="account-card">
-          <h4>处理中工单</h4>
+          <h4>{t('activeTickets')}</h4>
           <div className="num">{openTickets.totalDocs}</div>
         </div>
         <div className="account-card">
-          <h4>未读通知</h4>
+          <h4>{t('unreadNotifications')}</h4>
           <div className="num">{unreadNotifs.totalDocs}</div>
         </div>
       </section>
 
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
         <Link href="/macros" className="btn">
-          浏览宏库
+          {t('browseMacros')}
         </Link>
         <Link href="/account/credits" className="btn btn-primary">
-          充值积分
+          {t('buyCredits')}
         </Link>
         <Link href="/account/tickets/new" className="btn">
-          提交工单
+          {t('submitTicket')}
         </Link>
         <Link href="/account/exchanges" className="btn">
-          查看已兑换宏
+          {t('viewExchanges')}
         </Link>
       </section>
 
       <section style={{ marginTop: '2.5rem' }}>
         <h2 style={{ fontFamily: 'var(--font-main)', fontSize: '1.2rem', color: 'var(--gold)', marginBottom: '1rem' }}>
-          账号信息
+          {t('accountInfo')}
         </h2>
         <dl style={{ display: 'grid', gridTemplateColumns: '120px 1fr', rowGap: '0.6rem', fontSize: '0.92rem' }}>
-          <dt style={{ color: 'var(--text-muted)' }}>邮箱</dt>
+          <dt style={{ color: 'var(--text-muted)' }}>{t('emailField')}</dt>
           <dd style={{ margin: 0 }}>{user.email}</dd>
-          <dt style={{ color: 'var(--text-muted)' }}>昵称</dt>
-          <dd style={{ margin: 0 }}>{user.name || '（未设置）'}</dd>
-          <dt style={{ color: 'var(--text-muted)' }}>积分</dt>
+          <dt style={{ color: 'var(--text-muted)' }}>{t('nicknameField')}</dt>
+          <dd style={{ margin: 0 }}>{user.name || t('notSet')}</dd>
+          <dt style={{ color: 'var(--text-muted)' }}>{t('creditsField')}</dt>
           <dd style={{ margin: 0, color: 'var(--gold-bright)' }}>{credits}</dd>
-          <dt style={{ color: 'var(--text-muted)' }}>角色</dt>
-          <dd style={{ margin: 0 }}>{roleLabel(user.role ?? 'user')}</dd>
-          <dt style={{ color: 'var(--text-muted)' }}>邮箱状态</dt>
-          <dd style={{ margin: 0 }}>{verified ? '已验证' : '未验证'}</dd>
+          <dt style={{ color: 'var(--text-muted)' }}>{t('roleField')}</dt>
+          <dd style={{ margin: 0 }}>{roleLabel(user.role ?? 'user', t)}</dd>
+          <dt style={{ color: 'var(--text-muted)' }}>{t('emailStatus')}</dt>
+          <dd style={{ margin: 0 }}>{verified ? t('verified') : t('unverified')}</dd>
         </dl>
       </section>
     </>
   )
 }
 
-function roleLabel(role: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function roleLabel(role: string, t: any): string {
   switch (role) {
     case 'super-admin':
-      return '超级管理员'
+      return t('roleSuperAdmin')
     case 'operator':
-      return '运营'
+      return t('roleOperator')
     case 'support':
-      return '客服'
+      return t('roleSupport')
     default:
-      return '普通用户'
+      return t('roleUser')
   }
 }
