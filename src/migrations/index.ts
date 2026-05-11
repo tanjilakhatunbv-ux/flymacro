@@ -12,6 +12,7 @@ import * as migration_20260508_add_credit_orders_checkout_unique from './2026050
 import * as migration_20260511_add_news_collection from './20260511_add_news_collection';
 import * as migration_20260511_consolidate_roles from './20260511_consolidate_roles';
 import * as migration_20260511_add_audit_metadata from './20260511_add_audit_metadata';
+import * as migration_20260511_fix_set_null_constraints from './20260511_fix_set_null_constraints';
 
 export const migrations = [
   {
@@ -83,5 +84,10 @@ export const migrations = [
     up: migration_20260511_add_audit_metadata.up,
     down: migration_20260511_add_audit_metadata.down,
     name: '20260511_add_audit_metadata'
+  },
+  {
+    up: migration_20260511_fix_set_null_constraints.up,
+    down: migration_20260511_fix_set_null_constraints.down,
+    name: '20260511_fix_set_null_constraints'
   },
 ];
