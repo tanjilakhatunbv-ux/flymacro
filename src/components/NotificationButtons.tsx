@@ -1,27 +1,52 @@
 'use client'
 
-import { useActionState } from 'react'
-import { useFormStatus } from 'react-dom'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { markAllNotificationsReadAction } from '../lib/notification-actions'
 
 export function MarkAllReadButton() {
-  const [state, action] = useActionState(markAllNotificationsReadAction, {})
-
-  return (
-    <form action={action} style={{ display: 'inline' }}>
-      <SubmitButton />
-      {state.error && <span className="auth-field-err" style={{ marginLeft: 8 }}>{state.error}</span>}
-    </form>
-  )
-}
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
   const t = useTranslations('notifications')
+
+  async function handleClick() {
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/notifications/mark-all-read', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || '操作失败')
+        return
+      }
+
+      router.refresh()
+    } catch {
+      setError('网络错误，请重试')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <button type="submit" className="btn" disabled={pending} style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}>
-      {pending ? t('processing') : t('markAllRead')}
-    </button>
+    <>
+      <button
+        type="button"
+        className="btn"
+        disabled={loading}
+        onClick={handleClick}
+        style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
+      >
+        {loading ? t('processing') : t('markAllRead')}
+      </button>
+      {error && <span className="auth-field-err" style={{ marginLeft: 8 }}>{error}</span>}
+    </>
   )
 }
