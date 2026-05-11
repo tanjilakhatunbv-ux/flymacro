@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
@@ -199,34 +199,53 @@ function FieldRow({
 
 declare global {
   interface Window {
-    __flymacroOnTurnstile?: (token: string) => void
+    turnstile?: {
+      render: (container: string | HTMLElement, options: Record<string, unknown>) => string
+      remove: (widgetId: string) => void
+    }
   }
 }
 
 function TurnstileWidget({ siteKey, onToken }: { siteKey: string; onToken: (t: string) => void }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const widgetIdRef = useRef<string | null>(null)
+  const onTokenRef = useRef(onToken)
+  onTokenRef.current = onToken
+
   useEffect(() => {
-    window.__flymacroOnTurnstile = (t: string) => onToken(t)
-    if (!document.querySelector('script[data-turnstile]')) {
+    if (!containerRef.current) return
+
+    function doRender() {
+      if (!containerRef.current || !window.turnstile) return
+      widgetIdRef.current = window.turnstile.render(containerRef.current, {
+        sitekey: siteKey,
+        theme: 'dark',
+        callback: (token: string) => onTokenRef.current(token),
+        'error-callback': () => { onTokenRef.current('') },
+        'expired-callback': () => { onTokenRef.current('') },
+      })
+    }
+
+    if (window.turnstile) {
+      doRender()
+    } else if (!document.querySelector('script[data-turnstile]')) {
       const s = document.createElement('script')
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
       s.async = true
-      s.defer = true
       s.setAttribute('data-turnstile', '1')
+      s.onload = doRender
       document.head.appendChild(s)
     }
-    return () => {
-      delete window.__flymacroOnTurnstile
-    }
-  }, [onToken])
 
-  return (
-    <div
-      className="cf-turnstile auth-turnstile"
-      data-sitekey={siteKey}
-      data-theme="dark"
-      data-callback="__flymacroOnTurnstile"
-    />
-  )
+    return () => {
+      if (widgetIdRef.current && window.turnstile) {
+        try { window.turnstile.remove(widgetIdRef.current) } catch { /* ignore */ }
+        widgetIdRef.current = null
+      }
+    }
+  }, [siteKey])
+
+  return <div ref={containerRef} className="auth-turnstile" />
 }
 
 type AuthInput = {
