@@ -74,57 +74,12 @@ export async function POST(req: Request) {
         name: name || undefined,
         role: 'user',
         credits: 20,
+        _verified: true,
       } as never,
       overrideAccess: true,
     })
   } catch (err) {
     const msg = err instanceof Error ? err.message : '注册失败'
-    const errName = (err as { name?: string })?.name || ''
-    const isResendDomainError =
-      msg.includes('domain is not verified') ||
-      msg.includes('validation_error') ||
-      errName === 'validation_error'
-
-    if (isResendDomainError) {
-      try {
-        user = await payload.create({
-          collection: 'users',
-          data: {
-            email,
-            password,
-            name: name || undefined,
-            role: 'user',
-            credits: 20,
-            _verified: true,
-          } as never,
-          overrideAccess: true,
-        })
-      } catch (innerErr) {
-        const innerMsg = innerErr instanceof Error ? innerErr.message : '注册失败'
-        return internalError(innerMsg)
-      }
-
-      try {
-        await payload.create({
-          collection: 'credit-transactions',
-          data: {
-            user: user.id,
-            amount: 20,
-            balanceAfter: 20,
-            type: 'register_bonus',
-            reason: '新用户注册奖励',
-          },
-          overrideAccess: true,
-        })
-      } catch {
-        /* ignore credit transaction creation failure */
-      }
-
-      return NextResponse.json(success({
-        warning: '账号已创建（邮箱验证暂时跳过，发件域名配置中）。请直接登录。',
-      }))
-    }
-
     return internalError(msg)
   }
 
