@@ -9,6 +9,7 @@ import * as migration_20260508_sync_audit_logs_and_rels from './20260508_sync_au
 import * as migration_20260508_add_credit_transactions_label from './20260508_add_credit_transactions_label';
 import * as migration_20260508_add_site_settings from './20260508_add_site_settings';
 import * as migration_20260508_add_credit_orders_checkout_unique from './20260508_add_credit_orders_checkout_unique';
+import * as migration_20260511_add_news_collection from './20260511_add_news_collection';
 
 export const migrations = [
   {
@@ -65,5 +66,10 @@ export const migrations = [
     up: migration_20260508_add_credit_orders_checkout_unique.up,
     down: migration_20260508_add_credit_orders_checkout_unique.down,
     name: '20260508_add_credit_orders_checkout_unique'
+  },
+  {
+    up: migration_20260511_add_news_collection.up,
+    down: migration_20260511_add_news_collection.down,
+    name: '20260511_add_news_collection'
   },
 ];
