@@ -22,6 +22,16 @@ export function VerifyEmailRunner({ token }: { token: string }) {
         if (cancelled) return
         if (resp.ok) {
           setState('ok')
+          // Claim registration bonus after successful verification
+          try {
+            await fetch('/api/auth/claim-bonus', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token }),
+            })
+          } catch {
+            /* bonus claim failure should not affect UX */
+          }
         } else {
           let msg = t('failedMessage')
           try {

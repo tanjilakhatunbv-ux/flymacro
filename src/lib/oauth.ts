@@ -165,8 +165,6 @@ export async function fetchGitHubUserEmail(accessToken: string): Promise<string 
   const primary = emails.find((e) => e.primary && e.verified)
   if (primary) return primary.email
 
-  const verified = emails.find((e) => e.verified)
-  if (verified) return verified.email
-
-  return emails[0]?.email ?? null
+  // Only accept verified emails — do not fall back to unverified
+  return null
 }

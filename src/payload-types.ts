@@ -841,6 +841,10 @@ export interface AuditLog {
     | 'adjust_credits'
     | 'change_status'
     | 'reset_password'
+    | 'change_password'
+    | 'register'
+    | 'login_success'
+    | 'login_failed'
     | 'bulk_action'
     | 'other';
   collection: string;

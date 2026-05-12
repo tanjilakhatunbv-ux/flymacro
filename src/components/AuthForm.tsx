@@ -23,6 +23,8 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
   const [errors, setErrors] = useState<FieldError[]>([])
   const [success, setSuccess] = useState<string | null>(null)
   const [turnstileToken, setTurnstileToken] = useState<string>('')
+  const [captchaRequired, setCaptchaRequired] = useState(false)
+  const [formLoadTime] = useState(() => Date.now())
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -33,6 +35,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
     const password = String(fd.get('password') ?? '')
     const passwordConfirm = String(fd.get('passwordConfirm') ?? '')
     const name = String(fd.get('name') ?? '').trim()
+    const website = String(fd.get('website') ?? '').trim()
 
     if (mode === 'register' && password !== passwordConfirm) {
       setErrors([{ field: 'passwordConfirm', message: t('passwordMismatch') }])
@@ -50,6 +53,10 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       setErrors([{ message: t('captchaRequired') }])
       return
     }
+    if (mode === 'login' && captchaRequired && turnstileSiteKey && !turnstileToken) {
+      setErrors([{ message: t('captchaRequired') }])
+      return
+    }
 
     startTransition(async () => {
       try {
@@ -60,20 +67,25 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           name,
           token: resetToken,
           turnstileToken,
+          website,
+          _t: formLoadTime,
         }, t)
         if (!resp.ok) {
+          // Detect captcha_required from backend — activate Turnstile for login
+          if (mode === 'login' && resp.captchaRequired) {
+            setCaptchaRequired(true)
+            setTurnstileToken('')
+          }
           setErrors(resp.errors)
           return
         }
         if (mode === 'login') {
-          // Hard navigate to ensure full page reload so Server Components
-          // re-run with the fresh cookie.
           window.location.href = returnUrl
         } else if (mode === 'register') {
           if ('warning' in resp && resp.warning) {
             setSuccess(resp.warning)
           } else {
-            setSuccess(t('registerSuccess'))
+            setSuccess(t('registerVerify'))
           }
         } else if (mode === 'forgot') {
           setSuccess(t('resetSent'))
@@ -86,6 +98,8 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       }
     })
   }
+
+  const needsTurnstile = turnstileSiteKey && (mode === 'register' || (mode === 'login' && captchaRequired))
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">
@@ -114,8 +128,20 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
         />
       )}
 
-      {mode === 'register' && turnstileSiteKey && (
-        <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+      {/* Honeypot — invisible to humans, bots fill it */}
+      {mode === 'register' && (
+        <input
+          type="text"
+          name="website"
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+        />
+      )}
+
+      {needsTurnstile && (
+        <TurnstileWidget siteKey={turnstileSiteKey!} onToken={setTurnstileToken} />
       )}
 
       {errors.filter((e) => !e.field).length > 0 && (
@@ -263,13 +289,19 @@ type AuthInput = {
   name?: string
   token?: string
   turnstileToken?: string
+  website?: string
+  _t?: number
 }
 
-type AuthResult = { ok: true; warning?: string } | { ok: false; errors: FieldError[] }
+type AuthResult = { ok: true; warning?: string } | { ok: false; errors: FieldError[]; captchaRequired?: boolean }
 
 async function runAuth(mode: Mode, input: AuthInput, t: (key: string) => string): Promise<AuthResult> {
   if (mode === 'login') {
-    return postJson('/api/auth/login', { email: input.email, password: input.password }, t)
+    return postJson('/api/auth/login', {
+      email: input.email,
+      password: input.password,
+      turnstileToken: input.turnstileToken || undefined,
+    }, t)
   }
   if (mode === 'register') {
     return postJson('/api/auth/register', {
@@ -277,6 +309,8 @@ async function runAuth(mode: Mode, input: AuthInput, t: (key: string) => string)
       password: input.password,
       name: input.name || undefined,
       turnstileToken: input.turnstileToken || undefined,
+      website: input.website || undefined,
+      _t: input._t,
     }, t)
   }
   if (mode === 'forgot') {
@@ -305,7 +339,15 @@ async function postJson(url: string, body: Record<string, unknown>, t: (key: str
   } catch {
     /* ignore */
   }
-  return { ok: false, errors: extractErrors(data, resp.status, t) }
+  const errors = extractErrors(data, resp.status, t)
+  const captchaRequired = isCaptchaRequired(data)
+  return { ok: false, errors, captchaRequired }
+}
+
+function isCaptchaRequired(data: unknown): boolean {
+  if (!data || typeof data !== 'object') return false
+  const maybe = data as { code?: string }
+  return maybe.code === 'captcha_required'
 }
 
 function extractErrors(data: unknown, status: number, t: (key: string) => string): FieldError[] {
@@ -343,8 +385,10 @@ function translateMessage(msg: string, status: number, t: (key: string) => strin
   const lc = msg.toLowerCase()
   if (lc.includes('invalid') && lc.includes('credentials')) return t('wrongCredentials')
   if (lc.includes('email') && lc.includes('not verified')) return t('emailNotActivated')
+  if (lc.includes('not verified') || lc.includes('email_not_verified')) return t('emailNotActivated')
   if (lc.includes('locked')) return t('accountLocked')
   if (lc.includes('exists')) return t('emailRegistered')
+  if (lc.includes('turnstile') || lc.includes('人机验证')) return t('captchaRequired')
   if (status === 401 || status === 403) return defaultMessage(status, t)
   return msg
 }

@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
-import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { badRequest, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
-  const limit = rateLimit(`reset:${ip}`, { max: 5, windowMs: 60_000 })
+  const limit = await rateLimitWithFallback(`reset:${ip}`, [
+    { max: 5, windowMs: 60_000 },
+  ])
   if (!limit.allowed) {
     return NextResponse.json(
       { success: false, error: '请求过于频繁，请稍后再试', code: 'rate_limited' },

@@ -6,6 +6,8 @@ import { AuthForm } from '../../../../components/AuthForm'
 import { OAuthButtons } from '../../../../components/OAuthButtons'
 import { getCurrentUser } from '../../../../lib/auth'
 
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'auth' })
@@ -38,7 +40,7 @@ export default async function LoginPage({ params, searchParams }: { params: Prom
               {oauthError}
             </div>
           )}
-          <AuthForm mode="login" returnUrl={returnUrl} />
+          <AuthForm mode="login" returnUrl={returnUrl} turnstileSiteKey={turnstileSiteKey} />
           <OAuthButtons returnUrl={returnUrl} />
           <p className="auth-help">
             {t('adminLink')}

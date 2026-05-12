@@ -1,19 +1,26 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
-import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { success, badRequest, conflict, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
+import { verifyTurnstile } from '../../../../lib/turnstile'
 
 type RegisterBody = {
   email?: string
   password?: string
   name?: string
   turnstileToken?: string
+  website?: string
+  _t?: number | string
 }
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
-  const limit = rateLimit(`register:${ip}`, { max: 3, windowMs: 60_000 })
+  const limit = await rateLimitWithFallback(`register:${ip}`, [
+    { max: 3, windowMs: 60_000 },
+    { max: 10, windowMs: 3_600_000 },
+    { max: 50, windowMs: 86_400_000 },
+  ])
   if (!limit.allowed) {
     return NextResponse.json(
       { success: false, error: '请求过于频繁，请稍后再试', code: 'rate_limited' },
@@ -26,6 +33,17 @@ export async function POST(req: Request) {
     body = (await req.json()) as RegisterBody
   } catch {
     return badRequest('请求体格式错误', 'invalid_json')
+  }
+
+  // Honeypot check — bots fill hidden fields
+  if (String(body.website ?? '').trim()) {
+    return NextResponse.json(success({ ok: true }))
+  }
+
+  // Timing check — humans need > 3s to fill a form
+  const formTime = Number(body._t) || 0
+  if (formTime && Date.now() - formTime < 3000) {
+    return NextResponse.json(success({ ok: true }))
   }
 
   const email = (body.email ?? '').trim().toLowerCase()
@@ -78,8 +96,8 @@ export async function POST(req: Request) {
         password,
         name: name || undefined,
         role: 'user',
-        credits: 20,
-        _verified: true,
+        credits: 0,
+        _verified: false,
       } as never,
       overrideAccess: true,
     })
@@ -88,39 +106,24 @@ export async function POST(req: Request) {
     return internalError(msg)
   }
 
+  // Audit log for registration
   try {
     await payload.create({
-      collection: 'credit-transactions',
+      collection: 'audit-logs',
       data: {
-        user: user.id,
-        amount: 20,
-        balanceAfter: 20,
-        type: 'register_bonus',
-        reason: '新用户注册奖励',
+        action: 'register',
+        collection: 'users',
+        docId: String(user.id),
+        operator: user.id,
+        ip,
+        reason: '用户注册（待邮箱验证）',
+        metadata: { email },
       },
       overrideAccess: true,
     })
   } catch {
-    /* ignore credit transaction creation failure so registration still succeeds */
+    /* audit log failure must not block registration */
   }
 
   return NextResponse.json(success({ ok: true }))
-}
-
-async function verifyTurnstile(token: string, secret: string, ip?: string): Promise<boolean> {
-  try {
-    const form = new URLSearchParams()
-    form.append('secret', secret)
-    form.append('response', token)
-    if (ip) form.append('remoteip', ip)
-    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: form,
-    })
-    if (!resp.ok) return false
-    const data = (await resp.json()) as { success?: boolean }
-    return !!data?.success
-  } catch {
-    return false
-  }
 }

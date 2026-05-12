@@ -8,11 +8,20 @@ import {
 } from '../../../../../lib/oauth'
 import { getPayload } from '../../../../../lib/payload'
 import { signJwt } from '../../../../../lib/jwt'
+import { rateLimit, getClientIP } from '../../../../../lib/rate-limit'
 import type { User } from '../../../../../payload-types'
 
 export async function GET(req: Request) {
   if (!isGitHubOAuthConfigured()) {
     return NextResponse.json({ error: 'OAuth not configured' }, { status: 501 })
+  }
+
+  const ip = getClientIP(req)
+  const limit = rateLimit(`oauth-cb:${ip}`, { max: 5, windowMs: 60_000 })
+  if (!limit.allowed) {
+    return NextResponse.redirect(
+      new URL('/login?error=oauth&message=rate_limited', req.url),
+    )
   }
 
   const { searchParams } = new URL(req.url)
@@ -85,7 +94,7 @@ export async function GET(req: Request) {
 
   if (!email) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=no_email', req.url),
+      new URL('/login?error=oauth&message=no_verified_email', req.url),
     )
   }
 
@@ -179,6 +188,24 @@ export async function GET(req: Request) {
     })
   } catch {
     /* ignore metadata update failures */
+  }
+
+  // Audit log for OAuth login
+  try {
+    await payload.create({
+      collection: 'audit-logs',
+      data: {
+        action: 'login_success',
+        collection: 'users',
+        docId: String(userDoc.id),
+        operator: userDoc.id,
+        ip,
+        reason: 'GitHub OAuth 登录',
+      },
+      overrideAccess: true,
+    })
+  } catch {
+    /* ignore */
   }
 
   // Generate JWT directly — no temporary password needed
