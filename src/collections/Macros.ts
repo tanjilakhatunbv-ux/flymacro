@@ -262,5 +262,20 @@ export const Macros: CollectionConfig = {
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
   ],
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        // Auto-set publishedAt when publishing for the first time
+        if (
+          (data as Record<string, unknown>)._status === 'published' &&
+          !originalDoc?.publishedAt &&
+          !(data as Record<string, unknown>).publishedAt
+        ) {
+          ;(data as Record<string, unknown>).publishedAt = new Date().toISOString()
+        }
+        return data
+      },
+    ],
+  },
   timestamps: true,
 }

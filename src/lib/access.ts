@@ -28,7 +28,13 @@ export const publishedOrStaff: Access = ({ req: { user } }) => {
   return {
     and: [
       { _status: { equals: 'published' } as const },
-      { publishedAt: { less_than_equal: new Date().toISOString() } },
+      {
+        or: [
+          { publishedAt: { exists: false } },
+          { publishedAt: { equals: null } },
+          { publishedAt: { less_than_equal: new Date().toISOString() } },
+        ],
+      },
     ],
   } as Where
 }
