@@ -41,6 +41,17 @@ const serverUrl =
   process.env.NEXT_PUBLIC_SERVER_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
+// Collect all possible origins for CORS/CSRF
+const allOrigins = [
+  serverUrl,
+  'http://localhost:3000',
+  'https://flymacro.qzz.io',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+].filter(Boolean) as string[]
+
+// Deduplicate
+const uniqueOrigins = [...new Set(allOrigins)]
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -142,6 +153,6 @@ export default buildConfig({
         ]
       : []),
   ],
-  cors: [serverUrl],
-  csrf: [serverUrl],
+  cors: uniqueOrigins,
+  csrf: uniqueOrigins,
 })
