@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
 import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
 import { success, badRequest, conflict, internalError } from '../../../../lib/api-response'
+import { validatePasswordStrength } from '../../../../lib/validation'
 
 type RegisterBody = {
   email?: string
@@ -39,6 +40,10 @@ export async function POST(req: Request) {
   }
   if (password.length < 8) {
     return badRequest('密码至少 8 位', 'password_too_short')
+  }
+  const strength = validatePasswordStrength(password)
+  if (!strength.ok) {
+    return badRequest(strength.error, 'password_weak')
   }
 
   const turnstileSecret = process.env.TURNSTILE_SECRET_KEY

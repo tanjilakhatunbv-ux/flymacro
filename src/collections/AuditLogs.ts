@@ -43,6 +43,7 @@ export const AuditLogs: CollectionConfig = {
         { label: '积分调整', value: 'adjust_credits' },
         { label: '状态变更', value: 'change_status' },
         { label: '重置密码', value: 'reset_password' },
+        { label: '修改密码', value: 'change_password' },
         { label: '批量操作', value: 'bulk_action' },
         { label: '其他', value: 'other' },
       ],

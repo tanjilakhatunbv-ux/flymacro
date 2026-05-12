@@ -13,6 +13,8 @@ export const Users: CollectionConfig = {
   },
   auth: {
     tokenExpiration: 60 * 60 * 24 * 7,
+    maxLoginAttempts: 5,
+    lockTime: 15 * 60 * 1000,
     cookies: {
       sameSite: 'Lax',
       secure: true,

@@ -38,8 +38,12 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       setErrors([{ field: 'passwordConfirm', message: t('passwordMismatch') }])
       return
     }
-    if (mode === 'register' && password.length < 8) {
+    if ((mode === 'register' || mode === 'reset') && password.length < 8) {
       setErrors([{ field: 'password', message: t('passwordTooShort') }])
+      return
+    }
+    if ((mode === 'register' || mode === 'reset') && !isPasswordStrong(password)) {
+      setErrors([{ field: 'password', message: t('passwordWeak') }])
       return
     }
     if (mode === 'register' && turnstileSiteKey && !turnstileToken) {
@@ -152,6 +156,10 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
       </div>
     </form>
   )
+}
+
+function isPasswordStrong(password: string): boolean {
+  return /[a-zA-Z]/.test(password) && /[0-9]/.test(password)
 }
 
 function submitLabel(mode: Mode, t: (key: string) => string) {
@@ -272,10 +280,10 @@ async function runAuth(mode: Mode, input: AuthInput, t: (key: string) => string)
     }, t)
   }
   if (mode === 'forgot') {
-    return postJson('/api/users/forgot-password', { email: input.email }, t)
+    return postJson('/api/auth/forgot-password', { email: input.email }, t)
   }
   if (mode === 'reset') {
-    return postJson('/api/users/reset-password', {
+    return postJson('/api/auth/reset-password', {
       token: input.token,
       password: input.password,
     }, t)

@@ -246,6 +246,7 @@
     "processing": "Processing...",
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 8 characters",
+    "passwordWeak": "Password must contain both letters and digits",
     "captchaRequired": "Please complete the captcha verification",
     "registerSuccess": "Registration successful! We've sent a verification email. Please check your inbox.",
     "resetSent": "If that email exists, we've sent a reset link. Please check your inbox.",

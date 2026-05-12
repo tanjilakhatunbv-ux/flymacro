@@ -246,6 +246,7 @@
     "processing": "处理中...",
     "passwordMismatch": "两次输入的密码不一致",
     "passwordTooShort": "密码至少 8 位",
+    "passwordWeak": "密码需同时包含字母和数字",
     "captchaRequired": "请先完成人机验证",
     "registerSuccess": "注册成功，我们已向你的邮箱发送验证邮件，请查收并点击验证链接。",
     "resetSent": "如果该邮箱存在，我们已发送重置链接，请查收邮箱。",
