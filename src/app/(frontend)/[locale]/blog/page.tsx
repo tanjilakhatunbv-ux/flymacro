@@ -14,6 +14,7 @@ export default async function BlogListPage() {
     sort: ['-pinned', '-publishedAt'],
     limit: 100,
     depth: 0,
+    overrideAccess: true,
   })
   const articles = result.docs as Article[]
 

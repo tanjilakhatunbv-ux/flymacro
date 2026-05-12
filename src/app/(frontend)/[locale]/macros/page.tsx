@@ -16,15 +16,16 @@ const getLookupTables = unstable_cache(
   async () => {
     const payload = await getPayload()
     const [classesRes, specsRes, versionsRes, allMacrosRes] = await Promise.all([
-      payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0 }),
-      payload.find({ collection: 'specs', sort: 'sort', limit: 100, depth: 0 }),
-      payload.find({ collection: 'versions', sort: '-releasedAt', limit: 50, depth: 0 }),
+      payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
+      payload.find({ collection: 'specs', sort: 'sort', limit: 100, depth: 0, overrideAccess: true }),
+      payload.find({ collection: 'versions', sort: '-releasedAt', limit: 50, depth: 0, overrideAccess: true }),
       payload.find({
         collection: 'macros',
         where: { _status: { equals: 'published' } },
         depth: 0,
         limit: 1000,
         select: { tags: true },
+        overrideAccess: true,
       }),
     ])
 
@@ -43,7 +44,7 @@ const getLookupTables = unstable_cache(
       tags: Array.from(tagSet).sort((a, b) => a.localeCompare(b)),
     }
   },
-  ['macro-lookup-v1'],
+  ['macro-lookup-v2'],
   { revalidate: 300, tags: ['classes', 'specs', 'versions', 'macros'] }
 )
 
@@ -71,6 +72,7 @@ const findMacros = unstable_cache(
       page,
       limit: PAGE_SIZE,
       depth: 1,
+      overrideAccess: true,
       select: {
         id: true,
         title: true,
@@ -96,7 +98,7 @@ const findMacros = unstable_cache(
       page: result.page ?? page,
     }
   },
-  ['macros-search-v1'],
+  ['macros-search-v2'],
   { revalidate: 300, tags: ['macros'] },
 )
 

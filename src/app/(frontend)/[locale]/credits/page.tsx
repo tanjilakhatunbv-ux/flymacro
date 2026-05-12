@@ -22,8 +22,9 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
       sort: 'sort',
       limit: 10,
       depth: 0,
+      overrideAccess: true,
     }),
-    payload.findGlobal({ slug: 'site-settings' }),
+    payload.findGlobal({ slug: 'site-settings', overrideAccess: true }),
   ])
 
   const packages = pkgResult.docs as CreditPackage[]

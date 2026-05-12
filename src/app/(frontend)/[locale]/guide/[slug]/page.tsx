@@ -20,6 +20,7 @@ const findGuideCached = unstable_cache(
       where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
       limit: 1,
       depth: 1,
+      overrideAccess: true,
     })
     return (r.docs[0] as Guide | undefined) ?? null
   },
@@ -35,6 +36,7 @@ export async function generateStaticParams() {
       where: { _status: { equals: 'published' } },
       limit: 200,
       depth: 0,
+      overrideAccess: true,
     })
     return result.docs.map((g: { slug: string }) => ({ slug: g.slug }))
   } catch {
@@ -43,7 +45,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params
+  const { slug: rawSlug } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations('guide')
   const g = await findGuideCached(slug)
   if (!g) {
@@ -55,7 +58,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function GuideDetailPage({ params }: { params: Params }) {
-  const { slug } = await params
+  const { slug: rawSlug } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations('guide')
   const guide = await findGuideCached(slug)
 

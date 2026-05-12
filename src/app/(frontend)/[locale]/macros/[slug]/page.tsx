@@ -17,6 +17,14 @@ import type { Macro, Class, Spec, Version } from '../../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
 
+function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug)
+  } catch {
+    return slug
+  }
+}
+
 export const revalidate = 3600
 
 function pickSeoOgUrl(macro: Macro): string | null {
@@ -39,6 +47,7 @@ const findMacroBySlugCached = unstable_cache(
       },
       limit: 1,
       depth: 1,
+      overrideAccess: true,
     })
     const macro = (result.docs[0] as Macro | undefined) ?? null
     if (macro) {
@@ -46,7 +55,7 @@ const findMacroBySlugCached = unstable_cache(
     }
     return macro
   },
-  ['macro-by-slug-v3'],
+  ['macro-by-slug-v4'],
   { revalidate: 3600, tags: ['macros'] }
 )
 
@@ -58,6 +67,7 @@ export async function generateStaticParams() {
       where: { _status: { equals: 'published' } },
       limit: 200,
       depth: 0,
+      overrideAccess: true,
     })
     return result.docs.map((m: { slug: string }) => ({ slug: m.slug }))
   } catch {
@@ -66,7 +76,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params
+  const { slug: rawSlug } = await params
+  const slug = decodeSlug(rawSlug)
   const t = await getTranslations('macros')
   const macro = await findMacroBySlugCached(slug)
   if (!macro) return { title: t('notFound') }
@@ -102,7 +113,8 @@ export default async function MacroDetailPage({
 }: {
   params: Params
 }) {
-  const { slug } = await params
+  const { slug: rawSlug } = await params
+  const slug = decodeSlug(rawSlug)
   const t = await getTranslations('macros')
   const macro = await findMacroBySlugCached(slug)
   if (!macro) notFound()

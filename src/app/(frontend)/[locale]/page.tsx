@@ -24,14 +24,16 @@ async function loadHomeData() {
       sort: ['featuredOrder', '-publishedAt'],
       limit: 6,
       depth: 1,
+      overrideAccess: true,
     }),
-    payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0 }),
+    payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
     payload.find({
       collection: 'macros',
       where: { _status: { equals: 'published' } },
       limit: 1000,
       depth: 0,
       select: { classes: true },
+      overrideAccess: true,
     }),
     getCachedLatestPublishedPlugin(),
   ])

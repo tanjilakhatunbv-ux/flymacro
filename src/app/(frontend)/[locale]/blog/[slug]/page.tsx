@@ -19,6 +19,7 @@ const findArticleCached = unstable_cache(
       where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
       limit: 1,
       depth: 1,
+      overrideAccess: true,
     })
     return (r.docs[0] as Article | undefined) ?? null
   },
@@ -34,6 +35,7 @@ export async function generateStaticParams() {
       where: { _status: { equals: 'published' } },
       limit: 200,
       depth: 0,
+      overrideAccess: true,
     })
     return result.docs.map((a: { slug: string }) => ({ slug: a.slug }))
   } catch {
@@ -42,7 +44,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug, locale } = await params
+  const { slug: rawSlug, locale } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations({ locale, namespace: 'blog' })
   const a = await findArticleCached(slug)
   if (!a) return { title: t('notFound') }
@@ -50,7 +53,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function BlogDetailPage({ params }: { params: Params }) {
-  const { slug, locale } = await params
+  const { slug: rawSlug, locale } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations({ locale, namespace: 'blog' })
   const article = await findArticleCached(slug)
   if (!article) notFound()

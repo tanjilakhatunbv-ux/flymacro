@@ -28,6 +28,7 @@ export default async function NewsListPage({ params }: { params: Promise<{ local
       sort: ['-pinned', '-publishedAt'],
       limit: 100,
       depth: 1,
+      overrideAccess: true,
     })
     articles = result.docs as NewsItem[]
   } catch {

@@ -30,6 +30,7 @@ const findNewsCached = unstable_cache(
         where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
         limit: 1,
         depth: 1,
+        overrideAccess: true,
       })
       return (r.docs[0] as NewsItem | undefined) ?? null
     } catch {
@@ -48,6 +49,7 @@ export async function generateStaticParams() {
       where: { _status: { equals: 'published' } },
       limit: 200,
       depth: 0,
+      overrideAccess: true,
     })
     return result.docs.map((a: never) => ({ slug: (a as { slug: string }).slug }))
   } catch {
@@ -56,7 +58,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params
+  const { slug: rawSlug } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations('news')
   const a = await findNewsCached(slug)
   if (!a) return { title: t('notFound') }
@@ -64,7 +67,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function NewsDetailPage({ params }: { params: Params }) {
-  const { slug, locale } = await params
+  const { slug: rawSlug, locale } = await params
+  const slug = decodeURIComponent(rawSlug)
   const t = await getTranslations('news')
   const article = await findNewsCached(slug)
   if (!article) notFound()

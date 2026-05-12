@@ -15,6 +15,7 @@ export default async function GuideListPage() {
     sort: ['weight', '-publishedAt'],
     limit: 100,
     depth: 0,
+    overrideAccess: true,
   })
   const dbGuides = result.docs as Guide[]
 
