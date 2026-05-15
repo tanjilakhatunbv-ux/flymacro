@@ -10,7 +10,7 @@ import { extractTagValues } from '../lib/macro-utils'
 
 export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: boolean }) {
   const t = useTranslations('macroCard')
-  const img = previewUrl(macro)
+  const img = previewUrl(macro.previewImg ?? undefined)
   const durationText = (macro.durationDays ?? 0) === 0 ? t('permanent') : t('days', { days: macro.durationDays })
   const tagValues = extractTagValues(macro.tags)
   const visibleTags = tagValues.slice(0, 3)
