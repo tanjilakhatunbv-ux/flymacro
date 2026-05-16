@@ -432,7 +432,7 @@ export interface Macro {
    */
   summary: string;
   /**
-   * 建议尺寸 1600x900，会自动生成卡片/封面/OG 图多个尺寸
+   * 建议尺寸 1600x900。点击"上传"添加新图片，或点击"选择已有"从媒体库复用。
    */
   previewImg?: (number | null) | Media;
   /**
@@ -483,7 +483,7 @@ export interface Macro {
      */
     seoDescription?: string | null;
     /**
-     * 建议 1200x630，留空则使用预览图
+     * 建议 1200x630，留空则使用预览图。点击"上传"添加新图片，或点击"选择已有"从媒体库复用。
      */
     ogImage?: (number | null) | Media;
   };
