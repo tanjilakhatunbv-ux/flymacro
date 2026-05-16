@@ -14,6 +14,7 @@ import * as migration_20260511_consolidate_roles from './20260511_consolidate_ro
 import * as migration_20260511_add_audit_metadata from './20260511_add_audit_metadata';
 import * as migration_20260511_fix_set_null_constraints from './20260511_fix_set_null_constraints';
 import * as migration_20260516_add_media_prefix from './20260516_add_media_prefix';
+import * as migration_20260516_add_media_og_sizes from './20260516_add_media_og_sizes';
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20260516_add_media_prefix.up,
     down: migration_20260516_add_media_prefix.down,
     name: '20260516_add_media_prefix'
+  },
+  {
+    up: migration_20260516_add_media_og_sizes.up,
+    down: migration_20260516_add_media_og_sizes.down,
+    name: '20260516_add_media_og_sizes'
   },
 ];
