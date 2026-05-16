@@ -181,7 +181,13 @@ export const Macros: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       label: '预览图',
-      admin: { description: '建议尺寸 1600x900，会自动生成卡片/封面/OG 图多个尺寸' },
+      admin: {
+        description: '建议尺寸 1600x900。点击"上传"添加新图片，或点击"选择已有"从媒体库复用。',
+        allowCreate: true,
+      },
+      filterOptions: {
+        mimeType: { contains: 'image' },
+      },
     },
     {
       name: 'demoVideoUrl',
@@ -252,7 +258,19 @@ export const Macros: CollectionConfig = {
       fields: [
         { name: 'seoTitle', type: 'text', label: 'SEO 标题', admin: { description: '默认使用宏名称 + 站名' } },
         { name: 'seoDescription', type: 'textarea', maxLength: 160, label: 'SEO 描述', admin: { description: '默认使用简介' } },
-        { name: 'ogImage', type: 'upload', relationTo: 'media', label: '社交分享封面', admin: { description: '建议 1200x630，留空则使用预览图' } },
+        {
+          name: 'ogImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: '社交分享封面',
+          admin: {
+            description: '建议 1200x630，留空则使用预览图。点击"上传"添加新图片，或点击"选择已有"从媒体库复用。',
+            allowCreate: true,
+          },
+          filterOptions: {
+            mimeType: { contains: 'image' },
+          },
+        },
       ],
     },
     {
