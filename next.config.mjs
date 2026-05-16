@@ -17,6 +17,9 @@ const nextConfig = {
   },
   experimental: {
     reactCompiler: false,
+    serverActions: {
+      allowedOrigins: ['flymacro.qzz.io'],
+    },
   },
   async headers() {
     return [
