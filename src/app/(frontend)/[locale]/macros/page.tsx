@@ -8,7 +8,7 @@ import { Pagination } from '../../../../components/Pagination'
 import { FilterSkeleton, MacroGridSkeleton } from '../../../../components/Skeleton'
 import type { Macro, Class, Spec, Version } from '../../../../payload-types'
 
-export const revalidate = 300
+export const revalidate = 60
 
 const PAGE_SIZE = 24
 
@@ -44,8 +44,8 @@ const getLookupTables = unstable_cache(
       tags: Array.from(tagSet).sort((a, b) => a.localeCompare(b)),
     }
   },
-  ['macro-lookup-v2'],
-  { revalidate: 300, tags: ['classes', 'specs', 'versions', 'macros'] }
+  ['macro-lookup-v3'],
+  { revalidate: 60, tags: ['classes', 'specs', 'versions', 'macros'] }
 )
 
 type SearchQuery = {
@@ -98,8 +98,8 @@ const findMacros = unstable_cache(
       page: result.page ?? page,
     }
   },
-  ['macros-search-v2'],
-  { revalidate: 300, tags: ['macros'] },
+  ['macros-search-v3'],
+  { revalidate: 60, tags: ['macros'] },
 )
 
 function buildWhere(
