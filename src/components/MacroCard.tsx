@@ -27,6 +27,7 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
             loading="lazy"
+            unoptimized
           />
           {isExchanged && <span className="card-badge owned">{t('exchanged')}</span>}
         </Link>
