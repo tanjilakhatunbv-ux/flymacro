@@ -8,6 +8,7 @@ import {
 import { getPayload } from '../../../../../lib/payload'
 import { signJwt } from '../../../../../lib/jwt'
 import { rateLimit, getClientIP } from '../../../../../lib/rate-limit'
+import { grantRegisterBonus } from '../../../../../lib/register-bonus'
 import type { User } from '../../../../../payload-types'
 
 export async function GET(req: Request) {
@@ -153,6 +154,7 @@ export async function GET(req: Request) {
         } as never,
         overrideAccess: true,
       })
+      await grantRegisterBonus(user)
     }
   }
 

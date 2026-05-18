@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
+import { grantRegisterBonus } from '../../../../lib/register-bonus'
 import { success, badRequest } from '../../../../lib/api-response'
 
 /**
@@ -46,28 +47,7 @@ export async function POST(req: Request) {
   }
 
   // Award registration bonus
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: { credits: 20 } as never,
-    overrideAccess: true,
-  })
-
-  try {
-    await payload.create({
-      collection: 'credit-transactions',
-      data: {
-        user: user.id,
-        amount: 20,
-        balanceAfter: 20,
-        type: 'register_bonus',
-        reason: '新用户注册奖励（邮箱验证后发放）',
-      },
-      overrideAccess: true,
-    })
-  } catch {
-    /* ignore credit transaction failure */
-  }
+  await grantRegisterBonus(user)
 
   return NextResponse.json(success({ ok: true, credits: 20 }))
 }
