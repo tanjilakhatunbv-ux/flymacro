@@ -55,7 +55,7 @@ const findMacroBySlugCached = unstable_cache(
     }
     return macro
   },
-  ['macro-by-slug-v4'],
+  ['macro-by-slug-v5'],
   { revalidate: 3600, tags: ['macros'] }
 )
 
