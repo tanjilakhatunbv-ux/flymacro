@@ -29,7 +29,7 @@ export function MacroJsonLd({ macro }: { macro: Macro }) {
   const description = (macro as unknown as { seo?: { seoDescription?: string | null } }).seo?.seoDescription
     ?? macro.summary
     ?? undefined
-  const url = absoluteUrl(`/macros/${macro.slug}`) ?? `/macros/${macro.slug}`
+  const url = absoluteUrl(`/macros/${encodeURIComponent(macro.slug)}`) ?? `/macros/${encodeURIComponent(macro.slug)}`
 
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',

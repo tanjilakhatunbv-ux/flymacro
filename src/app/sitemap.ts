@@ -34,8 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })
 
   const macroEntries = macros.docs.flatMap((m: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/macros/${m.slug}`, lastModified: new Date(m.updatedAt) },
-    { url: `${baseUrl}/en/macros/${m.slug}`, lastModified: new Date(m.updatedAt) },
+    { url: `${baseUrl}/zh/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
+    { url: `${baseUrl}/en/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
   ])
 
   // News pages
@@ -48,8 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })
 
   const newsEntries = news.docs.flatMap((n: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/news/${n.slug}`, lastModified: new Date(n.updatedAt) },
-    { url: `${baseUrl}/en/news/${n.slug}`, lastModified: new Date(n.updatedAt) },
+    { url: `${baseUrl}/zh/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
+    { url: `${baseUrl}/en/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
   ])
 
   // Guide pages
@@ -62,8 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })
 
   const guideEntries = guides.docs.flatMap((g: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/guide/${g.slug}`, lastModified: new Date(g.updatedAt) },
-    { url: `${baseUrl}/en/guide/${g.slug}`, lastModified: new Date(g.updatedAt) },
+    { url: `${baseUrl}/zh/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
+    { url: `${baseUrl}/en/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
   ])
 
   return [...staticEntries, ...macroEntries, ...newsEntries, ...guideEntries]

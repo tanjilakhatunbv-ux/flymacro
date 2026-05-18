@@ -61,7 +61,7 @@ export default async function ExchangesPage({ params }: { params: Params }) {
                 <div className="row">
                   <span className="ticket-subject">
                     {macro ? (
-                      <Link href={`/macros/${macro.slug}`} style={{ color: 'var(--gold-bright)' }}>
+                      <Link href={`/macros/${encodeURIComponent(macro.slug)}`} style={{ color: 'var(--gold-bright)' }}>
                         {macro.title}
                       </Link>
                     ) : (

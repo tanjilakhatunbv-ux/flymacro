@@ -19,7 +19,7 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
   return (
     <article className="macro-card" data-tier={macro.tier} data-exchanged={isExchanged}>
       {img ? (
-        <Link href={`/macros/${macro.slug}`} className="card-img" aria-hidden="true">
+        <Link href={`/macros/${encodeURIComponent(macro.slug)}`} className="card-img" aria-hidden="true">
           <Image
             src={img}
             alt=""
@@ -59,7 +59,7 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
           <TierTag tier={macro.tier ?? 'regular'} />
         </div>
         <h3>
-          <Link href={`/macros/${macro.slug}`}>{macro.title}</Link>
+          <Link href={`/macros/${encodeURIComponent(macro.slug)}`}>{macro.title}</Link>
         </h3>
         {macro.summary && <p className="summary">{macro.summary}</p>}
         {visibleTags.length > 0 && (
