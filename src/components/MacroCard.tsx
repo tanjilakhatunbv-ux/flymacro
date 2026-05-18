@@ -33,7 +33,15 @@ export function MacroCard({ macro, isExchanged }: { macro: Macro; isExchanged?: 
         </Link>
       ) : (
         <Link href={`/macros/${macro.slug}`} className="card-img card-img--empty" aria-hidden="true">
-          <span className="card-img-placeholder">{macro.title.charAt(0)}</span>
+          <Image
+            src="/images/macro-fallback.svg"
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
+            loading="lazy"
+            unoptimized
+          />
           {isExchanged && <span className="card-badge owned">{t('exchanged')}</span>}
         </Link>
       )}

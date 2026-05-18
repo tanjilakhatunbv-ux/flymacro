@@ -73,22 +73,6 @@ const findMacros = unstable_cache(
       limit: PAGE_SIZE,
       depth: 1,
       overrideAccess: true,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        tier: true,
-        price: true,
-        durationDays: true,
-        summary: true,
-        previewImg: true,
-        classes: true,
-        specs: true,
-        versions: true,
-        tags: true,
-        publishedAt: true,
-        _status: true,
-      },
     })
     const docs = result.docs as Macro[]
     return {
@@ -98,7 +82,7 @@ const findMacros = unstable_cache(
       page: result.page ?? page,
     }
   },
-  ['macros-search-v3'],
+  ['macros-search-v4'],
   { revalidate: 60, tags: ['macros'] },
 )
 

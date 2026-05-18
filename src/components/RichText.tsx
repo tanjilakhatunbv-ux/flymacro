@@ -1,4 +1,6 @@
 import React from 'react'
+import Image from 'next/image'
+import { previewUrl } from '../lib/media'
 
 type LexicalNode = {
   type: string
@@ -16,8 +18,9 @@ type LexicalNode = {
   language?: string
   listType?: 'bullet' | 'number' | 'check'
   start?: number
-  value?: number
+  value?: number | Record<string, unknown>
   checked?: boolean
+  relationTo?: string
   [k: string]: unknown
 }
 
@@ -101,6 +104,29 @@ function renderNode(node: LexicalNode, key: number): React.ReactNode {
       )
     case 'code-highlight':
       return <span key={key}>{node.text}</span>
+    case 'upload': {
+      const relationTo = node.relationTo as string | undefined
+      const value = node.value as Record<string, unknown> | undefined
+      if (relationTo !== 'media' || !value || typeof value !== 'object') return null
+      const media = value as unknown as import('../payload-types').Media
+      const url = previewUrl(media)
+      if (!url) return null
+      const width = media.width || 800
+      const height = media.height || 450
+      const alt = media.alt || ''
+      return (
+        <figure key={key} className="richtext-upload">
+          <Image
+            src={url}
+            alt={alt}
+            width={width}
+            height={height}
+            style={{ maxWidth: '100%', height: 'auto' }}
+            unoptimized
+          />
+        </figure>
+      )
+    }
     default:
       return <React.Fragment key={key}>{renderChildren(node.children)}</React.Fragment>
   }

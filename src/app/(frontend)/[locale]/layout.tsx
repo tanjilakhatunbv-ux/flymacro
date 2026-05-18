@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: t('title'),
     description: t('description'),
-    icons: { icon: '/favicon.svg', type: 'image/svg+xml' },
+    icons: { icon: { url: '/favicon.svg', type: 'image/svg+xml' } },
   }
 }
 
