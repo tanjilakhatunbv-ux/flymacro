@@ -845,6 +845,7 @@ export interface AuditLog {
     | 'register'
     | 'login_success'
     | 'login_failed'
+    | 'resend_verification'
     | 'bulk_action'
     | 'other';
   collection: string;

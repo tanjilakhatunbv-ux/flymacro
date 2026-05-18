@@ -15,6 +15,7 @@ export async function GET() {
       role: user.role,
       credits: user.credits,
       status: user.status,
+      _verified: user._verified,
     }),
   )
 }

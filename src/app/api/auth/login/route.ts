@@ -3,6 +3,7 @@ import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP, getCount, incr, del } from '../../../../lib/rate-limit'
 import { success, badRequest, unauthorized, forbidden, internalError } from '../../../../lib/api-response'
 import { verifyTurnstile } from '../../../../lib/turnstile'
+import { setAuthCookie } from '../../../../lib/session'
 import type { User } from '../../../../payload-types'
 
 const FAIL_THRESHOLD = 2
@@ -112,12 +113,7 @@ export async function POST(req: Request) {
 
     const user = result.user as User
 
-    // Check email verification
-    if (!user._verified) {
-      return forbidden('邮箱尚未验证，请先查收验证邮件', 'email_not_verified')
-    }
-
-    // Check account status
+    // Check account status (suspended/banned users cannot log in)
     if (user.status === 'suspended') {
       return forbidden('账号已被停用，请联系客服', 'account_suspended')
     }
@@ -153,7 +149,7 @@ export async function POST(req: Request) {
           docId: String(user.id),
           operator: user.id,
           ip,
-          reason: '登录成功',
+          reason: user._verified ? '登录成功' : '登录成功（未验证邮箱）',
         },
         overrideAccess: true,
       })
@@ -167,13 +163,7 @@ export async function POST(req: Request) {
       message: '登录成功',
     }))
 
-    response.cookies.set('payload-token', result.token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    })
+    setAuthCookie(response, result.token)
 
     return response
   } catch (err) {
@@ -182,9 +172,6 @@ export async function POST(req: Request) {
       await incr(ipFailKey, FAIL_TTL)
       await incr(emailFailKey, FAIL_TTL)
       return unauthorized('invalid_credentials')
-    }
-    if (msg.includes('not verified') || msg.includes('verify') || msg.includes('验证')) {
-      return forbidden('邮箱未验证，请先完成邮箱验证', 'email_not_verified')
     }
     return internalError('登录失败，请稍后重试')
   }

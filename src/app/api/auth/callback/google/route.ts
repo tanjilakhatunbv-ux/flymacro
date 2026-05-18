@@ -9,6 +9,7 @@ import { getPayload } from '../../../../../lib/payload'
 import { signJwt } from '../../../../../lib/jwt'
 import { rateLimit, getClientIP } from '../../../../../lib/rate-limit'
 import { grantRegisterBonus } from '../../../../../lib/register-bonus'
+import { setAuthCookie } from '../../../../../lib/session'
 import type { User } from '../../../../../payload-types'
 
 export async function GET(req: Request) {
@@ -227,14 +228,7 @@ export async function GET(req: Request) {
     new URL(parsedState.returnUrl, req.url),
   )
 
-  response.cookies.set('payload-token', jwtToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  })
-
+  setAuthCookie(response, jwtToken)
   response.cookies.delete('oauth-state')
 
   return response

@@ -1,7 +1,9 @@
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 import { createHash } from 'crypto'
 import { getPayload } from './payload'
 import { verifyJwt } from './jwt'
+import { forbidden, unauthorized } from './api-response'
 import type { User } from '../payload-types'
 
 function getCandidateSecrets(payload: { config?: { secret?: string }; secret?: string }): string[] {
@@ -70,4 +72,26 @@ export async function getCurrentUser(): Promise<User | null> {
 export function isStaffRole(user: User | null): boolean {
   if (!user) return false
   return user.role === 'admin' || user.role === 'operator'
+}
+
+/**
+ * Gate an action behind email verification.
+ *
+ * Returns the verified user on success. Returns a NextResponse error if:
+ *   - the request has no valid session       → 401 not_authenticated
+ *   - the user's email is not yet verified   → 403 email_not_verified
+ *
+ * Usage:
+ *   const result = await requireVerifiedUser()
+ *   if (result instanceof NextResponse) return result
+ *   const user = result
+ *   // ... use user
+ */
+export async function requireVerifiedUser(): Promise<User | NextResponse> {
+  const user = await getCurrentUser()
+  if (!user) return unauthorized('not_authenticated')
+  if (!user._verified) {
+    return forbidden('请先验证邮箱后再操作', 'email_not_verified')
+  }
+  return user
 }

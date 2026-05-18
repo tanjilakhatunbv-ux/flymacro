@@ -47,6 +47,7 @@ export const AuditLogs: CollectionConfig = {
         { label: '用户注册', value: 'register' },
         { label: '登录成功', value: 'login_success' },
         { label: '登录失败', value: 'login_failed' },
+        { label: '重发验证邮件', value: 'resend_verification' },
         { label: '批量操作', value: 'bulk_action' },
         { label: '其他', value: 'other' },
       ],

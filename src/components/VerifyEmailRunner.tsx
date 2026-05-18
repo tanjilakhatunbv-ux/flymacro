@@ -68,8 +68,8 @@ export function VerifyEmailRunner({ token }: { token: string }) {
     return (
       <div className="auth-success" role="status" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <p>{t('success')}</p>
-        <Link href="/login" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
-          {t('goLogin')}
+        <Link href="/account" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
+          {t('goAccount')}
         </Link>
       </div>
     )

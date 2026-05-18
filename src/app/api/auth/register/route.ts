@@ -4,6 +4,7 @@ import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { success, badRequest, conflict, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
 import { verifyTurnstile } from '../../../../lib/turnstile'
+import { setAuthCookie } from '../../../../lib/session'
 
 type RegisterBody = {
   email?: string
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
     return conflict('该邮箱已注册，请直接登录或使用「忘记密码」', 'email_exists')
   }
 
-  let user: { id: number }
+  let user: { id: number; email: string; name?: string | null }
   try {
     user = await payload.create({
       collection: 'users',
@@ -105,6 +106,20 @@ export async function POST(req: Request) {
     return internalError(msg)
   }
 
+  // Auto-login: issue session token so user lands in the app without
+  // re-entering credentials. Verification proceeds asynchronously via email.
+  let token: string | null = null
+  try {
+    const loginResult = await payload.login({
+      collection: 'users',
+      data: { email, password },
+      depth: 0,
+    })
+    token = loginResult?.token ?? null
+  } catch {
+    /* fall through — registration still succeeded, user can log in manually */
+  }
+
   // Audit log for registration
   try {
     await payload.create({
@@ -115,7 +130,7 @@ export async function POST(req: Request) {
         docId: String(user.id),
         operator: user.id,
         ip,
-        reason: '用户注册（待邮箱验证）',
+        reason: token ? '注册并自动登录，等待邮箱验证' : '用户注册（待邮箱验证）',
         metadata: { email },
       },
       overrideAccess: true,
@@ -124,5 +139,21 @@ export async function POST(req: Request) {
     /* audit log failure must not block registration */
   }
 
-  return NextResponse.json(success({ ok: true }))
+  const response = NextResponse.json(success({
+    ok: true,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name ?? null,
+      _verified: false,
+    },
+    verificationPending: true,
+    autoLoggedIn: !!token,
+  }))
+
+  if (token) {
+    setAuthCookie(response, token)
+  }
+
+  return response
 }

@@ -47,6 +47,7 @@ export async function changePasswordAction(
 ): Promise<ProfileActionState> {
   const user = await getCurrentUser()
   if (!user) return { error: '请先登录' }
+  if (!user._verified) return { error: '请先验证邮箱后再修改密码' }
 
   const oldPassword = String(formData.get('oldPassword') ?? '')
   const newPassword = String(formData.get('newPassword') ?? '')

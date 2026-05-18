@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { Header } from '../../../components/Header'
 import { Footer } from '../../../components/Footer'
+import { VerificationBanner } from '../../../components/VerificationBanner'
 import '../../../styles/globals.css'
 
 type Params = Promise<{ locale: string }>
@@ -36,6 +37,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={locale === 'zh' ? 'zh-CN' : locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <VerificationBanner />
           <Header />
           <main>{children}</main>
           <Footer />

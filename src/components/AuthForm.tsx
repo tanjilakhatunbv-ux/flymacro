@@ -84,11 +84,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
         } else if (mode === 'register') {
           // Remember email for the verify-email page to claim bonus
           try { sessionStorage.setItem('register-email', email) } catch { /* ignore */ }
-          if ('warning' in resp && resp.warning) {
-            setSuccess(resp.warning)
-          } else {
-            setSuccess(t('registerVerify'))
-          }
+          window.location.href = returnUrl
         } else if (mode === 'forgot') {
           setSuccess(t('resetSent'))
         } else if (mode === 'reset') {
