@@ -96,7 +96,6 @@ export async function POST(req: Request) {
         password,
         name: name || undefined,
         role: 'user',
-        credits: 0,
         _verified: false,
       } as never,
       overrideAccess: true,

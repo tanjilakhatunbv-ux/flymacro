@@ -24,11 +24,13 @@ export function VerifyEmailRunner({ token }: { token: string }) {
           setState('ok')
           // Claim registration bonus after successful verification
           try {
+            const email = sessionStorage.getItem('register-email') || undefined
             await fetch('/api/auth/claim-bonus', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token }),
+              body: JSON.stringify({ token, email }),
             })
+            sessionStorage.removeItem('register-email')
           } catch {
             /* bonus claim failure should not affect UX */
           }

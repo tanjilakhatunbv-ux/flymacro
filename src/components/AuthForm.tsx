@@ -82,6 +82,8 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
         if (mode === 'login') {
           window.location.href = returnUrl
         } else if (mode === 'register') {
+          // Remember email for the verify-email page to claim bonus
+          try { sessionStorage.setItem('register-email', email) } catch { /* ignore */ }
           if ('warning' in resp && resp.warning) {
             setSuccess(resp.warning)
           } else {
