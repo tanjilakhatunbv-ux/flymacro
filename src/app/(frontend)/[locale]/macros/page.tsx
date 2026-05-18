@@ -71,7 +71,7 @@ const findMacros = unstable_cache(
       sort: '-publishedAt',
       page,
       limit: PAGE_SIZE,
-      depth: 1,
+      depth: 2,
       overrideAccess: true,
     })
     const docs = result.docs as Macro[]
