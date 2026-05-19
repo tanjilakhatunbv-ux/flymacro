@@ -70,7 +70,7 @@ async function rateLimitRedis(
     for (const w of windows) {
       const redisKey = `rl:${key}:${w.windowMs}`
       const now = Date.now()
-      const windowStart = now - (now % w.windowMs)
+      const _windowStart = now - (now % w.windowMs)
       const ttl = Math.ceil(w.windowMs / 1000)
 
       const count = await redis.incr(redisKey) as number

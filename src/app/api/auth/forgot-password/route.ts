@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
-import { badRequest, internalError } from '../../../../lib/api-response'
+import { badRequest } from '../../../../lib/api-response'
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       collection: 'users',
       data: { email },
     })
-  } catch (err) {
+  } catch (_err) {
     // Silently ignore — do not reveal whether email exists
   }
 

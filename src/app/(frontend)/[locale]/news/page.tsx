@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../../lib/payload'
@@ -51,11 +52,13 @@ export default async function NewsListPage({ params }: { params: Promise<{ local
             return (
               <Link key={a.id} href={`/news/${a.slug}`} className="macro-card" style={{ display: 'block' }}>
                 {coverUrl && (
-                  <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: '6px 6px 0 0' }}>
-                    <img
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: '6px 6px 0 0' }}>
+                    <Image
                       src={coverUrl}
                       alt={a.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 )}

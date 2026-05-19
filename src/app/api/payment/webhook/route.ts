@@ -111,6 +111,10 @@ export async function POST(req: Request) {
     rawAmount = (data.payment as Record<string, unknown>).amount as number
   }
 
+  // DodoPayments may return amounts in either major or minor units depending on
+  // the event type and mode. We use a heuristic: values larger than what any
+  // reasonable package costs in major units are treated as minor (cents) and
+  // divided by 100.
   const amount = rawAmount > 10000 ? rawAmount / 100 : rawAmount
 
   const currency = (
