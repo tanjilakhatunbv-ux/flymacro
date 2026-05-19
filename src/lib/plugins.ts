@@ -10,9 +10,11 @@ export async function getLatestPublishedPlugin() {
       sort: '-publishedAt',
       limit: 1,
       depth: 1,
+      overrideAccess: true,
     })
     return (result.docs[0] ?? null) as any
-  } catch {
+  } catch (err) {
+    console.error('[plugins] getLatestPublishedPlugin failed:', err)
     return null
   }
 }
@@ -32,9 +34,11 @@ export async function getPublishedPlugins() {
       sort: '-publishedAt',
       limit: 100,
       depth: 1,
+      overrideAccess: true,
     })
     return result.docs as any[]
-  } catch {
+  } catch (err) {
+    console.error('[plugins] getPublishedPlugins failed:', err)
     return []
   }
 }

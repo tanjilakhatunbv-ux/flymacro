@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { revalidateTag } from 'next/cache'
 import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
 import type { UserRole } from '../lib/access'
 
@@ -95,5 +96,17 @@ export const PluginReleases: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterChange: [
+      async () => {
+        try { revalidateTag('plugin-releases') } catch { /* ignore */ }
+      },
+    ],
+    afterDelete: [
+      async () => {
+        try { revalidateTag('plugin-releases') } catch { /* ignore */ }
+      },
+    ],
+  },
   timestamps: true,
 }
