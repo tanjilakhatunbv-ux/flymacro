@@ -103,13 +103,23 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
+      // Neon free tier allows ~10 concurrent connections.
+      // Vercel serverless can spawn many concurrent functions,
+      // so keep this low to avoid "too many connections" errors.
+      max: 5,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 3000,
+      // Allow queueing a few requests before failing
+      allowExitOnIdle: false,
     },
     push: false,
   }),
   serverURL: serverUrl,
+  bodyParser: {
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50 MB
+    },
+  },
   sharp,
   ...(useResend && {
     email: resendAdapter({
