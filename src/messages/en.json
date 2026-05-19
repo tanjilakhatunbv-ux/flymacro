@@ -6,6 +6,7 @@
   "nav": {
     "home": "Home",
     "macros": "Macros",
+    "scripts": "Scripts",
     "plugins": "Plugins",
     "guide": "Guides",
     "news": "News",
@@ -89,6 +90,26 @@
     "password": "Password: {password}",
     "noDownload": "No download available",
     "viewHistory": "View Version History"
+  },
+  "scripts": {
+    "metadataTitle": "Script Download — FlyMacro",
+    "metadataDescription": "World of Warcraft scripts, addons and tools download with version management and history.",
+    "pageTitle": "Script Download",
+    "pageSubtitle": "World of Warcraft scripts, addons and tools with version management and one-click download.",
+    "empty": "No published scripts yet.",
+    "notFound": "Script Not Found — FlyMacro",
+    "backToList": "Back to Scripts",
+    "latestVersion": "Latest Version {version}",
+    "downloadFile": "Download File",
+    "noDownload": "No download available",
+    "versionHistory": "Version History",
+    "latestBadge": "Latest",
+    "author": "Author",
+    "publishedAt": "Published",
+    "typeMacro": "Macro",
+    "typeAddon": "Addon",
+    "typeTool": "Tool",
+    "typeOther": "Other"
   },
   "guide": {
     "metadataTitle": "Guides — FlyMacro",

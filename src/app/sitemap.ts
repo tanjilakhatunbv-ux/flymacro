@@ -8,6 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     '',
     '/macros',
+    '/scripts',
     '/guide',
     '/news',
     '/about',
@@ -67,7 +68,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${baseUrl}/en/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
     ])
 
-    return [...staticEntries, ...macroEntries, ...newsEntries, ...guideEntries]
+    // Script pages
+    const scripts = await payload.find({
+      collection: 'scripts',
+      where: {
+        and: [
+          { status: { equals: 'published' } },
+          { _status: { equals: 'published' } },
+        ],
+      },
+      limit: 1000,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    const scriptEntries = scripts.docs.flatMap((s: { slug: string; updatedAt: string }) => [
+      { url: `${baseUrl}/zh/scripts/${encodeURIComponent(s.slug)}`, lastModified: new Date(s.updatedAt) },
+      { url: `${baseUrl}/en/scripts/${encodeURIComponent(s.slug)}`, lastModified: new Date(s.updatedAt) },
+    ])
+
+    return [...staticEntries, ...macroEntries, ...newsEntries, ...guideEntries, ...scriptEntries]
   } catch (err) {
     console.warn('sitemap: failed to fetch dynamic entries, returning static pages only', err)
     return staticEntries

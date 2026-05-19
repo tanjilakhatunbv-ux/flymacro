@@ -45,3 +45,25 @@ export function MacroGridSkeleton() {
     </div>
   )
 }
+
+export function ScriptGridSkeleton() {
+  return (
+    <div className="script-grid" style={{ minHeight: 200 }}>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="script-card" style={{ opacity: 0.6 }}>
+          <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.5rem' }}>
+            <Skeleton className="skeleton-tag" />
+            <Skeleton className="skeleton-tag" />
+          </div>
+          <Skeleton className="skeleton-title" />
+          <Skeleton className="skeleton-line" />
+          <Skeleton className="skeleton-line-short" />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+            <Skeleton className="skeleton-price-short" />
+            <Skeleton className="skeleton-price-short" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
