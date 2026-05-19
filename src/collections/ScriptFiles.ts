@@ -8,7 +8,7 @@ export const ScriptFiles: CollectionConfig = {
     group: '脚本管理',
     useAsTitle: 'filename',
     defaultColumns: ['filename', 'mimeType', 'filesize', 'updatedAt'],
-    description: '脚本文件上传库，支持 .lua / .zip / .txt / .json 等格式。',
+    description: '脚本文件上传库。步骤：1) 在此处上传文件 2) 去「脚本版本」创建新版本并选择此文件。支持 .lua / .zip / .txt / .json 等格式。',
   },
   access: {
     read: anyone,

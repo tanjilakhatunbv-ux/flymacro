@@ -22,7 +22,7 @@ export const Scripts: CollectionConfig = {
     group: '脚本管理',
     useAsTitle: 'name',
     defaultColumns: ['name', 'type', 'status', 'updatedAt'],
-    description: '脚本项目管理：一个脚本项目可包含多个历史版本。',
+    description: '脚本项目管理：先创建脚本项目，再在其下添加版本和上传文件。发布流程：1) 创建脚本项目 2) 上传文件到「脚本文件」3) 创建版本并选择文件 4) 将版本状态设为「已发布」。',
     listSearchableFields: ['name', 'slug'],
   },
   access: {
