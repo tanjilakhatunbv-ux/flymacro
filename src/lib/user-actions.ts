@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from './auth'
 import { getPayload } from './payload'
+import { invalidateUserCache } from './user-cache'
 import { validatePasswordStrength } from './validation'
 
 export type ProfileActionState = {
@@ -36,6 +37,7 @@ export async function updateProfileAction(
     return { error: err instanceof Error ? err.message : '保存失败' }
   }
 
+  await invalidateUserCache(user.id)
   revalidatePath('/account')
   revalidatePath('/account/settings')
   return { ok: true }
@@ -89,6 +91,8 @@ export async function changePasswordAction(
   } catch (err) {
     return { error: err instanceof Error ? err.message : '密码修改失败' }
   }
+
+  await invalidateUserCache(user.id)
 
   // Audit log for password change
   try {

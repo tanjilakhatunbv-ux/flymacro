@@ -46,7 +46,7 @@ const findMacroBySlugCached = unstable_cache(
         and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }],
       },
       limit: 1,
-      depth: 2,
+      depth: 1,
       overrideAccess: true,
     })
     const macro = (result.docs[0] as Macro | undefined) ?? null

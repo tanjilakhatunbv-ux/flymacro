@@ -29,6 +29,7 @@ export function HeaderAuth() {
     if (cacheValid) {
       setUser(cached.user as User | null)
       setUnread(cached.unread ?? 0)
+      return
     }
 
     fetch('/api/auth/session', { credentials: 'same-origin' })
@@ -40,7 +41,10 @@ export function HeaderAuth() {
         const count = payload.unread ?? 0
         setUser(u)
         setUnread(count)
-        writeSessionCache(u, { unread: count })
+        writeSessionCache(
+          u ? { id: u.id, credits: u.credits, role: u.role, _verified: (u as unknown as { _verified?: boolean })._verified } : null,
+          { unread: count },
+        )
       })
       .catch(() => {
         if (!cancelled) {

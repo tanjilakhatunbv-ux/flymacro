@@ -4,8 +4,6 @@ import { getCurrentUser } from '../../../../../lib/auth'
 import { getPayload } from '../../../../../lib/payload'
 import type { CreditTransaction } from '../../../../../payload-types'
 
-export const dynamic = 'force-dynamic'
-
 type Params = Promise<{ locale: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

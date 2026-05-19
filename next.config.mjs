@@ -11,8 +11,20 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'flymacro.qzz.io',
       },
+      {
+        protocol: 'https',
+        hostname: '*.vercel.app',
+      },
+      ...(process.env.S3_PUBLIC_URL
+        ? [(() => {
+            try {
+              const url = new URL(process.env.S3_PUBLIC_URL)
+              return { protocol: url.protocol.slice(0, -1), hostname: url.hostname }
+            } catch { return null }
+          })()].filter(Boolean)
+        : []),
     ],
   },
   experimental: {

@@ -3,16 +3,21 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../lib/payload'
 import { getCachedLatestPublishedPlugin, getPluginDownloadInfo } from '../../../lib/plugins'
+import { getCachedClassMacroCounts } from '../../../lib/class-counts'
 import { MacroCard } from '../../../components/MacroCard'
 import { PluginDownloadSection } from '../../../components/PluginDownloadSection'
 import { classSlugs } from '../../../lib/wow'
 import type { Macro, Class } from '../../../payload-types'
 
+export function generateStaticParams() {
+  return [{ locale: 'zh' }, { locale: 'en' }]
+}
+
 export const revalidate = 60
 
 async function loadHomeData() {
   const payload = await getPayload()
-  const [featured, classesList, allMacros, latestPlugin] = await Promise.all([
+  const [featured, classesList, counts, latestPlugin] = await Promise.all([
     payload.find({
       collection: 'macros',
       where: {
@@ -27,35 +32,9 @@ async function loadHomeData() {
       overrideAccess: true,
     }),
     payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
-    payload.find({
-      collection: 'macros',
-      where: { _status: { equals: 'published' } },
-      limit: 1000,
-      depth: 0,
-      select: { classes: true },
-      overrideAccess: true,
-    }),
+    getCachedClassMacroCounts(),
     getCachedLatestPublishedPlugin(),
   ])
-
-  const classIdToSlug = new Map<string | number, string>()
-  for (const c of classesList.docs as Class[]) {
-    classIdToSlug.set(c.id, c.slug)
-  }
-
-  const counts: Record<string, number> = {}
-  for (const slug of classSlugs) counts[slug] = 0
-
-  for (const macro of allMacros.docs as Partial<Macro>[]) {
-    const macroClasses = macro.classes
-    if (Array.isArray(macroClasses)) {
-      for (const clsRef of macroClasses) {
-        const clsId = typeof clsRef === 'object' ? clsRef.id : clsRef
-        const slug = classIdToSlug.get(clsId)
-        if (slug) counts[slug] = (counts[slug] ?? 0) + 1
-      }
-    }
-  }
 
   return {
     featured: featured.docs as Macro[],

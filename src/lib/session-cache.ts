@@ -5,6 +5,7 @@ export interface CachedUser {
   id: string | number
   credits?: number
   role?: string
+  _verified?: boolean
 }
 
 export function readSessionCache(): { user: CachedUser | null; unread?: number; ts: number } | null {

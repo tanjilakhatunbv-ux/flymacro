@@ -8,8 +8,6 @@ import { BackLink } from '../../../../../../components/BackLink'
 import { TicketReplyForm } from '../../../../../../components/TicketForms'
 import type { Ticket, TicketMessage } from '../../../../../../payload-types'
 
-export const dynamic = 'force-dynamic'
-
 type Params = Promise<{ id: string; locale: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

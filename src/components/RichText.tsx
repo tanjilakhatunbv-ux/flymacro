@@ -122,7 +122,6 @@ function renderNode(node: LexicalNode, key: number): React.ReactNode {
             width={width}
             height={height}
             style={{ maxWidth: '100%', height: 'auto' }}
-            unoptimized
           />
         </figure>
       )

@@ -7,8 +7,6 @@ import { MarkAllReadButton } from '../../../../../components/NotificationButtons
 import { MarkNotificationReadForm } from '../../../../../components/MarkNotificationReadForm'
 import type { Notification } from '../../../../../payload-types'
 
-export const dynamic = 'force-dynamic'
-
 type Params = Promise<{ locale: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

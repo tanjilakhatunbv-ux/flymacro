@@ -4,8 +4,6 @@ import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 
-export const dynamic = 'force-dynamic'
-
 type Params = Promise<{ locale: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

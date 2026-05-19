@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { readSessionCache, isCacheValid } from '../lib/session-cache'
 
 type User = {
   id: number
@@ -19,6 +20,17 @@ export function VerificationBanner() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
 
   useEffect(() => {
+    const cached = readSessionCache()
+    const cacheValid = cached && isCacheValid(cached.ts)
+
+    if (cacheValid) {
+      setLoading(false)
+      if (cached.user && cached.user._verified === false) {
+        setUser({ id: Number(cached.user.id), email: '', _verified: false })
+      }
+      return
+    }
+
     fetch('/api/auth/me')
       .then((r) => r.json())
       .then((data) => {

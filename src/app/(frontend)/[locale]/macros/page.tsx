@@ -2,8 +2,9 @@ import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { getPayload } from '../../../../lib/payload'
-import { MacroGridClient } from '../../../../components/MacroGridClient'
-import { MacroFilters } from '../../../../components/MacroFilters'
+import { getCurrentUser } from '../../../../lib/auth'
+import { MacroGrid } from '../../../../components/MacroGrid'
+import { MacroFilters, ClearFiltersLink } from '../../../../components/MacroFilters'
 import { Pagination } from '../../../../components/Pagination'
 import { FilterSkeleton, MacroGridSkeleton } from '../../../../components/Skeleton'
 import type { Macro, Class, Spec, Version } from '../../../../payload-types'
@@ -71,7 +72,7 @@ const findMacros = unstable_cache(
       sort: '-publishedAt',
       page,
       limit: PAGE_SIZE,
-      depth: 2,
+      depth: 1,
       overrideAccess: true,
     })
     const docs = result.docs as Macro[]
@@ -133,10 +134,44 @@ type Params = Promise<SearchQuery>
 export default async function MacrosListPage({ searchParams }: { searchParams: Params }) {
   const sp = await searchParams
   const t = await getTranslations('macros')
+  const tGrid = await getTranslations('macroGrid')
   const lookups = await getLookupTables()
   const where = buildWhere(sp, lookups)
   const page = Math.max(1, Number(sp.page ?? '1') || 1)
   const result = await findMacros(JSON.stringify(where), page)
+
+  const user = await getCurrentUser()
+  let exchangedIds = new Set<number | string>()
+  if (user) {
+    try {
+      const payload = await getPayload()
+      const exRes = await payload.find({
+        collection: 'macro-exchanges',
+        where: {
+          and: [
+            { user: { equals: user.id } },
+            {
+              or: [
+                { expiresAt: { exists: false } },
+                { expiresAt: { greater_than_equal: new Date().toISOString() } },
+              ],
+            },
+          ],
+        },
+        limit: 200,
+        depth: 0,
+        overrideAccess: true,
+      })
+      exchangedIds = new Set(
+        exRes.docs.map((e) => {
+          const doc = e as { macro?: number | { id?: number | string } }
+          return typeof doc.macro === 'object' ? doc.macro?.id : doc.macro
+        }).filter((id): id is number | string => id != null),
+      )
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <div className="container-page page-list">
@@ -157,7 +192,13 @@ export default async function MacrosListPage({ searchParams }: { searchParams: P
       </Suspense>
 
       <Suspense fallback={<MacroGridSkeleton />}>
-        <MacroGridClient macros={result.docs} totalDocs={result.totalDocs} />
+        <MacroGrid
+          macros={result.docs}
+          exchangedIds={exchangedIds}
+          totalCountText={tGrid('totalCount', { count: result.totalDocs })}
+          emptyText={tGrid('empty')}
+          clearFilters={<ClearFiltersLink />}
+        />
       </Suspense>
 
       {result.totalPages > 1 && (

@@ -6,8 +6,6 @@ import { getPayload } from '../../../../../lib/payload'
 import { ExchangeRenewButton } from '../../../../../components/ExchangeRenewButton'
 import type { MacroExchange } from '../../../../../payload-types'
 
-export const dynamic = 'force-dynamic'
-
 type Params = Promise<{ locale: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

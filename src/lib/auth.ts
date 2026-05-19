@@ -4,6 +4,7 @@ import { createHash } from 'crypto'
 import { getPayload } from './payload'
 import { verifyJwt } from './jwt'
 import { forbidden, unauthorized } from './api-response'
+import { getCachedUser, setCachedUser } from './user-cache'
 import type { User } from '../payload-types'
 
 function getCandidateSecrets(payload: { config?: { secret?: string }; secret?: string }): string[] {
@@ -51,6 +52,12 @@ export async function getCurrentUser(): Promise<User | null> {
     const userId = jwtResult.payload?.id
     if (!userId || typeof userId !== 'number') return null
 
+    const cached = await getCachedUser(userId)
+    if (cached) {
+      if (cached.status !== 'active') return null
+      return cached
+    }
+
     const user = await payload.findByID({
       collection: 'users',
       id: userId,
@@ -63,6 +70,7 @@ export async function getCurrentUser(): Promise<User | null> {
     // Reject suspended or banned users
     if (userDoc.status !== 'active') return null
 
+    await setCachedUser(userDoc)
     return userDoc
   } catch {
     return null
