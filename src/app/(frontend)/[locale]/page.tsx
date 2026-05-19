@@ -2,10 +2,8 @@ import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../lib/payload'
-import { getCachedLatestPublishedPlugin, getPluginDownloadInfo } from '../../../lib/plugins'
 import { getCachedClassMacroCounts } from '../../../lib/class-counts'
 import { MacroCard } from '../../../components/MacroCard'
-import { PluginDownloadSection } from '../../../components/PluginDownloadSection'
 import { classSlugs } from '../../../lib/wow'
 import type { Macro, Class } from '../../../payload-types'
 
@@ -17,7 +15,7 @@ export const revalidate = 60
 
 async function loadHomeData() {
   const payload = await getPayload()
-  const [featured, classesList, counts, latestPlugin] = await Promise.all([
+  const [featured, classesList, counts] = await Promise.all([
     payload.find({
       collection: 'macros',
       where: {
@@ -33,14 +31,12 @@ async function loadHomeData() {
     }),
     payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
     getCachedClassMacroCounts(),
-    getCachedLatestPublishedPlugin(),
   ])
 
   return {
     featured: featured.docs as Macro[],
     classes: classesList.docs as Class[],
     counts,
-    latestPlugin,
   }
 }
 
@@ -48,9 +44,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'home' })
   const tWow = await getTranslations({ locale, namespace: 'wow' })
-  const { featured, classes, counts, latestPlugin } = await loadHomeData()
+  const { featured, classes, counts } = await loadHomeData()
   const classBySlug = new Map(classes.map((c) => [c.slug, c] as const))
-  const pluginDownloadInfo = getPluginDownloadInfo(latestPlugin)
 
   return (
     <>
@@ -63,29 +58,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link href="/macros" className="btn btn-primary">
               {t('enterMacros')}
             </Link>
-            <Link href="/plugins" className="btn">
-              {t('pluginDownload')}
-            </Link>
           </div>
         </div>
       </section>
-
-      {latestPlugin && (
-        <section className="section section-alt">
-          <div className="container-page">
-            <h2>{t('pluginSection')}</h2>
-            <div className="section-divider" aria-hidden="true">
-              <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
-            </div>
-            <PluginDownloadSection
-              version={latestPlugin.version}
-              publishedAt={latestPlugin.publishedAt}
-              changelog={latestPlugin.changelog}
-              downloadInfo={pluginDownloadInfo}
-            />
-          </div>
-        </section>
-      )}
 
       <section className="section">
         <div className="container-page">

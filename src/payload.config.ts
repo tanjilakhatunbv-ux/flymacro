@@ -24,8 +24,6 @@ import { CreditTransactions } from './collections/CreditTransactions'
 import { Tickets } from './collections/Tickets'
 import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
-import { PluginFiles } from './collections/PluginFiles'
-import { PluginReleases } from './collections/PluginReleases'
 import { Scripts } from './collections/Scripts'
 import { ScriptFiles } from './collections/ScriptFiles'
 import { ScriptVersions } from './collections/ScriptVersions'
@@ -92,8 +90,6 @@ export default buildConfig({
     Tickets,
     TicketMessages,
     Notifications,
-    PluginFiles,
-    PluginReleases,
     Scripts,
     ScriptFiles,
     ScriptVersions,
@@ -141,15 +137,6 @@ export default buildConfig({
             collections: {
               media: {
                 prefix: 'media',
-                disablePayloadAccessControl: true,
-                generateFileURL: ({ filename, prefix }) => {
-                  const publicUrl = process.env.S3_PUBLIC_URL || ''
-                  const path = prefix ? `${prefix}/${filename}` : filename
-                  return `${publicUrl}/${path}`
-                },
-              },
-              'plugin-files': {
-                prefix: 'plugin-files',
                 disablePayloadAccessControl: true,
                 generateFileURL: ({ filename, prefix }) => {
                   const publicUrl = process.env.S3_PUBLIC_URL || ''
