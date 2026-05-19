@@ -3,7 +3,6 @@ import { getPayload } from '../lib/payload'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://flymacro.qzz.io'
-  const payload = await getPayload()
 
   // Static pages
   const staticPages = [
@@ -24,47 +23,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/en${path}`, lastModified: new Date() },
   ])
 
-  // Macro detail pages
-  const macros = await payload.find({
-    collection: 'macros',
-    where: { _status: { equals: 'published' } },
-    limit: 1000,
-    depth: 0,
-    overrideAccess: true,
-  })
+  try {
+    const payload = await getPayload()
 
-  const macroEntries = macros.docs.flatMap((m: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
-    { url: `${baseUrl}/en/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
-  ])
+    // Macro detail pages
+    const macros = await payload.find({
+      collection: 'macros',
+      where: { _status: { equals: 'published' } },
+      limit: 1000,
+      depth: 0,
+      overrideAccess: true,
+    })
 
-  // News pages
-  const news = await payload.find({
-    collection: 'news',
-    where: { _status: { equals: 'published' } },
-    limit: 1000,
-    depth: 0,
-    overrideAccess: true,
-  })
+    const macroEntries = macros.docs.flatMap((m: { slug: string; updatedAt: string }) => [
+      { url: `${baseUrl}/zh/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
+      { url: `${baseUrl}/en/macros/${encodeURIComponent(m.slug)}`, lastModified: new Date(m.updatedAt) },
+    ])
 
-  const newsEntries = news.docs.flatMap((n: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
-    { url: `${baseUrl}/en/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
-  ])
+    // News pages
+    const news = await payload.find({
+      collection: 'news',
+      where: { _status: { equals: 'published' } },
+      limit: 1000,
+      depth: 0,
+      overrideAccess: true,
+    })
 
-  // Guide pages
-  const guides = await payload.find({
-    collection: 'guides',
-    where: { _status: { equals: 'published' } },
-    limit: 1000,
-    depth: 0,
-    overrideAccess: true,
-  })
+    const newsEntries = news.docs.flatMap((n: { slug: string; updatedAt: string }) => [
+      { url: `${baseUrl}/zh/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
+      { url: `${baseUrl}/en/news/${encodeURIComponent(n.slug)}`, lastModified: new Date(n.updatedAt) },
+    ])
 
-  const guideEntries = guides.docs.flatMap((g: { slug: string; updatedAt: string }) => [
-    { url: `${baseUrl}/zh/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
-    { url: `${baseUrl}/en/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
-  ])
+    // Guide pages
+    const guides = await payload.find({
+      collection: 'guides',
+      where: { _status: { equals: 'published' } },
+      limit: 1000,
+      depth: 0,
+      overrideAccess: true,
+    })
 
-  return [...staticEntries, ...macroEntries, ...newsEntries, ...guideEntries]
+    const guideEntries = guides.docs.flatMap((g: { slug: string; updatedAt: string }) => [
+      { url: `${baseUrl}/zh/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
+      { url: `${baseUrl}/en/guide/${encodeURIComponent(g.slug)}`, lastModified: new Date(g.updatedAt) },
+    ])
+
+    return [...staticEntries, ...macroEntries, ...newsEntries, ...guideEntries]
+  } catch (err) {
+    console.warn('sitemap: failed to fetch dynamic entries, returning static pages only', err)
+    return staticEntries
+  }
 }
