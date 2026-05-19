@@ -85,6 +85,9 @@ export interface Config {
     notifications: Notification;
     'plugin-files': PluginFile;
     'plugin-releases': PluginRelease;
+    scripts: Script;
+    'script-files': ScriptFile;
+    'script-versions': ScriptVersion;
     'audit-logs': AuditLog;
     news: News;
     'payload-kv': PayloadKv;
@@ -99,6 +102,9 @@ export interface Config {
       macroExchangesJoin: 'macro-exchanges';
       ticketsJoin: 'tickets';
       notificationsJoin: 'notifications';
+    };
+    scripts: {
+      versionsJoin: 'script-versions';
     };
   };
   collectionsSelect: {
@@ -120,6 +126,9 @@ export interface Config {
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'plugin-files': PluginFilesSelect<false> | PluginFilesSelect<true>;
     'plugin-releases': PluginReleasesSelect<false> | PluginReleasesSelect<true>;
+    scripts: ScriptsSelect<false> | ScriptsSelect<true>;
+    'script-files': ScriptFilesSelect<false> | ScriptFilesSelect<true>;
+    'script-versions': ScriptVersionsSelect<false> | ScriptVersionsSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -821,6 +830,151 @@ export interface PluginRelease {
   createdAt: string;
 }
 /**
+ * 脚本项目管理：一个脚本项目可包含多个历史版本。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scripts".
+ */
+export interface Script {
+  id: number;
+  name: string;
+  /**
+   * 留空将根据名称自动生成，影响前台 URL
+   */
+  slug: string;
+  type: 'macro' | 'addon' | 'tool' | 'other';
+  /**
+   * 一句话描述用途
+   */
+  summary: string;
+  /**
+   * 脚本的详细功能说明和使用文档
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  author?: string | null;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string | null;
+  /**
+   * 当前已发布的最新版本（自动维护）
+   */
+  latestVersion?: (number | null) | ScriptVersion;
+  /**
+   * 该脚本的所有历史版本
+   */
+  versionsJoin?: {
+    docs?: (number | ScriptVersion)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * 脚本版本管理：维护脚本的所有历史版本记录。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "script-versions".
+ */
+export interface ScriptVersion {
+  id: number;
+  /**
+   * 选择该版本属于哪个脚本项目
+   */
+  script: number | Script;
+  /**
+   * 例如 v1.2.0，建议遵循语义化版本规范
+   */
+  version: string;
+  /**
+   * 上传该版本的脚本文件
+   */
+  scriptFile: number | ScriptFile;
+  scriptType: 'macro' | 'addon' | 'tool' | 'other';
+  /**
+   * 选择适配的魔兽世界版本
+   */
+  gameVersion?: (number | null) | Version;
+  /**
+   * 该版本相对上一版本的变更内容
+   */
+  changelog?: string | null;
+  /**
+   * 该版本的详细使用说明或文档
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * 该版本的作者或维护者
+   */
+  author?: string | null;
+  /**
+   * SHA256 或 MD5，用于文件完整性校验
+   */
+  checksum?: string | null;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string | null;
+  /**
+   * 发布时自动标记，同脚本下仅一个最新版本
+   */
+  isLatest?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * 脚本文件上传库，支持 .lua / .zip / .txt / .json 等格式。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "script-files".
+ */
+export interface ScriptFile {
+  id: number;
+  /**
+   * 简要描述此文件用途
+   */
+  description?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * 后台关键操作审计日志，支持按时间、操作人、操作类型筛选查询。
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1019,6 +1173,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'plugin-releases';
         value: number | PluginRelease;
+      } | null)
+    | ({
+        relationTo: 'scripts';
+        value: number | Script;
+      } | null)
+    | ({
+        relationTo: 'script-files';
+        value: number | ScriptFile;
+      } | null)
+    | ({
+        relationTo: 'script-versions';
+        value: number | ScriptVersion;
       } | null)
     | ({
         relationTo: 'audit-logs';
@@ -1450,6 +1616,65 @@ export interface PluginReleasesSelect<T extends boolean = true> {
   cloudPassword?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scripts_select".
+ */
+export interface ScriptsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  type?: T;
+  summary?: T;
+  description?: T;
+  author?: T;
+  status?: T;
+  publishedAt?: T;
+  latestVersion?: T;
+  versionsJoin?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "script-files_select".
+ */
+export interface ScriptFilesSelect<T extends boolean = true> {
+  description?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "script-versions_select".
+ */
+export interface ScriptVersionsSelect<T extends boolean = true> {
+  script?: T;
+  version?: T;
+  scriptFile?: T;
+  scriptType?: T;
+  gameVersion?: T;
+  changelog?: T;
+  description?: T;
+  author?: T;
+  checksum?: T;
+  status?: T;
+  publishedAt?: T;
+  isLatest?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

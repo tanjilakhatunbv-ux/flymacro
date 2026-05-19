@@ -26,6 +26,9 @@ import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
 import { PluginFiles } from './collections/PluginFiles'
 import { PluginReleases } from './collections/PluginReleases'
+import { Scripts } from './collections/Scripts'
+import { ScriptFiles } from './collections/ScriptFiles'
+import { ScriptVersions } from './collections/ScriptVersions'
 import { AuditLogs } from './collections/AuditLogs'
 import { News } from './collections/News'
 import { SiteSettings } from './globals/SiteSettings'
@@ -91,6 +94,9 @@ export default buildConfig({
     Notifications,
     PluginFiles,
     PluginReleases,
+    Scripts,
+    ScriptFiles,
+    ScriptVersions,
     AuditLogs,
     News,
   ],
@@ -144,6 +150,15 @@ export default buildConfig({
               },
               'plugin-files': {
                 prefix: 'plugin-files',
+                disablePayloadAccessControl: true,
+                generateFileURL: ({ filename, prefix }) => {
+                  const publicUrl = process.env.S3_PUBLIC_URL || ''
+                  const path = prefix ? `${prefix}/${filename}` : filename
+                  return `${publicUrl}/${path}`
+                },
+              },
+              'script-files': {
+                prefix: 'script-files',
                 disablePayloadAccessControl: true,
                 generateFileURL: ({ filename, prefix }) => {
                   const publicUrl = process.env.S3_PUBLIC_URL || ''

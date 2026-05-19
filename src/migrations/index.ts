@@ -15,6 +15,7 @@ import * as migration_20260511_add_audit_metadata from './20260511_add_audit_met
 import * as migration_20260511_fix_set_null_constraints from './20260511_fix_set_null_constraints';
 import * as migration_20260516_add_media_prefix from './20260516_add_media_prefix';
 import * as migration_20260516_add_media_og_sizes from './20260516_add_media_og_sizes';
+import * as migration_20260519_add_script_management from './20260519_add_script_management';
 
 export const migrations = [
   {
@@ -101,5 +102,10 @@ export const migrations = [
     up: migration_20260516_add_media_og_sizes.up,
     down: migration_20260516_add_media_og_sizes.down,
     name: '20260516_add_media_og_sizes'
+  },
+  {
+    up: migration_20260519_add_script_management.up,
+    down: migration_20260519_add_script_management.down,
+    name: '20260519_add_script_management'
   },
 ];
