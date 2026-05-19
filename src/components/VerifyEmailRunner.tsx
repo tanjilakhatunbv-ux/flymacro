@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
+import { clearSessionCache } from '../lib/session-cache'
 
 type State = 'pending' | 'ok' | 'fail'
 
@@ -22,6 +23,7 @@ export function VerifyEmailRunner({ token }: { token: string }) {
         if (cancelled) return
         if (resp.ok) {
           setState('ok')
+          clearSessionCache()
           // Claim registration bonus after successful verification
           try {
             const email = sessionStorage.getItem('register-email') || undefined

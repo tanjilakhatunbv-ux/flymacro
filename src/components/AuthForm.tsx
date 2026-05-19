@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
+import { clearSessionCache } from '../lib/session-cache'
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset'
 
@@ -80,8 +81,10 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           return
         }
         if (mode === 'login') {
+          clearSessionCache()
           window.location.href = returnUrl
         } else if (mode === 'register') {
+          clearSessionCache()
           // Remember email for the verify-email page to claim bonus
           try { sessionStorage.setItem('register-email', email) } catch { /* ignore */ }
           window.location.href = returnUrl
