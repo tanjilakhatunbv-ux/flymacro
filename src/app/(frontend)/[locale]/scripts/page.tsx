@@ -40,9 +40,25 @@ const findScripts = unstable_cache(
   { revalidate: 60, tags: ['scripts'] },
 )
 
-export default async function ScriptsListPage() {
+export default async function ScriptsListPage({
+  searchParams,
+  params,
+}: {
+  searchParams: Promise<{ page?: string }>
+  params: Promise<{ locale: string }>
+}) {
+  const [{ page: pageParam }, { locale }] = await Promise.all([searchParams, params])
+  const page = Math.max(1, parseInt(pageParam || '1', 10) || 1)
+
   const t = await getTranslations('scripts')
-  const result = await findScripts(1)
+  const result = await findScripts(page)
+
+  const typeLabel: Record<string, string> = {
+    macro: t('typeMacro'),
+    addon: t('typeAddon'),
+    tool: t('typeTool'),
+    other: t('typeOther'),
+  }
 
   return (
     <div className="container-page page-list">
@@ -58,7 +74,7 @@ export default async function ScriptsListPage() {
           <>
             <div className="script-grid">
               {result.docs.map((script) => (
-                <ScriptCard key={script.id} script={script} />
+                <ScriptCard key={script.id} script={script} typeLabel={typeLabel} locale={locale} />
               ))}
             </div>
             {result.totalPages > 1 && (

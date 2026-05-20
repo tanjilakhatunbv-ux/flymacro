@@ -3,19 +3,14 @@ import type { Script } from '../payload-types'
 
 interface Props {
   script: Script
+  typeLabel: Record<string, string>
+  locale: string
 }
 
-export function ScriptCard({ script }: Props) {
+export function ScriptCard({ script, typeLabel, locale }: Props) {
   const latestVersion = script.latestVersion
     ? (typeof script.latestVersion === 'object' ? script.latestVersion : null)
     : null
-
-  const typeLabel: Record<string, string> = {
-    macro: '宏命令',
-    addon: '插件',
-    tool: '工具',
-    other: '其他',
-  }
 
   return (
     <Link href={`/scripts/${script.slug}`} className="script-card">
@@ -31,7 +26,7 @@ export function ScriptCard({ script }: Props) {
         {script.author && <span className="script-author">{script.author}</span>}
         {script.publishedAt && (
           <span className="script-date">
-            {new Date(script.publishedAt).toLocaleDateString('zh-CN')}
+            {new Date(script.publishedAt).toLocaleDateString(locale)}
           </span>
         )}
       </div>

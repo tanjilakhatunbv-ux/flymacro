@@ -134,14 +134,13 @@ export const ScriptVersions: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: '首次发布时会自动勾选。勾选后该版本会成为脚本的「最新版本」，前台会优先展示。',
-        readOnly: true,
+        disabled: true,
       },
     },
   ],
   hooks: {
     beforeChange: [
       ({ data, originalDoc }) => {
-        // Auto-set publishedAt when publishing for the first time
         if (
           (data as Record<string, unknown>).status === 'published' &&
           !originalDoc?.publishedAt &&
@@ -155,22 +154,41 @@ export const ScriptVersions: CollectionConfig = {
     afterChange: [
       async ({ doc, req, previousDoc, operation }) => {
         const docData = doc as Record<string, unknown>
-        const scriptId = docData.script
+        const rawScript = docData.script
+        const scriptId = typeof rawScript === 'object' && rawScript !== null
+          ? (rawScript as Record<string, unknown>).id as number | string
+          : rawScript as number | string
         const isLatest = docData.isLatest
         const status = docData.status
-        const versionId = docData.id as number
+        const versionId = docData.id as number | string
 
         if (!scriptId || !versionId) {
           try { revalidateTag('script-versions') } catch { /* ignore */ }
           return
         }
 
-        // If this version is being published, handle latestVersion logic
-        if (status === 'published') {
-          let shouldBeLatest = isLatest === true
+        if (req.context?.scriptVersionInternalUpdate) {
+          try { revalidateTag('script-versions') } catch { /* ignore */ }
+          return
+        }
 
-          // On create, if not explicitly marked as latest, check if it's the first published version
-          if (operation === 'create' && !shouldBeLatest) {
+        if (status === 'published') {
+          // Any newly published version should become the latest
+          let shouldPromote = false
+          if (operation === 'create') {
+            // New version created as published — always promote
+            shouldPromote = true
+          } else {
+            // Existing version updated — promote if status just changed to published
+            const prev = previousDoc as Record<string, unknown> | undefined
+            const wasPublished = prev?.status === 'published'
+            if (!wasPublished) {
+              shouldPromote = true
+            }
+          }
+
+          if (shouldPromote) {
+            // Unmark all other latest versions for this script
             try {
               const siblings = await req.payload.find({
                 collection: 'script-versions',
@@ -178,72 +196,65 @@ export const ScriptVersions: CollectionConfig = {
                   and: [
                     { script: { equals: scriptId } },
                     { id: { not_equals: versionId } },
-                    { status: { equals: 'published' } },
+                    { isLatest: { equals: true } },
                   ],
                 },
-                limit: 1,
+                limit: 100,
                 depth: 0,
                 overrideAccess: true,
               })
-              if (siblings.totalDocs === 0) {
-                shouldBeLatest = true
-                // Update self to isLatest = true
+              for (const sib of siblings.docs) {
+                const sibId = ((sib as unknown) as Record<string, unknown>).id as number
+                if (!req.context) req.context = {}
+                req.context.scriptVersionInternalUpdate = true
                 await req.payload.update({
+                  collection: 'script-versions',
+                  id: sibId,
+                  data: { isLatest: false },
+                  overrideAccess: true,
+                  req,
+                })
+                delete req.context.scriptVersionInternalUpdate
+              }
+            } catch (err) {
+              req.payload.logger.error({ err, msg: 'Error unmarking sibling script-versions' })
+            }
+
+            // Mark self as latest if not already
+            if (!isLatest) {
+              try {
+                if (!req.context) req.context = {}
+                req.context.scriptVersionInternalUpdate = true
+                const updated = await req.payload.update({
                   collection: 'script-versions',
                   id: versionId,
                   data: { isLatest: true },
                   overrideAccess: true,
+                  req,
                 })
-              }
-            } catch {
-              /* ignore */
-            }
-          }
-
-          // When this version becomes latest, unmark siblings and update parent script
-          if (shouldBeLatest) {
-            const prev = previousDoc as Record<string, unknown> | undefined
-            const wasAlreadyLatest = operation === 'update' && prev?.isLatest === true
-
-            if (!wasAlreadyLatest) {
-              // Unmark siblings
-              try {
-                const siblings = await req.payload.find({
-                  collection: 'script-versions',
-                  where: {
-                    and: [
-                      { script: { equals: scriptId } },
-                      { id: { not_equals: versionId } },
-                      { isLatest: { equals: true } },
-                    ],
-                  },
-                  limit: 100,
-                  depth: 0,
-                  overrideAccess: true,
-                })
-                for (const sib of siblings.docs) {
-                  await req.payload.update({
-                    collection: 'script-versions',
-                    id: ((sib as unknown) as Record<string, unknown>).id as number,
-                    data: { isLatest: false },
-                    overrideAccess: true,
-                  })
-                }
-              } catch {
-                /* ignore auto-unmark failures */
+                delete req.context.scriptVersionInternalUpdate
+                req.payload.logger.info(`Set isLatest=true for script-version ${versionId}, result isLatest=${updated.isLatest}`)
+              } catch (err) {
+                delete req.context?.scriptVersionInternalUpdate
+                req.payload.logger.error({ err, msg: 'Error setting isLatest on script-version' })
               }
             }
 
-            // Always update parent script's latestVersion to this version
+            // Update parent script's latestVersion
             try {
+              if (!req.context) req.context = {}
+              req.context.scriptVersionInternalUpdate = true
               await req.payload.update({
                 collection: 'scripts',
                 id: scriptId as number,
-                data: { latestVersion: versionId },
+                data: { latestVersion: versionId as number },
                 overrideAccess: true,
+                req,
               })
-            } catch {
-              /* ignore parent update failures */
+              delete req.context.scriptVersionInternalUpdate
+            } catch (err) {
+              delete req.context?.scriptVersionInternalUpdate
+              req.payload.logger.error({ err, msg: 'Error updating parent script latestVersion' })
             }
           }
         }
@@ -252,7 +263,66 @@ export const ScriptVersions: CollectionConfig = {
       },
     ],
     afterDelete: [
-      async () => {
+      async ({ doc, req }) => {
+        const docData = doc as Record<string, unknown>
+        const rawScript = docData.script
+        const scriptId = typeof rawScript === 'object' && rawScript !== null
+          ? (rawScript as Record<string, unknown>).id as number | string
+          : rawScript as number | string
+        const wasLatest = docData.isLatest === true
+
+        if (wasLatest && scriptId) {
+          try {
+            const remaining = await req.payload.find({
+              collection: 'script-versions',
+              where: {
+                and: [
+                  { script: { equals: scriptId } },
+                  { status: { equals: 'published' } },
+                ],
+              },
+              sort: '-publishedAt',
+              limit: 1,
+              depth: 0,
+              overrideAccess: true,
+            })
+
+            if (remaining.docs.length > 0) {
+              const newLatest = remaining.docs[0] as unknown as Record<string, unknown>
+              const newLatestId = newLatest.id as number
+
+              if (!req.context) req.context = {}
+              req.context.scriptVersionInternalUpdate = true
+              await req.payload.update({
+                collection: 'script-versions',
+                id: newLatestId,
+                data: { isLatest: true },
+                overrideAccess: true,
+                req,
+              })
+              delete req.context.scriptVersionInternalUpdate
+
+              await req.payload.update({
+                collection: 'scripts',
+                id: scriptId as number,
+                data: { latestVersion: newLatestId },
+                overrideAccess: true,
+                req,
+              })
+            } else {
+              await req.payload.update({
+                collection: 'scripts',
+                id: scriptId as number,
+                data: { latestVersion: null as unknown as number },
+                overrideAccess: true,
+                req,
+              })
+            }
+          } catch {
+            /* ignore */
+          }
+        }
+
         try { revalidateTag('script-versions') } catch { /* ignore */ }
       },
     ],

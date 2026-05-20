@@ -115,8 +115,8 @@ function formatFileSize(bytes?: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export default async function ScriptDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug: rawSlug } = await params
+export default async function ScriptDetailPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+  const { slug: rawSlug, locale } = await params
   const slug = decodeSlug(rawSlug)
   const t = await getTranslations('scripts')
   const script = await findScriptBySlugCached(slug)
@@ -144,7 +144,7 @@ export default async function ScriptDetailPage({ params }: { params: Promise<{ s
             {script.author && <span className="meta-item">{t('author')}: {script.author}</span>}
             {script.publishedAt && (
               <span className="meta-item">
-                {t('publishedAt')}: {new Date(script.publishedAt).toLocaleDateString('zh-CN')}
+                {t('publishedAt')}: {new Date(script.publishedAt).toLocaleDateString(locale)}
               </span>
             )}
           </div>
@@ -197,7 +197,7 @@ export default async function ScriptDetailPage({ params }: { params: Promise<{ s
                       {v.isLatest && <span className="version-badge">{t('latestBadge')}</span>}
                       {v.publishedAt && (
                         <span className="version-date">
-                          {new Date(v.publishedAt).toLocaleDateString('zh-CN')}
+                          {new Date(v.publishedAt).toLocaleDateString(locale)}
                         </span>
                       )}
                     </div>
