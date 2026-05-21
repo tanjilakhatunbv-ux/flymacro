@@ -9,32 +9,27 @@ function isPopulated<T extends object>(value: MaybeRef<T>): value is T {
   return !!value && typeof value === 'object'
 }
 
-function wowName(tWow: ReturnType<typeof useTranslations>, slug: string, fallback: string | undefined | null): string {
-  try {
-    return tWow(slug)
-  } catch {
-    return fallback || slug
-  }
-}
-
 export function ClassTag({ value }: { value: MaybeRef<Class> }) {
   const tWow = useTranslations('wow')
   const locale = useLocale()
   if (!isPopulated(value)) return null
-  const fb = locale === 'en' ? value.nameEn : value.nameZh
+  const name = locale === 'en'
+    ? (value.nameEn || tWow(value.slug))
+    : (value.nameZh || tWow(value.slug))
   return (
     <span className="tag class" data-class={value.slug}>
-      {wowName(tWow, value.slug, fb)}
+      {name}
     </span>
   )
 }
 
 export function SpecTag({ value }: { value: MaybeRef<Spec> }) {
-  const tWow = useTranslations('wow')
   const locale = useLocale()
   if (!isPopulated(value)) return null
-  const fb = locale === 'en' ? value.nameEn : value.nameZh
-  return <span className="tag spec">{wowName(tWow, value.slug, fb)}</span>
+  const name = locale === 'en'
+    ? (value.nameEn || value.nameZh || value.slug)
+    : (value.nameZh || value.nameEn || value.slug)
+  return <span className="tag spec">{name}</span>
 }
 
 export function VersionTag({ value }: { value: MaybeRef<Version> }) {

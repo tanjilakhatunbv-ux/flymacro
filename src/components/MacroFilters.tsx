@@ -99,7 +99,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
               onClick={() => setParams({ class: c.slug, spec: null })}
               aria-pressed={classSlug === c.slug}
             >
-              {(() => { try { return tWow(c.slug) } catch { return locale === 'en' ? (c.nameEn ?? c.slug) : (c.nameZh ?? c.slug) } })()}
+              {locale === 'en' ? (c.nameEn || tWow(c.slug)) : (c.nameZh || tWow(c.slug))}
             </button>
           ))}
         </div>
@@ -118,7 +118,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
                 onClick={() => setParams({ spec: s.slug })}
                 aria-pressed={specSlug === s.slug}
               >
-                {(() => { try { return tWow(s.slug) } catch { return locale === 'en' ? (s.nameEn ?? s.slug) : (s.nameZh ?? s.slug) } })()}
+                {locale === 'en' ? (s.nameEn || s.nameZh || s.slug) : (s.nameZh || s.nameEn || s.slug)}
               </button>
             ))}
           </div>
