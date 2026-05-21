@@ -281,11 +281,13 @@
     "emailNotActivated": "Email not yet verified. Please check your inbox for the verification email.",
     "accountLocked": "Account has been locked. Please contact support.",
     "emailRegistered": "This email is already registered. Please log in directly.",
-    "verificationBannerTitle": "Verify your email to unlock all features",
+    "verificationBannerTitle": "Please verify your email — required to change password, plus earn <strong>20 credits</strong> as a bonus",
     "verificationBannerCta": "Resend verification email",
     "resendSuccess": "Verification email sent. Please check your inbox.",
     "resendRateLimited": "Too many requests. Please try again later.",
     "alreadyVerified": "Email already verified",
+    "verificationDismissed": "Verification reminder hidden. It will reappear next time you log in.",
+    "passwordChangeLocked": "You need to verify your email before changing your password. Check your inbox for the verification email, or resend it from the banner at the top of the page.",
     "unknownFormType": "Unknown form type"
   },
   "error": {

@@ -11,6 +11,8 @@ type User = {
   _verified?: boolean | null
 }
 
+const DISMISS_KEY = 'verification-banner-dismissed'
+
 export function VerificationBanner() {
   const t = useTranslations('auth')
   const [user, setUser] = useState<User | null>(null)
@@ -18,8 +20,15 @@ export function VerificationBanner() {
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem(DISMISS_KEY)) {
+      setDismissed(true)
+      setLoading(false)
+      return
+    }
+
     const cached = readSessionCache()
     const cacheValid = cached && isCacheValid(cached.ts)
 
@@ -44,7 +53,7 @@ export function VerificationBanner() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading || !user || user._verified) return null
+  if (loading || !user || user._verified || dismissed) return null
 
   async function handleResend() {
     if (sending) return
@@ -74,12 +83,18 @@ export function VerificationBanner() {
     }
   }
 
+  function handleDismiss() {
+    setDismissed(true)
+    sessionStorage.setItem(DISMISS_KEY, '1')
+  }
+
   return (
     <div className="verification-banner" role="alert">
       <div className="verification-banner-inner">
-        <span className="verification-banner-text">
-          {t('verificationBannerTitle')}
-        </span>
+        <span
+          className="verification-banner-text"
+          dangerouslySetInnerHTML={{ __html: t('verificationBannerTitle') }}
+        />
         <button
           type="button"
           className="verification-banner-btn"
@@ -87,6 +102,15 @@ export function VerificationBanner() {
           disabled={sending}
         >
           {sending ? t('processing') : t('verificationBannerCta')}
+        </button>
+        <button
+          type="button"
+          className="verification-banner-dismiss"
+          onClick={handleDismiss}
+          aria-label="Dismiss"
+          title={t('verificationDismissed')}
+        >
+          ×
         </button>
       </div>
       {message && (

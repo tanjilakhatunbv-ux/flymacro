@@ -281,11 +281,13 @@
     "emailNotActivated": "邮箱尚未激活，请先查收验证邮件",
     "accountLocked": "账号已被锁定，请联系客服",
     "emailRegistered": "该邮箱已注册，请直接登录",
-    "verificationBannerTitle": "验证邮箱以解锁全部功能",
+    "verificationBannerTitle": "请验证你的邮箱 — 修改密码时需要验证，验证后还可获得 <strong>20 积分</strong>奖励",
     "verificationBannerCta": "重发验证邮件",
     "resendSuccess": "验证邮件已发送，请查收邮箱",
     "resendRateLimited": "请求过于频繁，请稍后再试",
     "alreadyVerified": "邮箱已验证",
+    "verificationDismissed": "已隐藏验证提醒，下次登录会再次显示",
+    "passwordChangeLocked": "修改密码前需要先验证邮箱。请查看收件箱中的验证邮件，或点击页面顶部的提醒栏重发。",
     "unknownFormType": "未知的表单类型"
   },
   "error" : {
