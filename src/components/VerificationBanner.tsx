@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { readSessionCache, isCacheValid } from '../lib/session-cache'
+import { getApiErrorMessage } from '../lib/api-errors'
 
 type User = {
   id: number
@@ -72,7 +73,7 @@ export function VerificationBanner() {
         setMessage(t('resendRateLimited'))
         setMessageType('error')
       } else {
-        setMessage(data?.error || t('requestFailed'))
+        setMessage(data?.error ? getApiErrorMessage(data, t) : t('requestFailed'))
         setMessageType('error')
       }
     } catch {

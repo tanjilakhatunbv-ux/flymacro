@@ -547,5 +547,33 @@
     "or": "or",
     "googleLogin": "Sign in with Google",
     "githubLogin": "Sign in with GitHub"
+  },
+  "apiErrors": {
+    "unknown": "Something went wrong. Please try again.",
+    "rate_limited": "Too many requests. Please wait a moment.",
+    "captcha_required": "Please complete the CAPTCHA to continue.",
+    "invalid_credentials": "Invalid email or password.",
+    "missing_credentials": "Please enter your email and password.",
+    "invalid_email": "Invalid email format.",
+    "email_exists": "This email is already registered. Please log in.",
+    "password_weak": "Password must contain both letters and numbers.",
+    "password_too_short": "Password must be at least 8 characters.",
+    "password_reuse": "New password must be different from the current one.",
+    "missing_turnstile": "Please complete the CAPTCHA first.",
+    "turnstile_failed": "CAPTCHA verification failed. Please refresh and try again.",
+    "account_suspended": "Your account has been suspended. Please contact support.",
+    "account_banned": "Your account has been banned. Please contact support.",
+    "insufficient_credits": "Insufficient credits.",
+    "already_exchanged": "You have already purchased this macro.",
+    "macro_not_found": "Macro not found.",
+    "exchange_not_found": "Exchange record not found.",
+    "package_not_found": "Credit package not found or no longer available.",
+    "invalid_package": "Invalid credit package.",
+    "payment_not_configured": "Payment is not available at this time.",
+    "checkout_failed": "Failed to create checkout session. Please try again.",
+    "unauthenticated": "Please log in first.",
+    "internal_error": "Internal server error. Please try again later.",
+    "invalid_token": "Token is invalid or has expired.",
+    "email_not_verified": "Please verify your email before proceeding."
   }
 }

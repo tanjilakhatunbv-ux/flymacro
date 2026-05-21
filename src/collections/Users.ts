@@ -17,7 +17,7 @@ export const Users: CollectionConfig = {
     lockTime: 15 * 60 * 1000,
     cookies: {
       sameSite: 'Lax',
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
     },
     verify: {
       generateEmailHTML: ({ token, user }) => {

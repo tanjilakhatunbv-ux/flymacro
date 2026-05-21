@@ -1,13 +1,33 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP, getCount, incr, del } from '../../../../lib/rate-limit'
 import { success, badRequest, unauthorized, forbidden, internalError } from '../../../../lib/api-response'
 import { verifyTurnstile } from '../../../../lib/turnstile'
+import { signJwt } from '../../../../lib/jwt'
 import { setAuthCookie } from '../../../../lib/session'
+import { sql } from '@payloadcms/db-postgres'
 import type { User } from '../../../../payload-types'
 
 const FAIL_THRESHOLD = 2
 const FAIL_TTL = 600 // 10 minutes
+
+async function verifyPassword(password: string, hash: string, salt: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    crypto.pbkdf2(password, salt, 25000, 512, 'sha256', (err, hashBuffer) => {
+      if (err) {
+        resolve(false)
+        return
+      }
+      const storedHashBuffer = Buffer.from(hash, 'hex')
+      if (hashBuffer.length === storedHashBuffer.length && crypto.timingSafeEqual(hashBuffer, storedHashBuffer)) {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
+  })
+}
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -61,45 +81,78 @@ export async function POST(req: Request) {
   const payload = await getPayload()
 
   try {
-    const result = await payload.login({
+    // Look up user first for status checks
+    const userRes = await payload.find({
       collection: 'users',
-      data: { email, password },
+      where: { email: { equals: normalizedEmail } },
+      limit: 1,
       depth: 0,
+      overrideAccess: true,
     })
 
-    if (!result || !result.token) {
-      // Increment failure counters
+    if (userRes.docs.length === 0) {
+      await incr(ipFailKey, FAIL_TTL)
+      await incr(emailFailKey, FAIL_TTL)
+      return unauthorized('invalid_credentials')
+    }
+
+    const user = userRes.docs[0] as User
+
+    // Try payload.login() first — works for verified users
+    let token: string | null = null
+    let passwordCorrect = false
+    try {
+      const result = await payload.login({
+        collection: 'users',
+        data: { email: normalizedEmail, password },
+        depth: 0,
+      })
+      if (result?.token) {
+        token = result.token
+        passwordCorrect = true
+      }
+    } catch {
+      // payload.login() throws for unverified users even with correct password.
+      // Verify password directly using pbkdf2 against the DB-stored hash/salt.
+    }
+
+    if (!passwordCorrect) {
+      // Fetch hash and salt directly from DB (not returned by payload.find)
+      try {
+        const hashResult = await payload.db.drizzle.execute(
+          sql`SELECT hash, salt FROM users WHERE id = ${user.id}`
+        )
+        const rows = hashResult.rows as Array<{ hash: string; salt: string }> | undefined
+        const row = rows?.[0]
+        if (row?.hash && row?.salt) {
+          passwordCorrect = await verifyPassword(password, row.hash, row.salt)
+        }
+      } catch {
+        // DB query failed — treat as wrong password
+      }
+    }
+
+    if (!passwordCorrect) {
       await incr(ipFailKey, FAIL_TTL)
       await incr(emailFailKey, FAIL_TTL)
 
-      // Audit log for failed login
       try {
-        const failUsers = await payload.find({
-          collection: 'users',
-          where: { email: { equals: normalizedEmail } },
-          limit: 1,
-          depth: 0,
+        await payload.create({
+          collection: 'audit-logs',
+          data: {
+            action: 'login_failed',
+            collection: 'users',
+            docId: String(user.id),
+            operator: user.id,
+            ip,
+            reason: '密码错误',
+          },
           overrideAccess: true,
         })
-        if (failUsers.docs.length > 0) {
-          await payload.create({
-            collection: 'audit-logs',
-            data: {
-              action: 'login_failed',
-              collection: 'users',
-              docId: String(failUsers.docs[0].id),
-              operator: failUsers.docs[0].id,
-              ip,
-              reason: '密码错误',
-            },
-            overrideAccess: true,
-          })
-        }
       } catch {
         /* ignore */
       }
 
-      // If this failure just hit the threshold, tell frontend to show captcha next time
       const newIpFails = ipFails + 1
       const newEmailFails = emailFails + 1
       if (newIpFails >= FAIL_THRESHOLD || newEmailFails >= FAIL_THRESHOLD) {
@@ -110,8 +163,6 @@ export async function POST(req: Request) {
       }
       return unauthorized('invalid_credentials')
     }
-
-    const user = result.user as User
 
     // Check account status (suspended/banned users cannot log in)
     if (user.status === 'suspended') {
@@ -157,22 +208,27 @@ export async function POST(req: Request) {
       /* ignore */
     }
 
+    // If payload.login() returned a token (verified user), use it.
+    // Otherwise sign JWT directly to bypass Payload's verify gate.
+    if (!token) {
+      const payloadSecret = (payload as { secret?: string }).secret ?? ''
+      token = signJwt(
+        { id: user.id, email: user.email, collection: 'users' },
+        payloadSecret,
+        { expiresInSeconds: 60 * 60 * 24 * 7 },
+      )
+    }
+
     const response = NextResponse.json(success({
       user,
-      token: result.token,
+      token,
       message: '登录成功',
     }))
 
-    setAuthCookie(response, result.token)
+    setAuthCookie(response, token)
 
     return response
-  } catch (err) {
-    const msg = err instanceof Error ? err.message.toLowerCase() : ''
-    if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('密码') || msg.includes('incorrect')) {
-      await incr(ipFailKey, FAIL_TTL)
-      await incr(emailFailKey, FAIL_TTL)
-      return unauthorized('invalid_credentials')
-    }
+  } catch {
     return internalError('登录失败，请稍后重试')
   }
 }

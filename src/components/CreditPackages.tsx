@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import type { CreditPackage } from '../payload-types'
+import { getApiErrorMessage } from '../lib/api-errors'
 
 export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage[]; loggedIn: boolean }) {
   const t = useTranslations('creditPackages')
@@ -23,9 +24,9 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
           credentials: 'same-origin',
           body: JSON.stringify({ packageId: pkg.id }),
         })
-        const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; message?: string }
+        const data = (await resp.json()) as { success?: boolean; data?: { checkoutUrl?: string }; error?: string; code?: string; message?: string }
         if (!resp.ok || !data.success) {
-          setError(data.error || data.message || t('sessionFailed'))
+          setError(getApiErrorMessage({ success: false, error: data.error || data.message || '', code: data.code || '' }, t))
           setPendingId(null)
           return
         }

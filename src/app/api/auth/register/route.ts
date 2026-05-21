@@ -4,6 +4,7 @@ import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { success, badRequest, conflict, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
 import { verifyTurnstile } from '../../../../lib/turnstile'
+import { signJwt } from '../../../../lib/jwt'
 import { setAuthCookie } from '../../../../lib/session'
 
 type RegisterBody = {
@@ -106,19 +107,14 @@ export async function POST(req: Request) {
     return internalError(msg)
   }
 
-  // Auto-login: issue session token so user lands in the app without
-  // re-entering credentials. Verification proceeds asynchronously via email.
-  let token: string | null = null
-  try {
-    const loginResult = await payload.login({
-      collection: 'users',
-      data: { email, password },
-      depth: 0,
-    })
-    token = loginResult?.token ?? null
-  } catch {
-    /* fall through — registration still succeeded, user can log in manually */
-  }
+  // Auto-login: sign JWT directly to bypass Payload's verify gate.
+  // Users can use the full site without email verification.
+  const payloadSecret = (payload as { secret?: string }).secret ?? ''
+  const token = signJwt(
+    { id: user.id, email: user.email, collection: 'users' },
+    payloadSecret,
+    { expiresInSeconds: 60 * 60 * 24 * 7 },
+  )
 
   // Audit log for registration
   try {
@@ -130,7 +126,7 @@ export async function POST(req: Request) {
         docId: String(user.id),
         operator: user.id,
         ip,
-        reason: token ? '注册并自动登录，等待邮箱验证' : '用户注册（待邮箱验证）',
+        reason: '注册并自动登录，等待邮箱验证',
         metadata: { email },
       },
       overrideAccess: true,
@@ -148,12 +144,10 @@ export async function POST(req: Request) {
       _verified: false,
     },
     verificationPending: true,
-    autoLoggedIn: !!token,
+    autoLoggedIn: true,
   }))
 
-  if (token) {
-    setAuthCookie(response, token)
-  }
+  setAuthCookie(response, token)
 
   return response
 }

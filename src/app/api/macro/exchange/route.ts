@@ -44,45 +44,46 @@ export async function POST(req: Request) {
       return badRequest('该宏无法兑换', 'invalid-macro')
     }
 
-    // Check for existing active exchange
-    const existing = await payload.find({
-      collection: 'macro-exchanges',
-      where: {
-        and: [
-          { user: { equals: user.id } },
-          { macro: { equals: macro.id } },
-          {
-            or: [
-              { expiresAt: { exists: false } },
-              { expiresAt: { greater_than_equal: new Date().toISOString() } },
-            ],
-          },
-        ],
-      },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
+    // Wrap duplicate check + credit deduction in a transaction to close the race window
+    let newCredits: number
+    let exchangeAlreadyExists: boolean
 
-    if (existing.docs.length > 0) {
-      return conflict('你已经兑换过此宏，且仍在有效期内', 'already-exchanged')
-    }
-
-    // Atomic credit deduction: check AND deduct in one SQL statement to prevent race conditions.
-    // Returns the new balance if successful, or empty if insufficient credits.
-    const result = await payload.db.drizzle.execute(
-      sql`UPDATE users SET credits = credits - ${price} WHERE id = ${user.id} AND credits >= ${price} RETURNING credits`
+    await payload.db.drizzle.execute(
+      sql`BEGIN`
     )
 
-    const rows = result.rows as Array<{ credits: number }> | undefined
-    if (!rows || rows.length === 0) {
-      return forbidden(
-        `积分不足，需要 ${price} 积分`,
-        'insufficient-credits',
+    try {
+      // Check for existing active exchange within transaction
+      const existingRes = await payload.db.drizzle.execute(
+        sql`SELECT id FROM macro_exchanges WHERE user_id = ${user.id} AND macro_id = ${macro.id} AND (expires_at IS NULL OR expires_at >= NOW()) LIMIT 1`
       )
-    }
+      const existingRows = existingRes.rows as Array<{ id: number }> | undefined
+      exchangeAlreadyExists = !!(existingRows && existingRows.length > 0)
 
-    const newCredits = rows[0].credits
+      if (exchangeAlreadyExists) {
+        await payload.db.drizzle.execute(sql`ROLLBACK`)
+        return conflict('你已经兑换过此宏，且仍在有效期内', 'already-exchanged')
+      }
+
+      // Atomic credit deduction
+      const result = await payload.db.drizzle.execute(
+        sql`UPDATE users SET credits = credits - ${price} WHERE id = ${user.id} AND credits >= ${price} RETURNING credits`
+      )
+      const rows = result.rows as Array<{ credits: number }> | undefined
+      if (!rows || rows.length === 0) {
+        await payload.db.drizzle.execute(sql`ROLLBACK`)
+        return forbidden(
+          `积分不足，需要 ${price} 积分`,
+          'insufficient-credits',
+        )
+      }
+      newCredits = rows[0].credits
+
+      await payload.db.drizzle.execute(sql`COMMIT`)
+    } catch (txErr) {
+      await payload.db.drizzle.execute(sql`ROLLBACK`).catch(() => {})
+      throw txErr
+    }
 
     const now = new Date()
     const durationDays = macro.durationDays ?? 0

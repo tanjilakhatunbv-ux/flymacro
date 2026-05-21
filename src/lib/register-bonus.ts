@@ -1,21 +1,19 @@
 import { getPayload } from './payload'
-import type { User } from '../payload-types'
+import { sql } from '@payloadcms/db-postgres'
 
 /**
  * Grant 20 registration bonus credits to a newly-registered user.
- * Idempotent: if the user already has credits > 0, it does nothing.
+ * Uses atomic SQL to prevent concurrent calls from granting the bonus twice.
  */
-export async function grantRegisterBonus(user: User | { id: number; credits?: number | null }): Promise<void> {
-  if ((user.credits ?? 0) > 0) return
-
+export async function grantRegisterBonus(user: { id: number; credits?: number | null }): Promise<void> {
   const payload = await getPayload()
 
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: { credits: 20 } as never,
-    overrideAccess: true,
-  })
+  // Atomic: only updates if credits is currently 0, preventing double-grant races
+  const result = await payload.db.drizzle.execute(
+    sql`UPDATE users SET credits = 20 WHERE id = ${user.id} AND credits = 0 RETURNING id`
+  )
+  const rows = result.rows as Array<{ id: number }> | undefined
+  if (!rows || rows.length === 0) return
 
   try {
     await payload.create({

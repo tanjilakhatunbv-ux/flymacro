@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, internalError } from '../../../../lib/api-response'
+import { sql } from '@payloadcms/db-postgres'
 import type { Macro, MacroExchange } from '../../../../payload-types'
 
 export async function POST(req: Request) {
@@ -54,14 +55,6 @@ export async function POST(req: Request) {
     }
 
     const price = macro.price ?? 0
-    const currentCredits = user.credits ?? 0
-
-    if (currentCredits < price) {
-      return forbidden(
-        `积分不足，需要 ${price} 积分续费，当前 ${currentCredits} 积分`,
-        'insufficient-credits',
-      )
-    }
 
     const now = new Date()
     const baseTime =
@@ -75,14 +68,18 @@ export async function POST(req: Request) {
         ? new Date(baseTime.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
         : null
 
-    // Deduct credits
-    const newCredits = currentCredits - price
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { credits: newCredits },
-      overrideAccess: true,
-    })
+    // Atomic credit deduction — same pattern as exchange endpoint
+    const result = await payload.db.drizzle.execute(
+      sql`UPDATE users SET credits = credits - ${price} WHERE id = ${user.id} AND credits >= ${price} RETURNING credits`
+    )
+    const rows = result.rows as Array<{ credits: number }> | undefined
+    if (!rows || rows.length === 0) {
+      return forbidden(
+        `积分不足，需要 ${price} 积分续费`,
+        'insufficient-credits',
+      )
+    }
+    const newCredits = rows[0].credits
 
     // Update exchange
     await payload.update({

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useTransition, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
+import { getApiErrorMessage } from '../lib/api-errors'
 
 type ApiResponse<T> = { success: true; data: T } | { success: false; error: string; code: string }
 
@@ -17,6 +19,7 @@ export function useExchange({
   userCredits?: number
   onSuccess?: (data: { credits: number; expiresAt: string | null }) => void
 }) {
+  const t = useTranslations()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -26,7 +29,7 @@ export function useExchange({
     async (payload: { macroSlug?: string; exchangeId?: number | string }) => {
       setError(null)
       if (insufficient) {
-        setError(`积分不足，需要 ${price} 积分`)
+        setError(t('apiErrors.insufficient_credits'))
         return
       }
 
@@ -47,18 +50,18 @@ export function useExchange({
 
           const data = (await resp.json()) as ApiResponse<{ credits?: number; expiresAt?: string | null }>
           if (!resp.ok || !data.success) {
-            setError(data.success === false ? data.error : '操作失败')
+            setError(getApiErrorMessage(data as { success: false; error: string; code: string }, t))
             return
           }
 
           onSuccess?.({ credits: data.data.credits ?? 0, expiresAt: data.data.expiresAt ?? null })
           window.location.reload()
-        } catch (e) {
-          setError(e instanceof Error ? e.message : '请求失败')
+        } catch {
+          setError(t('apiErrors.unknown'))
         }
       })
     },
-    [mode, price, insufficient, onSuccess],
+    [mode, price, insufficient, onSuccess, t],
   )
 
   return { execute, error, isPending, insufficient }

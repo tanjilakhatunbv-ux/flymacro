@@ -68,6 +68,10 @@ export async function POST(req: Request) {
       if (env.DODO_MODE !== 'test_mode') {
         return unauthorized('missing-signature')
       }
+      // Test mode: accept unsigned webhooks only from non-production
+      if (process.env.NODE_ENV === 'production') {
+        return unauthorized('missing-signature')
+      }
     } else {
       const isValid = verifySignature(payloadText, signature, secret)
       if (!isValid) {
