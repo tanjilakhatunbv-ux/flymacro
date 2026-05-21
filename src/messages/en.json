@@ -330,7 +330,8 @@
     "supportAutoRenew": "Supports auto-renewal",
     "loginToExchange": "Log in to Redeem",
     "buyCredits": "Buy Credits",
-    "renewManage": "Manage Renewal"
+    "renewManage": "Manage Renewal",
+    "exchangePrice": "Redeem ({price} credits)"
   },
   "macroFilters": {
     "searchPlaceholder": "Search macro name or description...",

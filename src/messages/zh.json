@@ -330,7 +330,8 @@
     "supportAutoRenew": "支持自动续费",
     "loginToExchange": "登录后兑换",
     "buyCredits": "充值积分",
-    "renewManage": "续费管理"
+    "renewManage": "续费管理",
+    "exchangePrice": "兑换 {price} 积分"
   },
   "macroFilters" : {
     "searchPlaceholder": "搜索宏名称或简介...",
