@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTransition, useMemo, useState, useEffect } from 'react'
 
-type ClassRef = { id: number | string; slug: string; nameZh: string }
-type SpecRef = { id: number | string; slug: string; nameZh: string; classId?: number | string }
+type ClassRef = { id: number | string; slug: string; nameZh?: string; nameEn?: string }
+type SpecRef = { id: number | string; slug: string; nameZh?: string; nameEn?: string; classId?: number | string }
 type VersionRef = { id: number | string; label: string }
 
 type MacroFiltersProps = {
@@ -19,6 +19,7 @@ type MacroFiltersProps = {
 export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersProps) {
   const t = useTranslations('macroFilters')
   const tWow = useTranslations('wow')
+  const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -98,7 +99,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
               onClick={() => setParams({ class: c.slug, spec: null })}
               aria-pressed={classSlug === c.slug}
             >
-              {tWow(c.slug)}
+              {(() => { try { return tWow(c.slug) } catch { return locale === 'en' ? (c.nameEn ?? c.slug) : (c.nameZh ?? c.slug) } })()}
             </button>
           ))}
         </div>
@@ -117,7 +118,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
                 onClick={() => setParams({ spec: s.slug })}
                 aria-pressed={specSlug === s.slug}
               >
-                {tWow(s.slug)}
+                {(() => { try { return tWow(s.slug) } catch { return locale === 'en' ? (s.nameEn ?? s.slug) : (s.nameZh ?? s.slug) } })()}
               </button>
             ))}
           </div>

@@ -179,11 +179,12 @@ export default async function MacrosListPage({ searchParams }: { searchParams: P
 
       <Suspense fallback={<FilterSkeleton />}>
         <MacroFilters
-          classes={lookups.classes.map((c) => ({ id: c.id, slug: c.slug, nameZh: c.nameZh }))}
+          classes={lookups.classes.map((c) => ({ id: c.id, slug: c.slug, nameZh: c.nameZh, nameEn: c.nameEn }))}
           specs={lookups.specs.map((s) => ({
             id: s.id,
             slug: s.slug,
             nameZh: s.nameZh,
+            nameEn: s.nameEn,
             classId: typeof s.class === 'object' ? s.class?.id : s.class,
           }))}
           versions={lookups.versions.map((v) => ({ id: v.id, label: v.label }))}
