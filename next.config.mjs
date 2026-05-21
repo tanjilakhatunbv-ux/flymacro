@@ -30,7 +30,7 @@ const nextConfig = {
   experimental: {
     reactCompiler: false,
     serverActions: {
-      allowedOrigins: ['flymacro.qzz.io'],
+      allowedOrigins: ['flymacro.qzz.io', 'localhost:3000'],
     },
   },
   async headers() {
@@ -42,6 +42,20 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://media.flymacro.qzz.io https://flymacro.qzz.io",
+              "font-src 'self'",
+              "connect-src 'self' https://media.flymacro.qzz.io https://challenges.cloudflare.com",
+              "frame-src https://challenges.cloudflare.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+            ].join('; '),
+          },
         ],
       },
       {

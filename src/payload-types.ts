@@ -767,7 +767,7 @@ export interface TicketMessage {
   createdAt: string;
 }
 /**
- * 脚本项目管理：一个脚本项目可包含多个历史版本。
+ * 脚本项目管理：先创建脚本项目，再在其下添加版本和上传文件。发布流程：1) 创建脚本项目 2) 上传文件到「脚本文件」3) 创建版本并选择文件 4) 将版本状态设为「已发布」。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "scripts".
@@ -822,7 +822,7 @@ export interface Script {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 脚本版本管理：维护脚本的所有历史版本记录。
+ * 脚本版本管理。流程：1) 选择所属脚本项目 2) 填写版本号（如 v1.0.0）3) 选择已上传的脚本文件 4) 状态设为「已发布」即可自动标记为最新版并同步到脚本项目。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "script-versions".
@@ -834,7 +834,7 @@ export interface ScriptVersion {
    */
   script: number | Script;
   /**
-   * 例如 v1.2.0，建议遵循语义化版本规范
+   * 建议格式：v1.0.0、v1.2.3。第一位是大版本，第二位是功能更新，第三位是修复补丁。
    */
   version: string;
   /**
@@ -879,7 +879,7 @@ export interface ScriptVersion {
   status: 'draft' | 'published' | 'archived';
   publishedAt?: string | null;
   /**
-   * 发布时自动标记，同脚本下仅一个最新版本
+   * 首次发布时会自动勾选。勾选后该版本会成为脚本的「最新版本」，前台会优先展示。
    */
   isLatest?: boolean | null;
   updatedAt: string;
@@ -887,7 +887,7 @@ export interface ScriptVersion {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 脚本文件上传库，支持 .lua / .zip / .txt / .json 等格式。
+ * 脚本文件上传库。步骤：1) 在此处上传文件 2) 去「脚本版本」创建新版本并选择此文件。支持 .lua / .zip / .txt / .json 等格式。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "script-files".

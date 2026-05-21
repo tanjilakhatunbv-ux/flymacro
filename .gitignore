@@ -44,3 +44,4 @@ media/
 
 .vercel
 src/payload-generated-schema.ts
+.gstack/

@@ -18,15 +18,29 @@ function generateOrderNumber(): string {
 }
 
 function verifySignature(payload: string, signature: string, secret: string): boolean {
+  const signedHex = crypto.createHmac('sha256', secret).update(payload).digest('hex')
+
+  // Handle v1= prefix format (Stripe-style)
   if (signature.includes('v1=')) {
-    const signed = crypto.createHmac('sha256', secret).update(payload).digest('hex')
-    return signature.includes(signed)
+    const token = signature.replace('v1=', '')
+    return timingSafeEqual(token, signedHex)
   }
-  const signed = crypto.createHmac('sha256', secret).update(payload).digest('hex')
-  if (signed === signature) return true
+
+  // Try hex comparison
+  if (timingSafeEqual(signature, signedHex)) return true
+
+  // Try base64 comparison
   const signedB64 = crypto.createHmac('sha256', secret).update(payload).digest('base64')
-  if (signedB64 === signature) return true
+  if (timingSafeEqual(signature, signedB64)) return true
+
   return false
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a)
+  const bufB = Buffer.from(b)
+  if (bufA.length !== bufB.length) return false
+  return crypto.timingSafeEqual(bufA, bufB)
 }
 
 export async function POST(req: Request) {

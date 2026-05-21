@@ -3,6 +3,7 @@ import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, conflict, internalError } from '../../../../lib/api-response'
 import type { Macro } from '../../../../payload-types'
+import { sql } from '@payloadcms/db-postgres'
 
 export async function POST(req: Request) {
   try {
@@ -38,13 +39,9 @@ export async function POST(req: Request) {
     }
 
     const price = macro.price ?? 0
-    const currentCredits = user.credits ?? 0
 
-    if (currentCredits < price) {
-      return forbidden(
-        `积分不足，需要 ${price} 积分，当前 ${currentCredits} 积分`,
-        'insufficient-credits',
-      )
+    if (price === 0) {
+      return badRequest('该宏无法兑换', 'invalid-macro')
     }
 
     // Check for existing active exchange
@@ -71,20 +68,27 @@ export async function POST(req: Request) {
       return conflict('你已经兑换过此宏，且仍在有效期内', 'already-exchanged')
     }
 
+    // Atomic credit deduction: check AND deduct in one SQL statement to prevent race conditions.
+    // Returns the new balance if successful, or empty if insufficient credits.
+    const result = await payload.db.drizzle.execute(
+      sql`UPDATE users SET credits = credits - ${price} WHERE id = ${user.id} AND credits >= ${price} RETURNING credits`
+    )
+
+    const rows = result.rows as Array<{ credits: number }> | undefined
+    if (!rows || rows.length === 0) {
+      return forbidden(
+        `积分不足，需要 ${price} 积分`,
+        'insufficient-credits',
+      )
+    }
+
+    const newCredits = rows[0].credits
+
     const now = new Date()
     const durationDays = macro.durationDays ?? 0
     const expiresAt = durationDays > 0
       ? new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
       : null
-
-    // Deduct credits
-    const newCredits = currentCredits - price
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { credits: newCredits },
-      overrideAccess: true,
-    })
 
     // Create exchange record
     const exchange = await payload.create({
