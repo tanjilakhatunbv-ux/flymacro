@@ -92,10 +92,9 @@ export function VerificationBanner() {
   return (
     <div className="verification-banner" role="alert">
       <div className="verification-banner-inner">
-        <span
-          className="verification-banner-text"
-          dangerouslySetInnerHTML={{ __html: t('verificationBannerTitle') }}
-        />
+        <span className="verification-banner-text">
+          {t('verificationBannerTitle')} <strong>{t('verificationBannerReward')}</strong>
+        </span>
         <button
           type="button"
           className="verification-banner-btn"
