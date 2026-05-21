@@ -72,11 +72,11 @@ export const CreditPackages: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
-      name: 'dodoProductId',
+      name: 'creemProductId',
       type: 'text',
       required: true,
-      label: 'DodoPayments 产品 ID',
-      admin: { description: '在 DodoPayments 后台创建的对应价格产品 ID' },
+      label: 'Creem 产品 ID',
+      admin: { description: '在 Creem.io 后台创建的对应产品 ID' },
     },
     {
       name: 'currency',

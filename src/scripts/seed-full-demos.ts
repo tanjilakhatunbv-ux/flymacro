@@ -908,10 +908,10 @@ const PAGES = [
 // ═══════════════════════════════════════════════════════════
 
 const CREDIT_PACKAGES = [
-  { label: '充值 10 元得 12 积分',      amount: 10,  originalAmount: 12,  creditsGranted: 12,  dodoProductId: 'prod_10cny',  currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
-  { label: '充值 50 元得 60 积分',      amount: 50,  originalAmount: 60,  creditsGranted: 60,  dodoProductId: 'prod_50cny',  currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: '限时特惠', badge: 'hot' },
-  { label: '充值 100 元得 125 积分',    amount: 100, originalAmount: 120, creditsGranted: 125, dodoProductId: 'prod_100cny', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '最超值', badge: 'recommended' },
-  { label: '充值 300 元得 400 积分',    amount: 300, originalAmount: 400, creditsGranted: 400, dodoProductId: 'prod_300cny', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: 'VIP专享', badge: 'recommended' },
+  { label: '充值 10 元得 12 积分',      amount: 10,  originalAmount: 12,  creditsGranted: 12,  creemProductId: 'prod_6Ww3phKb8k0vR7lq3TDVc6', currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
+  { label: '充值 50 元得 60 积分',      amount: 50,  originalAmount: 60,  creditsGranted: 60,  creemProductId: 'prod_78dxlqqlgx9L5cBogqTFkq', currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: '限时特惠', badge: 'hot' },
+  { label: '充值 100 元得 125 积分',    amount: 100, originalAmount: 120, creditsGranted: 125, creemProductId: 'prod_2HMhpCtZLpT0Pt1ZYCSYAr', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '最超值', badge: 'recommended' },
+  { label: '充值 300 元得 400 积分',    amount: 300, originalAmount: 400, creditsGranted: 400, creemProductId: 'prod_7HyLoOKySZUgExRgSmrIN5', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: 'VIP专享', badge: 'recommended' },
 ]
 
 // ═══════════════════════════════════════════════════════════
@@ -1140,11 +1140,11 @@ async function main() {
   for (const cp of CREDIT_PACKAGES) {
     const existing = await payload.find({
       collection: 'credit-packages',
-      where: { dodoProductId: { equals: cp.dodoProductId } },
+      where: { creemProductId: { equals: cp.creemProductId } },
       limit: 1, depth: 0,
     })
     if (existing.docs.length > 0) {
-      console.log(`[seed-full] credit-package "${cp.dodoProductId}" already exists, skipping`)
+      console.log(`[seed-full] credit-package "${cp.creemProductId}" already exists, skipping`)
       continue
     }
     await payload.create({ collection: 'credit-packages', data: cp as any })

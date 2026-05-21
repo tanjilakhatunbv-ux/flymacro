@@ -29,10 +29,10 @@ const envSchema = z.object({
   PAYLOAD_SECRET: z.string().min(1),
   NEXT_PUBLIC_SERVER_URL: z.string().url(),
 
-  // Payment
-  DODO_API_KEY: z.string().min(1),
-  DODO_WEBHOOK_SECRET: optionalString(),
-  DODO_MODE: z.enum(['test_mode', 'live']).default('test_mode'),
+  // Payment (Creem.io)
+  CREEM_API_KEY: z.string().min(1),
+  CREEM_WEBHOOK_SECRET: optionalString(),
+  CREEM_MODE: z.enum(['test', 'live']).default('test'),
 
   // Email
   RESEND_API_KEY: optionalString(),

@@ -122,7 +122,7 @@ async function main() {
         label: TEST_PACKAGE_LABEL,
         amount: 1,
         creditsGranted: 100,
-        dodoProductId: 'e2e-test-product',
+        creemProductId: 'e2e-test-product',
         currency: 'CNY',
         enabled: true,
         sort: 999,
@@ -187,7 +187,7 @@ async function main() {
       currency: 'CNY',
       creditsGranted: testPackage.creditsGranted,
       status: 'paid',
-      dodoCheckoutId: sessionId,
+      creemCheckoutId: sessionId,
       paidAt: new Date().toISOString(),
     } as any,
     overrideAccess: true,
@@ -233,7 +233,7 @@ async function main() {
   console.log('\n[e2e] --- TEST: duplicate webhook prevention ---')
   const dupOrders = await payload.find({
     collection: 'credit-orders',
-    where: { dodoCheckoutId: { equals: sessionId } },
+    where: { creemCheckoutId: { equals: sessionId } },
     limit: 2,
     depth: 0,
     overrideAccess: true,

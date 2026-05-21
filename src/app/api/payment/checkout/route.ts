@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
-import { dodoFetch, isDodoConfigured, type DodoCheckoutSession } from '../../../../lib/dodo'
+import { creemFetch, isCreemConfigured, type CreemCheckoutSession } from '../../../../lib/creem'
 import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
 import { parseParam, IdParam } from '../../../../lib/validation'
 
 export async function POST(req: Request) {
-  if (!isDodoConfigured()) {
+  if (!isCreemConfigured()) {
     return internalError('支付系统尚未配置', 'payment-not-configured')
   }
 
@@ -46,23 +46,17 @@ export async function POST(req: Request) {
     return notFound('充值档次不存在或已下架', 'package-not-found')
   }
 
-  const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`
-  const cancelUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=cancel`
+  const successUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`
 
   try {
-    const session = await dodoFetch<DodoCheckoutSession>('/checkouts', {
+    const session = await creemFetch<CreemCheckoutSession>('/checkouts', {
       method: 'POST',
       body: {
-        product_cart: [{ product_id: pkg.dodoProductId, quantity: 1 }],
+        product_id: pkg.creemProductId,
+        success_url: successUrl,
         customer: {
           email: user.email,
-          name: user.name || user.email.split('@')[0],
         },
-        billing_address: {
-          country: 'CN',
-        },
-        return_url: returnUrl,
-        cancel_url: cancelUrl,
         metadata: {
           userId: String(user.id),
           packageId: String(parsed.data),
@@ -70,7 +64,7 @@ export async function POST(req: Request) {
       },
     })
 
-    return NextResponse.json(success({ checkoutUrl: session.checkout_url, sessionId: session.session_id }))
+    return NextResponse.json(success({ checkoutUrl: session.checkout_url, sessionId: session.id }))
   } catch (err) {
     const msg = err instanceof Error ? err.message : '创建支付会话失败'
     return internalError(msg, 'checkout-failed')

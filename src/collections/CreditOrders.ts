@@ -9,7 +9,7 @@ export const CreditOrders: CollectionConfig = {
     defaultColumns: ['orderNumber', 'user', 'amount', 'creditsGranted', 'status', 'createdAt'],
     group: '商务',
     description: '充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。',
-    listSearchableFields: ['orderNumber', 'dodoCheckoutId'],
+    listSearchableFields: ['orderNumber', 'creemCheckoutId'],
   },
   access: {
     read: isOwnerOrStaff,
@@ -69,12 +69,12 @@ export const CreditOrders: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
-      name: 'dodoCheckoutId',
+      name: 'creemCheckoutId',
       type: 'text',
       index: true,
       unique: true,
-      label: 'DodoPayments 会话 ID',
-      admin: { readOnly: true, description: 'DodoPayments checkout session ID' },
+      label: 'Creem 会话 ID',
+      admin: { readOnly: true, description: 'Creem checkout session ID' },
     },
     {
       name: 'paidAt',

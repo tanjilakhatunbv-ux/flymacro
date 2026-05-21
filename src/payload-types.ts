@@ -324,9 +324,9 @@ export interface CreditOrder {
   creditsGranted: number;
   status: 'pending' | 'paid' | 'failed';
   /**
-   * DodoPayments checkout session ID
+   * Creem checkout session ID
    */
-  dodoCheckoutId?: string | null;
+  creemCheckoutId?: string | null;
   paidAt?: string | null;
   /**
    * 调试用，请勿手动修改
@@ -714,9 +714,9 @@ export interface CreditPackage {
   discountLabel?: string | null;
   badge?: ('none' | 'hot' | 'recommended' | 'new') | null;
   /**
-   * 在 DodoPayments 后台创建的对应价格产品 ID
+   * 在 Creem.io 后台创建的对应产品 ID
    */
-  dodoProductId: string;
+  creemProductId: string;
   currency: 'CNY' | 'USD';
   enabled?: boolean | null;
   sort?: number | null;
@@ -1404,7 +1404,7 @@ export interface CreditPackagesSelect<T extends boolean = true> {
   creditsGranted?: T;
   discountLabel?: T;
   badge?: T;
-  dodoProductId?: T;
+  creemProductId?: T;
   currency?: T;
   enabled?: T;
   sort?: T;
@@ -1422,7 +1422,7 @@ export interface CreditOrdersSelect<T extends boolean = true> {
   currency?: T;
   creditsGranted?: T;
   status?: T;
-  dodoCheckoutId?: T;
+  creemCheckoutId?: T;
   paidAt?: T;
   meta?: T;
   updatedAt?: T;

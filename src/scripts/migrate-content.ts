@@ -413,7 +413,7 @@ async function main() {
           { value: '自动判断目标血量切换技能' },
           { value: '暗影幻灵一键释放' },
         ],
-        dodoProductId: `PLACEHOLDER_${slug}_0`,
+        creemProductId: `PLACEHOLDER_${slug}_0`,
         sort: 0,
       },
       {
@@ -426,7 +426,7 @@ async function main() {
           { value: '多目标AOE自动切换' },
           { value: '语音提醒关键技能CD' },
         ],
-        dodoProductId: `PLACEHOLDER_${slug}_1`,
+        creemProductId: `PLACEHOLDER_${slug}_1`,
         sort: 1,
       },
       {
@@ -440,7 +440,7 @@ async function main() {
           { value: '1对1语音配置指导' },
           { value: '终身免费更新' },
         ],
-        dodoProductId: `PLACEHOLDER_${slug}_2`,
+        creemProductId: `PLACEHOLDER_${slug}_2`,
         sort: 2,
       },
     ]
