@@ -18,7 +18,10 @@
     "logout": "退出登录",
     "loggingOut": "退出中…",
     "mainNav": "主导航",
-    "switchLang": "切换语言"
+    "switchLang": "切换语言",
+    "notFoundTitle": "页面未找到",
+    "notFoundDesc": "您访问的页面不存在或已被移动。",
+    "backToHome": "返回首页"
   },
   "home": {
     "heroTitle": "为你的冒险而生",

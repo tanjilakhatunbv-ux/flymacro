@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import type { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: '404 — Page Not Found | FlyMacro',
-}
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 export default function NotFound() {
+  const t = useTranslations('nav')
+
   return (
     <div style={{
       display: 'flex',
@@ -35,7 +35,7 @@ export default function NotFound() {
         color: 'var(--gold)',
         marginBottom: '1rem',
       }}>
-        Page Not Found
+        {t('notFoundTitle')}
       </h1>
       <p style={{
         color: 'var(--text-muted)',
@@ -44,14 +44,14 @@ export default function NotFound() {
         marginBottom: '2rem',
         lineHeight: 1.7,
       }}>
-        The page you are looking for does not exist or has been moved.
+        {t('notFoundDesc')}
       </p>
       <Link
         href="/"
         className="btn btn-primary"
         style={{ textDecoration: 'none' }}
       >
-        Back to Home
+        {t('backToHome')}
       </Link>
     </div>
   )

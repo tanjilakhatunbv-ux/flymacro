@@ -18,6 +18,7 @@ type MacroFiltersProps = {
 
 export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersProps) {
   const t = useTranslations('macroFilters')
+  const tWow = useTranslations('wow')
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -97,7 +98,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
               onClick={() => setParams({ class: c.slug, spec: null })}
               aria-pressed={classSlug === c.slug}
             >
-              {c.nameZh}
+              {tWow(c.slug)}
             </button>
           ))}
         </div>
@@ -116,7 +117,7 @@ export function MacroFilters({ classes, specs, versions, tags }: MacroFiltersPro
                 onClick={() => setParams({ spec: s.slug })}
                 aria-pressed={specSlug === s.slug}
               >
-                {s.nameZh}
+                {tWow(s.slug)}
               </button>
             ))}
           </div>

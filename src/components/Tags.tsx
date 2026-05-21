@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import type { Class, Spec, Version } from '../payload-types'
-import { classLabel, specLabel } from '../lib/wow'
 
 type MaybeRef<T> = T | number | null | undefined
 
@@ -11,17 +10,19 @@ function isPopulated<T extends object>(value: MaybeRef<T>): value is T {
 }
 
 export function ClassTag({ value }: { value: MaybeRef<Class> }) {
+  const tWow = useTranslations('wow')
   if (!isPopulated(value)) return null
   return (
     <span className="tag class" data-class={value.slug}>
-      {value.nameZh ?? classLabel(value.slug)}
+      {tWow(value.slug)}
     </span>
   )
 }
 
 export function SpecTag({ value }: { value: MaybeRef<Spec> }) {
+  const tWow = useTranslations('wow')
   if (!isPopulated(value)) return null
-  return <span className="tag spec">{value.nameZh ?? specLabel(value.slug)}</span>
+  return <span className="tag spec">{tWow(value.slug)}</span>
 }
 
 export function VersionTag({ value }: { value: MaybeRef<Version> }) {
