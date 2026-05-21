@@ -61,7 +61,7 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
     window.location.href = '/'
   }
 
-  const display = name || email.split('@')[0]
+  const display = name || (email ? email.split('@')[0] : '?')
   const initial = (display[0] || '?').toUpperCase()
   const isStaff = role === 'admin' || role === 'operator'
 

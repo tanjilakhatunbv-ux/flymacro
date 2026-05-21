@@ -3,6 +3,8 @@ export const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 export interface CachedUser {
   id: string | number
+  email?: string
+  name?: string | null
   credits?: number
   role?: string
   _verified?: boolean

@@ -42,7 +42,7 @@ export function HeaderAuth() {
         setUser(u)
         setUnread(count)
         writeSessionCache(
-          u ? { id: u.id, credits: u.credits, role: u.role, _verified: (u as unknown as { _verified?: boolean })._verified } : null,
+          u ? { id: u.id, email: u.email, name: u.name, credits: u.credits, role: u.role, _verified: (u as unknown as { _verified?: boolean })._verified } : null,
           { unread: count },
         )
       })
