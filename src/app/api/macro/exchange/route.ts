@@ -2,10 +2,24 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, conflict, internalError } from '../../../../lib/api-response'
+import { writeAuditLog } from '../../../../lib/audit'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import type { Macro } from '../../../../payload-types'
 import { sql } from '@payloadcms/db-postgres'
 
 export async function POST(req: Request) {
+  const ip = getClientIP(req)
+  const limit = await rateLimitWithFallback(`exchange:${ip}`, [
+    { max: 10, windowMs: 60_000 },
+    { max: 50, windowMs: 3_600_000 },
+  ])
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { status: 429 },
+    )
+  }
+
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -131,6 +145,16 @@ export async function POST(req: Request) {
         read: false,
       },
       overrideAccess: true,
+    })
+
+    writeAuditLog({
+      action: 'exchange',
+      collection: 'macros',
+      docId: String(macro.id),
+      operator: user.id,
+      ip: getClientIP(req),
+      reason: `兑换「${macro.title}」花费 ${price} 积分`,
+      metadata: { credits: newCredits, exchangeId: exchange.id },
     })
 
     return NextResponse.json(success({

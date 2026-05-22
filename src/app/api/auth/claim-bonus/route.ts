@@ -2,12 +2,25 @@ import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
 import { grantRegisterBonus } from '../../../../lib/register-bonus'
 import { success, badRequest } from '../../../../lib/api-response'
+import { writeAuditLog } from '../../../../lib/audit'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 
 /**
  * Called after email verification to award registration bonus.
  * Requires a valid verification token to prevent unauthorized claims.
  */
 export async function POST(req: Request) {
+  const ip = getClientIP(req)
+  const limit = await rateLimitWithFallback(`claim:${ip}`, [
+    { max: 3, windowMs: 60_000 },
+  ])
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { status: 429 },
+    )
+  }
+
   let body: { token?: string }
   try {
     body = await req.json()
@@ -47,6 +60,15 @@ export async function POST(req: Request) {
 
   // Award registration bonus
   await grantRegisterBonus(user)
+
+  writeAuditLog({
+    action: 'claim_bonus',
+    collection: 'users',
+    docId: String(user.id),
+    operator: user.id,
+    ip: getClientIP(req),
+    reason: '邮箱验证后领取注册奖励',
+  })
 
   return NextResponse.json(success({ ok: true, credits: 20 }))
 }

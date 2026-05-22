@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
+import { success, unauthorized, internalError } from '../../../../lib/api-response'
 
 export async function POST(_req: Request) {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({ error: '请先登录' }, { status: 401 })
+    return unauthorized('unauthenticated')
   }
 
   const payload = await getPayload()
 
   try {
-    const { id } = user
-    // not_equals catches both false and null
     await payload.update({
       collection: 'notifications',
       where: {
-        recipient: { equals: id },
+        recipient: { equals: user.id },
         read: { not_equals: true },
       },
       data: { read: true, readAt: new Date().toISOString() },
@@ -24,9 +23,8 @@ export async function POST(_req: Request) {
       overrideAccess: true,
     })
 
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : '操作失败'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(success({ ok: true }))
+  } catch {
+    return internalError('操作失败')
   }
 }

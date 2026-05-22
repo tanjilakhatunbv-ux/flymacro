@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
 import { env } from '../../../../lib/env'
 import { unauthorized, success, internalError } from '../../../../lib/api-response'
+import { writeAuditLog } from '../../../../lib/audit'
 import { sql } from '@payloadcms/db-postgres'
 import type { Macro, User } from '../../../../payload-types'
 
@@ -99,6 +100,16 @@ export async function GET(req: Request) {
           overrideAccess: true,
         })
 
+        writeAuditLog({
+          action: 'auto_renew',
+          collection: 'macro-exchanges',
+          docId: String(ex.id),
+          operator: userId,
+          ip: 'cron',
+          reason: `自动续费失败：积分不足（需要 ${price}）`,
+          metadata: { macroId: macroDoc.id, macroTitle: macroDoc.title },
+        })
+
         failed++
         continue
       }
@@ -140,6 +151,16 @@ export async function GET(req: Request) {
           read: false,
         },
         overrideAccess: true,
+      })
+
+      writeAuditLog({
+        action: 'auto_renew',
+        collection: 'macro-exchanges',
+        docId: String(ex.id),
+        operator: userId,
+        ip: 'cron',
+        reason: `自动续费「${macroDoc.title}」扣除 ${price} 积分`,
+        metadata: { macroId: macroDoc.id, macroTitle: macroDoc.title, credits: newCredits },
       })
 
       renewed++

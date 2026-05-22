@@ -2,10 +2,24 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, internalError } from '../../../../lib/api-response'
+import { writeAuditLog } from '../../../../lib/audit'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { sql } from '@payloadcms/db-postgres'
 import type { Macro, MacroExchange } from '../../../../payload-types'
 
 export async function POST(req: Request) {
+  const ip = getClientIP(req)
+  const limit = await rateLimitWithFallback(`renew:${ip}`, [
+    { max: 10, windowMs: 60_000 },
+    { max: 50, windowMs: 3_600_000 },
+  ])
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { status: 429 },
+    )
+  }
+
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -104,6 +118,16 @@ export async function POST(req: Request) {
         reason: `续费「${macro.title}」`,
       },
       overrideAccess: true,
+    })
+
+    writeAuditLog({
+      action: 'renew',
+      collection: 'macros',
+      docId: String(macro.id),
+      operator: user.id,
+      ip: getClientIP(req),
+      reason: `续费「${macro.title}」花费 ${price} 积分`,
+      metadata: { credits: newCredits, exchangeId },
     })
 
     return NextResponse.json(success({ credits: newCredits, expiresAt: newExpiresAt }))

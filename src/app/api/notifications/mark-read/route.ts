@@ -1,23 +1,24 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
+import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
 
 export async function POST(req: Request) {
   const user = await getCurrentUser()
   if (!user) {
-    return NextResponse.json({ error: '请先登录' }, { status: 401 })
+    return unauthorized('unauthenticated')
   }
 
   let body: { id?: number | string }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '无效请求' }, { status: 400 })
+    return badRequest('请求体格式错误', 'invalid-body')
   }
 
   const { id } = body
   if (!id) {
-    return NextResponse.json({ error: '缺少通知标识' }, { status: 400 })
+    return badRequest('缺少通知标识', 'missing-id')
   }
 
   const payload = await getPayload()
@@ -38,12 +39,11 @@ export async function POST(req: Request) {
     })
 
     if (!result.docs.length) {
-      return NextResponse.json({ error: '通知不存在或无权操作' }, { status: 404 })
+      return notFound('notification-not-found')
     }
 
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : '操作失败'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(success({ ok: true }))
+  } catch {
+    return internalError('操作失败')
   }
 }

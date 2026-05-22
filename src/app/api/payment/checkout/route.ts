@@ -4,8 +4,21 @@ import { getPayload } from '../../../../lib/payload'
 import { creemFetch, isCreemConfigured, type CreemCheckoutSession } from '../../../../lib/creem'
 import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
 import { parseParam, IdParam } from '../../../../lib/validation'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 
 export async function POST(req: Request) {
+  const ip = getClientIP(req)
+  const limit = await rateLimitWithFallback(`checkout:${ip}`, [
+    { max: 5, windowMs: 60_000 },
+    { max: 20, windowMs: 3_600_000 },
+  ])
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { status: 429 },
+    )
+  }
+
   if (!isCreemConfigured()) {
     return internalError('支付系统尚未配置', 'payment-not-configured')
   }

@@ -2,9 +2,21 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser, isStaffRole } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { unauthorized, badRequest, notFound, forbidden, success } from '../../../../lib/api-response'
+import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import type { Macro } from '../../../../payload-types'
 
 export async function GET(req: Request) {
+  const ip = getClientIP(req)
+  const limit = await rateLimitWithFallback(`code:${ip}`, [
+    { max: 30, windowMs: 60_000 },
+  ])
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { status: 429 },
+    )
+  }
+
   const user = await getCurrentUser()
   if (!user) {
     return unauthorized('unauthenticated')

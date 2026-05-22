@@ -3,6 +3,7 @@ import { getPayload } from '../../../../lib/payload'
 import { env } from '../../../../lib/env'
 import { success, badRequest, unauthorized, internalError } from '../../../../lib/api-response'
 import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
+import { writeAuditLog } from '../../../../lib/audit'
 import { sql } from '@payloadcms/db-postgres'
 import crypto from 'crypto'
 
@@ -134,52 +135,65 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
 
   const creditsGranted = pkg?.creditsGranted ?? Math.floor(amount)
 
-  // Check for duplicate
-  if (checkoutId) {
-    const existing = await payload.find({
-      collection: 'credit-orders',
-      where: { creemCheckoutId: { equals: checkoutId } },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
-    if (existing.docs.length > 0) {
-      throw new DuplicateWebhookError()
-    }
-  }
-
+  // Transaction: duplicate check + order creation + credit update
+  let newCredits: number
   let order: { id: number }
+
+  await payload.db.drizzle.execute(sql`BEGIN`)
+
   try {
-    order = await payload.create({
-      collection: 'credit-orders',
-      data: {
-        orderNumber: generateOrderNumber(),
-        user: userId,
-        amount,
-        currency,
-        creditsGranted,
-        status: 'paid',
-        creemCheckoutId: checkoutId,
-        paidAt: new Date().toISOString(),
-        meta,
-      },
-      overrideAccess: true,
-    })
-  } catch (err) {
-    if (isUniqueConstraintError(err)) {
-      throw new DuplicateWebhookError()
+    // Check for duplicate within transaction
+    if (checkoutId) {
+      const dupRes = await payload.db.drizzle.execute(
+        sql`SELECT id FROM credit_orders WHERE creem_checkout_id = ${checkoutId} LIMIT 1`
+      )
+      const dupRows = dupRes.rows as Array<{ id: number }> | undefined
+      if (dupRows && dupRows.length > 0) {
+        await payload.db.drizzle.execute(sql`ROLLBACK`)
+        throw new DuplicateWebhookError()
+      }
     }
+
+    // Create order via payload (within transaction)
+    try {
+      order = await payload.create({
+        collection: 'credit-orders',
+        data: {
+          orderNumber: generateOrderNumber(),
+          user: userId,
+          amount,
+          currency,
+          creditsGranted,
+          status: 'paid',
+          creemCheckoutId: checkoutId,
+          paidAt: new Date().toISOString(),
+          meta,
+        },
+        overrideAccess: true,
+      })
+    } catch (err) {
+      if (isUniqueConstraintError(err)) {
+        await payload.db.drizzle.execute(sql`ROLLBACK`)
+        throw new DuplicateWebhookError()
+      }
+      throw err
+    }
+
+    // Atomic credit update within same transaction
+    const creditResult = await payload.db.drizzle.execute(
+      sql`UPDATE users SET credits = credits + ${creditsGranted} WHERE id = ${userId} RETURNING credits`
+    )
+    const creditRows = creditResult.rows as Array<{ credits: number }> | undefined
+    newCredits = creditRows?.[0]?.credits ?? creditsGranted
+
+    await payload.db.drizzle.execute(sql`COMMIT`)
+  } catch (err) {
+    await payload.db.drizzle.execute(sql`ROLLBACK`).catch(() => {})
+    if (err instanceof DuplicateWebhookError) throw err
     throw err
   }
 
-  // Atomic credit update — avoids TOCTOU race under concurrent webhooks
-  const creditResult = await payload.db.drizzle.execute(
-    sql`UPDATE users SET credits = credits + ${creditsGranted} WHERE id = ${userId} RETURNING credits`
-  )
-  const creditRows = creditResult.rows as Array<{ credits: number }> | undefined
-  const newCredits = creditRows?.[0]?.credits ?? creditsGranted
-
-  // Create credit transaction
+  // Non-critical side effects (outside transaction)
   await payload.create({
     collection: 'credit-transactions',
     data: {
@@ -193,7 +207,6 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
     overrideAccess: true,
   })
 
-  // Create notification
   await payload.create({
     collection: 'notifications',
     data: {
@@ -205,6 +218,16 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
       read: false,
     },
     overrideAccess: true,
+  })
+
+  writeAuditLog({
+    action: 'payment_received',
+    collection: 'credit-orders',
+    docId: String(order.id),
+    operator: userId,
+    ip: 'webhook',
+    reason: `充值 ¥${amount.toFixed(2)} 获得 ${creditsGranted} 积分`,
+    metadata: { checkoutId, creditsGranted, currency },
   })
 
   return { orderId: order.id }
