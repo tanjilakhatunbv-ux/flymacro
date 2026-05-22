@@ -10,7 +10,7 @@
     "lint": "next lint",
     "generate:types": "node --env-file=.env node_modules/payload/bin.js generate:types",
     "generate:importmap": "node --env-file=.env node_modules/payload/bin.js generate:importmap",
-    "test:regression": "tsx scripts/test-auth-form-security.ts && tsx scripts/test-auth-form-error-codes.ts && tsx scripts/test-auth-form-client-submit.ts && tsx scripts/test-next-config-sanity.ts && tsx scripts/test-csp-dev-hydration.ts && tsx scripts/test-macros-lookup-sequential.ts && tsx scripts/test-public-page-payload-query-sequencing.ts && tsx scripts/test-admin-middleware-redirect.ts && tsx scripts/test-header-prefetch-budget.ts",
+    "test:regression": "tsx scripts/test-auth-form-security.ts && tsx scripts/test-auth-form-error-codes.ts && tsx scripts/test-auth-form-client-submit.ts && tsx scripts/test-next-config-sanity.ts && tsx scripts/test-csp-dev-hydration.ts && tsx scripts/test-macros-lookup-sequential.ts && tsx scripts/test-public-page-payload-query-sequencing.ts && tsx scripts/test-macro-card-image-container.ts && tsx scripts/test-admin-middleware-redirect.ts && tsx scripts/test-header-prefetch-budget.ts",
     "canary:prod": "node scripts/canary-prod.mjs",
     "payload": "node --env-file=.env node_modules/payload/bin.js",
     "seed": "tsx --env-file=.env src/scripts/seed.ts",

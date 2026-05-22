@@ -651,6 +651,7 @@ main { min-height: calc(100vh - 200px); }
 }
 
 .card-img {
+  display: block;
   position: relative;
   aspect-ratio: 16/9;
   overflow: hidden;
