@@ -29,7 +29,6 @@ export const ScriptFiles: CollectionConfig = {
       'application/x-zip',
       'application/octet-stream',
     ],
-    disableLocalStorage: true,
   },
   fields: [
     {
