@@ -1,10 +1,12 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import { UserMenu } from './UserMenu'
 import { readSessionCache, writeSessionCache, isCacheValid } from '../lib/session-cache'
+
+const UserMenu = dynamic(() => import('./UserMenu').then((m) => ({ default: m.UserMenu })))
 
 type UserRole = 'admin' | 'operator' | 'user'
 

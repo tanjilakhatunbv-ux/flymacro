@@ -5,7 +5,7 @@ import { CreditPackages } from '../../../../components/CreditPackages'
 import { RichText } from '../../../../components/RichText'
 import type { CreditPackage, SiteSetting } from '../../../../payload-types'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export default async function CreditsPage({ searchParams }: { searchParams: Promise<{ paid?: string }> }) {
   const t = await getTranslations('credits')

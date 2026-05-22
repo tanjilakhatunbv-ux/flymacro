@@ -31,7 +31,17 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     notFound()
   }
 
-  const messages = await getMessages()
+  const allMessages = await getMessages()
+  const publicNamespaces = [
+    'nav', 'account', 'auth', 'apiErrors', 'wow', 'tier',
+    'home', 'macros', 'macroCard', 'macroDetail', 'macroFilters',
+    'macroGrid', 'codeBlock', 'pagination', 'video',
+    'news', 'scripts', 'guide', 'blog', 'about', 'plugins',
+    'credits', 'contact', 'error', 'metadata',
+  ]
+  const messages = Object.fromEntries(
+    publicNamespaces.filter((k) => k in allMessages).map((k) => [k, allMessages[k as keyof typeof allMessages]]),
+  )
 
   return (
     <html lang={locale === 'zh' ? 'zh-CN' : locale}>

@@ -87,6 +87,37 @@ const findMacros = unstable_cache(
   { revalidate: 60, tags: ['macros'] },
 )
 
+const getCachedUserExchangedIds = unstable_cache(
+  async (userId: number): Promise<Set<number | string>> => {
+    const payload = await getPayload()
+    const exRes = await payload.find({
+      collection: 'macro-exchanges',
+      where: {
+        and: [
+          { user: { equals: userId } },
+          {
+            or: [
+              { expiresAt: { exists: false } },
+              { expiresAt: { greater_than_equal: new Date().toISOString() } },
+            ],
+          },
+        ],
+      },
+      limit: 200,
+      depth: 0,
+      overrideAccess: true,
+    })
+    return new Set(
+      exRes.docs.map((e) => {
+        const doc = e as { macro?: number | { id?: number | string } }
+        return typeof doc.macro === 'object' ? doc.macro?.id : doc.macro
+      }).filter((id): id is number | string => id != null),
+    )
+  },
+  ['user-exchanged-ids'],
+  { revalidate: 30, tags: ['macro-exchanges'] },
+)
+
 function buildWhere(
   q: SearchQuery,
   lookups: { classes: Class[]; specs: Spec[]; versions: Version[] },
@@ -144,30 +175,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: P
   let exchangedIds = new Set<number | string>()
   if (user) {
     try {
-      const payload = await getPayload()
-      const exRes = await payload.find({
-        collection: 'macro-exchanges',
-        where: {
-          and: [
-            { user: { equals: user.id } },
-            {
-              or: [
-                { expiresAt: { exists: false } },
-                { expiresAt: { greater_than_equal: new Date().toISOString() } },
-              ],
-            },
-          ],
-        },
-        limit: 200,
-        depth: 0,
-        overrideAccess: true,
-      })
-      exchangedIds = new Set(
-        exRes.docs.map((e) => {
-          const doc = e as { macro?: number | { id?: number | string } }
-          return typeof doc.macro === 'object' ? doc.macro?.id : doc.macro
-        }).filter((id): id is number | string => id != null),
-      )
+      exchangedIds = await getCachedUserExchangedIds(Number(user.id))
     } catch {
       // ignore
     }

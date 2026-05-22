@@ -30,28 +30,31 @@ export function VerificationBanner() {
       return
     }
 
-    const cached = readSessionCache()
-    const cacheValid = cached && isCacheValid(cached.ts)
-
-    if (cacheValid) {
-      setLoading(false)
-      if (cached.user && cached.user._verified === false) {
-        setUser({ id: Number(cached.user.id), email: '', _verified: false })
+    function checkCache() {
+      const cached = readSessionCache()
+      if (cached && isCacheValid(cached.ts)) {
+        setLoading(false)
+        if (cached.user && cached.user._verified === false) {
+          setUser({ id: Number(cached.user.id), email: '', _verified: false })
+        }
+        return true
       }
-      return
+      return false
     }
 
-    fetch('/api/auth/me')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.success && data?.data) {
-          setUser(data.data as User)
-        }
-      })
-      .catch(() => {
-        /* ignore */
-      })
-      .finally(() => setLoading(false))
+    if (checkCache()) return
+
+    // Cache miss: wait for HeaderAuth to populate session cache (up to 600ms)
+    let attempts = 0
+    const poll = setInterval(() => {
+      attempts++
+      if (checkCache() || attempts >= 3) {
+        clearInterval(poll)
+        setLoading(false)
+      }
+    }, 200)
+
+    return () => clearInterval(poll)
   }, [])
 
   if (loading || !user || user._verified || dismissed) return null

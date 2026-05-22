@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: `${t('loginTitle')} — FlyMacro` }
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 type SearchParams = Promise<{ return?: string; error?: string; message?: string }>
 
