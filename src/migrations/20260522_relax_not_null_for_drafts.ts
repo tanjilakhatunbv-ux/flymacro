@@ -1,4 +1,4 @@
-import type { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 /**
  * Relax NOT NULL constraints on user-defined required fields so that
@@ -14,38 +14,40 @@ import type { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
  * The working collections (macros, guides, articles, pages) already have
  * nullable columns for their required fields.
  */
-export async function up({ payload }: MigrateUpArgs): Promise<void> {
-  const sql = payload.db.drizzle
+export async function up({ db }: MigrateUpArgs): Promise<void> {
+  await db.execute(sql`
+    ALTER TABLE news
+      ALTER COLUMN title DROP NOT NULL,
+      ALTER COLUMN slug  DROP NOT NULL;
 
-  // --- news ---
-  await sql`ALTER TABLE news ALTER COLUMN title DROP NOT NULL`
-  await sql`ALTER TABLE news ALTER COLUMN slug DROP NOT NULL`
+    ALTER TABLE scripts
+      ALTER COLUMN name   DROP NOT NULL,
+      ALTER COLUMN slug   DROP NOT NULL,
+      ALTER COLUMN type   DROP NOT NULL,
+      ALTER COLUMN status DROP NOT NULL;
 
-  // --- scripts ---
-  await sql`ALTER TABLE scripts ALTER COLUMN name DROP NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN slug DROP NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN type DROP NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN status DROP NOT NULL`
-
-  // --- script_versions ---
-  await sql`ALTER TABLE script_versions ALTER COLUMN version DROP NOT NULL`
-  await sql`ALTER TABLE script_versions ALTER COLUMN script_type DROP NOT NULL`
-  await sql`ALTER TABLE script_versions ALTER COLUMN status DROP NOT NULL`
+    ALTER TABLE script_versions
+      ALTER COLUMN version      DROP NOT NULL,
+      ALTER COLUMN script_type  DROP NOT NULL,
+      ALTER COLUMN status       DROP NOT NULL;
+  `)
 }
 
-export async function down({ payload }: MigrateDownArgs): Promise<void> {
-  const sql = payload.db.drizzle
+export async function down({ db }: MigrateDownArgs): Promise<void> {
+  await db.execute(sql`
+    ALTER TABLE news
+      ALTER COLUMN title SET NOT NULL,
+      ALTER COLUMN slug  SET NOT NULL;
 
-  // Re-add NOT NULL constraints (only safe if no NULL rows exist)
-  await sql`ALTER TABLE news ALTER COLUMN title SET NOT NULL`
-  await sql`ALTER TABLE news ALTER COLUMN slug SET NOT NULL`
+    ALTER TABLE scripts
+      ALTER COLUMN name   SET NOT NULL,
+      ALTER COLUMN slug   SET NOT NULL,
+      ALTER COLUMN type   SET NOT NULL,
+      ALTER COLUMN status SET NOT NULL;
 
-  await sql`ALTER TABLE scripts ALTER COLUMN name SET NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN slug SET NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN type SET NOT NULL`
-  await sql`ALTER TABLE scripts ALTER COLUMN status SET NOT NULL`
-
-  await sql`ALTER TABLE script_versions ALTER COLUMN version SET NOT NULL`
-  await sql`ALTER TABLE script_versions ALTER COLUMN script_type SET NOT NULL`
-  await sql`ALTER TABLE script_versions ALTER COLUMN status SET NOT NULL`
+    ALTER TABLE script_versions
+      ALTER COLUMN version      SET NOT NULL,
+      ALTER COLUMN script_type  SET NOT NULL,
+      ALTER COLUMN status       SET NOT NULL;
+  `)
 }
