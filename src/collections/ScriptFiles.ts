@@ -22,11 +22,14 @@ export const ScriptFiles: CollectionConfig = {
       'text/x-lua',
       'application/x-lua',
       'text/plain',
+      'text/csv',
       'application/json',
       'application/zip',
       'application/x-zip-compressed',
+      'application/x-zip',
       'application/octet-stream',
     ],
+    disableLocalStorage: true,
   },
   fields: [
     {
