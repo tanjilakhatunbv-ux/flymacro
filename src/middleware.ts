@@ -67,7 +67,34 @@ function fixMojibakePathname(pathname: string): string | null {
   return changed ? segments.join('/') : null
 }
 
+function isPublicAdminPath(pathname: string): boolean {
+  return (
+    pathname === '/admin/login' ||
+    pathname.startsWith('/admin/login/') ||
+    pathname === '/admin/forgot' ||
+    pathname.startsWith('/admin/forgot/') ||
+    pathname === '/admin/forgot-password' ||
+    pathname.startsWith('/admin/forgot-password/') ||
+    pathname === '/admin/create-first-user' ||
+    pathname.startsWith('/admin/create-first-user/')
+  )
+}
+
+function redirectUnauthenticatedAdmin(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl
+  if (pathname !== '/admin' && !pathname.startsWith('/admin/')) return null
+  if (isPublicAdminPath(pathname)) return null
+  if (request.cookies.has('payload-token')) return null
+
+  const url = request.nextUrl.clone()
+  url.pathname = '/admin/login'
+  return NextResponse.redirect(url)
+}
+
 export default function middleware(request: NextRequest) {
+  const adminRedirect = redirectUnauthenticatedAdmin(request)
+  if (adminRedirect) return adminRedirect
+
   const fixed = fixMojibakePathname(request.nextUrl.pathname)
   if (fixed && fixed !== request.nextUrl.pathname) {
     const url = request.nextUrl.clone()
@@ -78,5 +105,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|admin|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/admin/:path*', '/((?!api|admin|_next|_vercel|.*\\..*).*)'],
 }

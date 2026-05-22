@@ -20,7 +20,7 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="container-page">
-        <Link href="/" className="site-logo" aria-label="FlyMacro">
+        <Link href="/" prefetch={false} className="site-logo" aria-label="FlyMacro">
           FlyMacro
         </Link>
         <nav className="site-nav" aria-label={t('mainNav')}>
@@ -28,6 +28,7 @@ export function Header() {
             <Link
               key={key}
               href={navHrefs[i]}
+              prefetch={false}
               className={isActive(pathname, navHrefs[i]) ? 'nav-active' : undefined}
               aria-current={isActive(pathname, navHrefs[i]) ? 'page' : undefined}
             >
