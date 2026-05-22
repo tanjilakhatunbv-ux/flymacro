@@ -24,17 +24,15 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
 
   const payload = await getPayload()
 
-  const [pkgResult, settingsResult] = await Promise.all([
-    payload.find({
-      collection: 'credit-packages',
-      where: { enabled: { equals: true } },
-      sort: 'sort',
-      limit: 10,
-      depth: 0,
-      overrideAccess: true,
-    }),
-    payload.findGlobal({ slug: 'site-settings', overrideAccess: true }),
-  ])
+  const pkgResult = await payload.find({
+    collection: 'credit-packages',
+    where: { enabled: { equals: true } },
+    sort: 'sort',
+    limit: 10,
+    depth: 0,
+    overrideAccess: true,
+  })
+  const settingsResult = await payload.findGlobal({ slug: 'site-settings', overrideAccess: true })
 
   const packages = pkgResult.docs as CreditPackage[]
   const creditPage = (settingsResult as SiteSetting | null)?.creditPage ?? {}

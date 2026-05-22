@@ -25,23 +25,21 @@ export const revalidate = 60
 
 async function loadHomeData() {
   const payload = await getPayload()
-  const [featured, classesList, counts] = await Promise.all([
-    payload.find({
-      collection: 'macros',
-      where: {
-        and: [
-          { _status: { equals: 'published' } },
-          { isFeatured: { equals: true } },
-        ],
-      },
-      sort: ['featuredOrder', '-publishedAt'],
-      limit: 6,
-      depth: 1,
-      overrideAccess: true,
-    }),
-    payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
-    getCachedClassMacroCounts(),
-  ])
+  const featured = await payload.find({
+    collection: 'macros',
+    where: {
+      and: [
+        { _status: { equals: 'published' } },
+        { isFeatured: { equals: true } },
+      ],
+    },
+    sort: ['featuredOrder', '-publishedAt'],
+    limit: 6,
+    depth: 1,
+    overrideAccess: true,
+  })
+  const classesList = await payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true })
+  const counts = await getCachedClassMacroCounts(classesList.docs as Class[])
 
   return {
     featured: featured.docs as Macro[],

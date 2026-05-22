@@ -938,6 +938,13 @@ export interface AuditLog {
     | 'login_failed'
     | 'resend_verification'
     | 'bulk_action'
+    | 'logout'
+    | 'exchange'
+    | 'renew'
+    | 'claim_bonus'
+    | 'payment_received'
+    | 'oauth_login'
+    | 'auto_renew'
     | 'other';
   collection: string;
   docId?: string | null;

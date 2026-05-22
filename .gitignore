@@ -45,3 +45,5 @@ media/
 .vercel
 src/payload-generated-schema.ts
 .gstack/
+.claude/
+script-versions-create-fixed.png
