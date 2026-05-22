@@ -1,7 +1,17 @@
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../../lib/payload'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'news' })
+  return {
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+  }
+}
 
 type NewsItem = {
   id: string

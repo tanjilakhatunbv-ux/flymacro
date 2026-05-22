@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getPayload } from '../../../../lib/payload'
 import { getCurrentUser } from '../../../../lib/auth'
@@ -8,6 +9,15 @@ import { MacroFilters, ClearFiltersLink } from '../../../../components/MacroFilt
 import { Pagination } from '../../../../components/Pagination'
 import { FilterSkeleton, MacroGridSkeleton } from '../../../../components/Skeleton'
 import type { Macro, Class, Spec, Version } from '../../../../payload-types'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'macros' })
+  return {
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+  }
+}
 
 export const revalidate = 60
 

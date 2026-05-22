@@ -26,11 +26,10 @@ export function VerifyEmailRunner({ token }: { token: string }) {
           clearSessionCache()
           // Claim registration bonus after successful verification
           try {
-            const email = sessionStorage.getItem('register-email') || undefined
             await fetch('/api/auth/claim-bonus', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token, email }),
+              body: JSON.stringify({ token }),
             })
             sessionStorage.removeItem('register-email')
           } catch {

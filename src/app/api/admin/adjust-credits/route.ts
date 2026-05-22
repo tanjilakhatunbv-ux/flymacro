@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '../../../../lib/admin-guard'
+import { sql } from '@payloadcms/db-postgres'
 import type { User } from '../../../../payload-types'
 
 export async function POST(req: Request) {
@@ -34,17 +35,21 @@ export async function POST(req: Request) {
     }
 
     const currentCredits = (target.credits as number) ?? 0
-    const newCredits = currentCredits + amount
-    if (newCredits < 0) {
+
+    // Atomic credit adjustment — prevents race conditions
+    // For negative adjustments, add a guard so credits don't go below zero
+    const creditResult = amount > 0
+      ? await payload.db.drizzle.execute(
+          sql`UPDATE users SET credits = credits + ${amount} WHERE id = ${userId} RETURNING credits`
+        )
+      : await payload.db.drizzle.execute(
+          sql`UPDATE users SET credits = credits + ${amount} WHERE id = ${userId} AND credits + ${amount} >= 0 RETURNING credits`
+        )
+    const creditRows = creditResult.rows as Array<{ credits: number }> | undefined
+    if (!creditRows || creditRows.length === 0) {
       return NextResponse.json({ error: '积分余额不足' }, { status: 400 })
     }
-
-    await payload.update({
-      collection: 'users',
-      id: userId,
-      data: { credits: newCredits },
-      overrideAccess: true,
-    })
+    const newCredits = creditRows[0].credits
 
     await payload.create({
       collection: 'credit-transactions',

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from '../../../../lib/payload'
 import { env } from '../../../../lib/env'
 import { unauthorized, success, internalError } from '../../../../lib/api-response'
+import { sql } from '@payloadcms/db-postgres'
 import type { Macro, User } from '../../../../payload-types'
 
 interface ExchangeDoc {
@@ -54,33 +55,30 @@ export async function GET(req: Request) {
     let failed = 0
 
     for (const ex of exchanges.docs as ExchangeDoc[]) {
-      const macro = typeof ex.macro === 'number'
-        ? await payload.findByID({ collection: 'macros', id: ex.macro, depth: 0 }).catch(() => null)
-        : ex.macro
-
-      if (!macro) {
+      // depth:1 populates macro and user, only fallback to findByID if needed
+      const macroDoc = (typeof ex.macro === 'object' && ex.macro !== null ? ex.macro : null) as Macro | null
+      if (!macroDoc) {
         failed++
         continue
       }
 
-      const macroDoc = macro as Macro
       const price = macroDoc.price ?? 0
       const durationDays = macroDoc.durationDays ?? 0
-      const userId = typeof ex.user === 'number' ? ex.user : ex.user?.id
+      const userId = typeof ex.user === 'number' ? ex.user : (ex.user as User)?.id
       if (!userId) {
         failed++
         continue
       }
 
-      const user = await payload.findByID({ collection: 'users', id: userId, depth: 0 }).catch(() => null) as User | null
-      if (!user) {
-        failed++
-        continue
-      }
+      // Atomic credit deduction — no need to read user credits first
+      const creditResult = await payload.db.drizzle.execute(
+        sql`UPDATE users SET credits = credits - ${price} WHERE id = ${userId} AND credits >= ${price} RETURNING credits`
+      )
+      const creditRows = creditResult.rows as Array<{ credits: number }> | undefined
 
-      const currentCredits = user.credits ?? 0
-
-      if (currentCredits < price) {
+      if (!creditRows || creditRows.length === 0) {
+        // Insufficient credits — disable auto-renew and notify
+        const userForMsg = typeof ex.user === 'object' && ex.user !== null ? ex.user as User : null
         await payload.update({
           collection: 'macro-exchanges',
           id: ex.id,
@@ -93,7 +91,7 @@ export async function GET(req: Request) {
           data: {
             recipient: userId,
             title: '自动续费失败',
-            body: `「${macroDoc.title}」自动续费失败：积分不足（当前 ${currentCredits}，需要 ${price}）。请充值后手动续费。`,
+            body: `「${macroDoc.title}」自动续费失败：积分不足（需要 ${price}）。请充值后手动续费。`,
             link: `/macros/${macroDoc.slug}`,
             category: 'order',
             read: false,
@@ -105,18 +103,11 @@ export async function GET(req: Request) {
         continue
       }
 
-      const newCredits = currentCredits - price
+      const newCredits = creditRows[0].credits
       const baseTime = ex.expiresAt ? new Date(ex.expiresAt) : now
       const newExpiresAt = durationDays > 0
         ? new Date(baseTime.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
         : null
-
-      await payload.update({
-        collection: 'users',
-        id: userId,
-        data: { credits: newCredits },
-        overrideAccess: true,
-      })
 
       await payload.update({
         collection: 'macro-exchanges',

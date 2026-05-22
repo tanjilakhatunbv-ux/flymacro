@@ -17,10 +17,21 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'metadata' })
+  const baseUrl = 'https://flymacro.qzz.io'
+  const alternateLocale = locale === 'zh' ? 'en' : 'zh'
+
   return {
     title: t('title'),
     description: t('description'),
     icons: { icon: { url: '/favicon.svg', type: 'image/svg+xml' } },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        zh: `${baseUrl}/zh`,
+        en: `${baseUrl}/en`,
+        'x-default': `${baseUrl}/zh`,
+      },
+    },
   }
 }
 

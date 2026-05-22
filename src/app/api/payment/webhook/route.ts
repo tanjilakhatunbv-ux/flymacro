@@ -3,6 +3,7 @@ import { getPayload } from '../../../../lib/payload'
 import { env } from '../../../../lib/env'
 import { success, badRequest, unauthorized, internalError } from '../../../../lib/api-response'
 import { rateLimit, getClientIP } from '../../../../lib/rate-limit'
+import { sql } from '@payloadcms/db-postgres'
 import crypto from 'crypto'
 
 function generateOrderNumber(): string {
@@ -171,22 +172,12 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
     throw err
   }
 
-  // Update user credits
-  const user = await payload.findByID({
-    collection: 'users',
-    id: userId,
-    depth: 0,
-  })
-
-  const currentCredits = (user?.credits as number | undefined) ?? 0
-  const newCredits = currentCredits + creditsGranted
-
-  await payload.update({
-    collection: 'users',
-    id: userId,
-    data: { credits: newCredits },
-    overrideAccess: true,
-  })
+  // Atomic credit update — avoids TOCTOU race under concurrent webhooks
+  const creditResult = await payload.db.drizzle.execute(
+    sql`UPDATE users SET credits = credits + ${creditsGranted} WHERE id = ${userId} RETURNING credits`
+  )
+  const creditRows = creditResult.rows as Array<{ credits: number }> | undefined
+  const newCredits = creditRows?.[0]?.credits ?? creditsGranted
 
   // Create credit transaction
   await payload.create({

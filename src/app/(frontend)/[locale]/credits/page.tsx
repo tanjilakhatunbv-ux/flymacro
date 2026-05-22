@@ -1,9 +1,18 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { CreditPackages } from '../../../../components/CreditPackages'
 import { RichText } from '../../../../components/RichText'
 import type { CreditPackage, SiteSetting } from '../../../../payload-types'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'credits' })
+  return {
+    title: t('metadataTitle'),
+  }
+}
 
 export const revalidate = 300
 

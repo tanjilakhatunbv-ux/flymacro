@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { badRequest, internalError } from '../../../../lib/api-response'
@@ -54,16 +55,15 @@ export async function POST(req: Request) {
 
   const user = users.docs[0] as { id: number; email: string; hash?: string; salt?: string }
 
-  // Check if new password matches the old one
+  // Check if new password matches the old one (using pbkdf2 to match Payload's KDF)
   if (user.hash && user.salt) {
-    const { scrypt } = await import('crypto')
-    const derivedKey = await new Promise<Buffer>((resolve, reject) => {
-      scrypt(password, user.salt as string, 64, (err, key) => {
-        if (err) reject(err)
+    const derivedKey = await new Promise<Buffer>((resolve) => {
+      crypto.pbkdf2(password, user.salt as string, 25000, 512, 'sha256', (err, key) => {
+        if (err) resolve(Buffer.alloc(0))
         else resolve(key)
       })
     })
-    if (derivedKey.toString('hex') === user.hash) {
+    if (derivedKey.length > 0 && derivedKey.toString('hex') === user.hash) {
       return badRequest('新密码不能与当前密码相同', 'password_reuse')
     }
   }

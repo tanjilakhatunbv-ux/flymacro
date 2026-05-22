@@ -1,7 +1,17 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../../lib/payload'
 import type { Article } from '../../../../payload-types'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'blog' })
+  return {
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+  }
+}
 
 export const revalidate = 300
 

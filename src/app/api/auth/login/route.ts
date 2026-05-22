@@ -219,8 +219,11 @@ export async function POST(req: Request) {
       )
     }
 
+    // Strip sensitive fields from response
+    const { hash, salt, resetPasswordToken, resetPasswordExpiration, ...safeUser } = user as User & Record<string, unknown>
+
     const response = NextResponse.json(success({
-      user,
+      user: safeUser,
       token,
       message: '登录成功',
     }))

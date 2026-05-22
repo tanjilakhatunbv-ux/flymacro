@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../lib/payload'
@@ -6,6 +7,15 @@ import { getCachedClassMacroCounts } from '../../../lib/class-counts'
 import { MacroCard } from '../../../components/MacroCard'
 import { classSlugs } from '../../../lib/wow'
 import type { Macro, Class } from '../../../payload-types'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'metadata' })
+  return {
+    title: { absolute: t('title') },
+    description: t('description'),
+  }
+}
 
 export function generateStaticParams() {
   return [{ locale: 'zh' }, { locale: 'en' }]

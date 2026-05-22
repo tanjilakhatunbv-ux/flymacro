@@ -3,6 +3,7 @@ import type { User } from '../payload-types'
 
 const USER_CACHE_TTL = 300 // 5 minutes in seconds
 const USER_CACHE_PREFIX = 'user:'
+const SENSITIVE_KEYS = ['hash', 'salt', 'resetPasswordToken', 'resetPasswordExpiration', 'refreshToken'] as const
 
 function getRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL
@@ -27,7 +28,11 @@ export async function setCachedUser(user: User): Promise<void> {
   const redis = getRedis()
   if (!redis) return
   try {
-    await redis.setex(`${USER_CACHE_PREFIX}${user.id}`, USER_CACHE_TTL, user)
+    const { ...safe } = user as User & Record<string, unknown>
+    for (const key of SENSITIVE_KEYS) {
+      delete safe[key]
+    }
+    await redis.setex(`${USER_CACHE_PREFIX}${user.id}`, USER_CACHE_TTL, safe)
   } catch {
     // ignore cache write failures
   }
