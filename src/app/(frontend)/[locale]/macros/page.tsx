@@ -26,19 +26,17 @@ const PAGE_SIZE = 24
 const getLookupTables = unstable_cache(
   async () => {
     const payload = await getPayload()
-    const [classesRes, specsRes, versionsRes, allMacrosRes] = await Promise.all([
-      payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true }),
-      payload.find({ collection: 'specs', sort: 'sort', limit: 100, depth: 0, overrideAccess: true }),
-      payload.find({ collection: 'versions', sort: '-releasedAt', limit: 50, depth: 0, overrideAccess: true }),
-      payload.find({
-        collection: 'macros',
-        where: { _status: { equals: 'published' } },
-        depth: 0,
-        limit: 1000,
-        select: { tags: true },
-        overrideAccess: true,
-      }),
-    ])
+    const classesRes = await payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true })
+    const specsRes = await payload.find({ collection: 'specs', sort: 'sort', limit: 100, depth: 0, overrideAccess: true })
+    const versionsRes = await payload.find({ collection: 'versions', sort: '-releasedAt', limit: 50, depth: 0, overrideAccess: true })
+    const allMacrosRes = await payload.find({
+      collection: 'macros',
+      where: { _status: { equals: 'published' } },
+      depth: 0,
+      limit: 1000,
+      select: { tags: true },
+      overrideAccess: true,
+    })
 
     const tagSet = new Set<string>()
     for (const m of allMacrosRes.docs as Macro[]) {

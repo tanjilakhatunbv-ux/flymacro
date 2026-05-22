@@ -2,12 +2,12 @@ import { withPayload } from '@payloadcms/next/withPayload'
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin()
+const devScriptSrc = process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : ''
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'),
   images: {
     remotePatterns: [
       {
@@ -47,7 +47,7 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+              `script-src 'self' 'unsafe-inline'${devScriptSrc} https://static.cloudflareinsights.com https://challenges.cloudflare.com`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://media.flymacro.qzz.io https://flymacro.qzz.io",
               "font-src 'self'",

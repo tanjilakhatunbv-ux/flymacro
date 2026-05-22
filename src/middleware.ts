@@ -5,61 +5,70 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-/**
- * Detects GBK-encoded pathname segments and converts them to UTF-8.
- * Lazy-loads iconv-lite only when percent-encoded segments are found.
- * Returns null if no conversion is needed.
- */
-async function fixGbkPathname(pathname: string): Promise<string | null> {
+const WINDOWS_1252_BYTES: Record<string, number> = {
+  '€': 0x80,
+  '‚': 0x82,
+  'ƒ': 0x83,
+  '„': 0x84,
+  '…': 0x85,
+  '†': 0x86,
+  '‡': 0x87,
+  'ˆ': 0x88,
+  '‰': 0x89,
+  'Š': 0x8a,
+  '‹': 0x8b,
+  'Œ': 0x8c,
+  'Ž': 0x8e,
+  '‘': 0x91,
+  '’': 0x92,
+  '“': 0x93,
+  '”': 0x94,
+  '•': 0x95,
+  '–': 0x96,
+  '—': 0x97,
+  '˜': 0x98,
+  '™': 0x99,
+  'š': 0x9a,
+  '›': 0x9b,
+  'œ': 0x9c,
+  'ž': 0x9e,
+  'Ÿ': 0x9f,
+}
+
+function fixMojibakePathname(pathname: string): string | null {
   const segments = pathname.split('/')
   let changed = false
-  let iconv: typeof import('iconv-lite') | null = null
 
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i]
     if (!segment.includes('%')) continue
 
-    // Lazy-load iconv-lite only when needed
-    if (!iconv) {
-      iconv = await import('iconv-lite')
-    }
-
     try {
-      const utf8 = decodeURIComponent(segment)
-      if (/[一-龥　-〿＀-￯]/.test(utf8)) continue
-      if (!utf8.includes('�')) continue
-    } catch {
-      // Not valid UTF-8 — will try GBK below
-    }
+      const decoded = decodeURIComponent(segment)
+      if (!/[À-ÿ€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]/.test(decoded)) continue
 
-    try {
-      const bytes: number[] = []
-      let j = 0
-      while (j < segment.length) {
-        if (segment[j] === '%' && j + 2 < segment.length) {
-          bytes.push(parseInt(segment.slice(j + 1, j + 3), 16))
-          j += 3
-        } else {
-          bytes.push(segment.charCodeAt(j))
-          j++
-        }
-      }
-      const buf = Buffer.from(bytes)
-      const gbk = iconv.decode(buf, 'gbk')
-      if (iconv.encode(gbk, 'gbk').equals(buf)) {
-        segments[i] = encodeURIComponent(gbk)
+      const repaired = Array.from(decoded, (char) => {
+        const byte = WINDOWS_1252_BYTES[char] ?? char.charCodeAt(0)
+        if (byte <= 0x7f) return encodeURIComponent(char)
+        if (byte <= 0xff) return `%${byte.toString(16).toUpperCase().padStart(2, '0')}`
+        return encodeURIComponent(char)
+      }).join('')
+
+      if (repaired !== segment) {
+        decodeURIComponent(repaired)
+        segments[i] = repaired
         changed = true
       }
     } catch {
-      // Ignore decode errors
+      // Ignore invalid escapes and non-UTF-8 repair attempts.
     }
   }
 
   return changed ? segments.join('/') : null
 }
 
-export default async function middleware(request: NextRequest) {
-  const fixed = await fixGbkPathname(request.nextUrl.pathname)
+export default function middleware(request: NextRequest) {
+  const fixed = fixMojibakePathname(request.nextUrl.pathname)
   if (fixed && fixed !== request.nextUrl.pathname) {
     const url = request.nextUrl.clone()
     url.pathname = fixed
@@ -70,5 +79,4 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/((?!api|admin|_next|_vercel|.*\\..*).*)'],
-  runtime: 'nodejs',
 }

@@ -26,12 +26,22 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
   const [turnstileToken, setTurnstileToken] = useState<string>('')
   const [captchaRequired, setCaptchaRequired] = useState(false)
   const [formLoadTime] = useState(() => Date.now())
+  const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    submitForm(e.currentTarget)
+  }
+
+  function submitCurrentForm() {
+    if (!formRef.current) return
+    submitForm(formRef.current)
+  }
+
+  function submitForm(form: HTMLFormElement) {
     setErrors([])
     setSuccess(null)
-    const fd = new FormData(e.currentTarget)
+    const fd = new FormData(form)
     const email = String(fd.get('email') ?? '').trim()
     const password = String(fd.get('password') ?? '')
     const passwordConfirm = String(fd.get('passwordConfirm') ?? '')
@@ -103,7 +113,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
   const needsTurnstile = turnstileSiteKey && (mode === 'register' || (mode === 'login' && captchaRequired))
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
+    <form ref={formRef} onSubmit={handleSubmit} method="post" className="auth-form">
       {(mode === 'login' || mode === 'register' || mode === 'forgot') && (
         <FieldRow label={t('emailField')} name="email" type="email" required errors={errors} />
       )}
@@ -158,7 +168,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
         </div>
       )}
 
-      <button type="submit" className="btn btn-primary auth-submit" disabled={pending}>
+      <button type="button" className="btn btn-primary auth-submit" disabled={pending} onClick={() => submitCurrentForm()}>
         {pending ? t('processing') : submitLabel(mode, t)}
       </button>
 
@@ -296,6 +306,20 @@ type AuthInput = {
 
 type AuthResult = { ok: true; warning?: string } | { ok: false; errors: FieldError[]; captchaRequired?: boolean }
 
+const CODE_TO_AUTH_KEY: Record<string, string> = {
+  invalid_credentials: 'wrongCredentials',
+  missing_credentials: 'missingCredentials',
+  captcha_required: 'captchaRequired',
+  turnstile_failed: 'captchaRequired',
+  rate_limited: 'tooManyRequests',
+  account_suspended: 'accountInactive',
+  account_banned: 'accountInactive',
+  email_exists: 'emailRegistered',
+  password_weak: 'passwordWeak',
+  password_too_short: 'passwordTooShort',
+  email_not_verified: 'emailNotActivated',
+}
+
 async function runAuth(mode: Mode, input: AuthInput, t: (key: string) => string): Promise<AuthResult> {
   if (mode === 'login') {
     return postJson('/api/auth/login', {
@@ -355,7 +379,10 @@ function extractErrors(data: unknown, status: number, t: (key: string) => string
   if (!data || typeof data !== 'object') {
     return [{ message: defaultMessage(status, t) }]
   }
-  const maybe = data as { errors?: unknown; message?: unknown; success?: boolean; error?: string }
+  const maybe = data as { errors?: unknown; message?: unknown; success?: boolean; error?: string; code?: string }
+  if (typeof maybe.code === 'string') {
+    return [{ message: translateCode(maybe.code, status, t) }]
+  }
   if (maybe.success === false && typeof maybe.error === 'string') {
     return [{ message: translateMessage(maybe.error, status, t) }]
   }
@@ -373,6 +400,19 @@ function extractErrors(data: unknown, status: number, t: (key: string) => string
     return [{ message: translateMessage(maybe.message, status, t) }]
   }
   return [{ message: defaultMessage(status, t) }]
+}
+
+function translateCode(code: string, status: number, t: (key: string) => string): string {
+  const key = CODE_TO_AUTH_KEY[code]
+  if (key) {
+    try {
+      const translated = t(key)
+      if (translated && translated !== key) return translated
+    } catch {
+      // Fall back to status-based defaults below.
+    }
+  }
+  return defaultMessage(status, t)
 }
 
 function defaultMessage(status: number, t: (key: string) => string): string {
