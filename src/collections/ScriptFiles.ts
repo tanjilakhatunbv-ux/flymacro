@@ -38,4 +38,20 @@ export const ScriptFiles: CollectionConfig = {
       admin: { description: '简要描述此文件用途' },
     },
   ],
+  hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const refs = await req.payload.find({
+          collection: 'script-versions',
+          where: { scriptFile: { equals: id } },
+          limit: 1,
+          depth: 0,
+          overrideAccess: true,
+        })
+        if (refs.totalDocs > 0) {
+          throw new Error(`无法删除：此文件仍被 ${refs.totalDocs} 个脚本版本引用。请先删除或替换相关版本。`)
+        }
+      },
+    ],
+  },
 }

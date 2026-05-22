@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getPayload } from '../../../../lib/payload'
 import { ScriptCard } from '../../../../components/ScriptCard'
@@ -8,6 +9,15 @@ import { ScriptGridSkeleton } from '../../../../components/Skeleton'
 import type { Script } from '../../../../payload-types'
 
 export const revalidate = 60
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'scripts' })
+  return {
+    title: t('metadataTitle'),
+    description: t('metadataDescription'),
+  }
+}
 
 const PAGE_SIZE = 24
 

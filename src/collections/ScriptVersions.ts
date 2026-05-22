@@ -207,16 +207,20 @@ export const ScriptVersions: CollectionConfig = {
                 const sibId = ((sib as unknown) as Record<string, unknown>).id as number
                 if (!req.context) req.context = {}
                 req.context.scriptVersionInternalUpdate = true
-                await req.payload.update({
-                  collection: 'script-versions',
-                  id: sibId,
-                  data: { isLatest: false },
-                  overrideAccess: true,
-                  req,
-                })
-                delete req.context.scriptVersionInternalUpdate
+                try {
+                  await req.payload.update({
+                    collection: 'script-versions',
+                    id: sibId,
+                    data: { isLatest: false },
+                    overrideAccess: true,
+                    req,
+                  })
+                } finally {
+                  delete req.context.scriptVersionInternalUpdate
+                }
               }
             } catch (err) {
+              delete req.context?.scriptVersionInternalUpdate
               req.payload.logger.error({ err, msg: 'Error unmarking sibling script-versions' })
             }
 
@@ -260,6 +264,7 @@ export const ScriptVersions: CollectionConfig = {
         }
 
         try { revalidateTag('script-versions') } catch { /* ignore */ }
+        try { revalidateTag('scripts') } catch { /* ignore */ }
       },
     ],
     afterDelete: [
@@ -324,6 +329,7 @@ export const ScriptVersions: CollectionConfig = {
         }
 
         try { revalidateTag('script-versions') } catch { /* ignore */ }
+        try { revalidateTag('scripts') } catch { /* ignore */ }
       },
     ],
   },
