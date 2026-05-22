@@ -18,6 +18,7 @@ import * as migration_20260516_add_media_og_sizes from './20260516_add_media_og_
 import * as migration_20260519_add_script_management from './20260519_add_script_management';
 import * as migration_20260520_fix_payload_locked_documents_rels from './20260520_fix_payload_locked_documents_rels';
 import * as migration_20260521_rename_dodo_to_creem from './20260521_rename_dodo_to_creem';
+import * as migration_20260522_relax_not_null_for_drafts from './20260522_relax_not_null_for_drafts';
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20260521_rename_dodo_to_creem.up,
     down: migration_20260521_rename_dodo_to_creem.down,
     name: '20260521_rename_dodo_to_creem'
+  },
+  {
+    up: migration_20260522_relax_not_null_for_drafts.up,
+    down: migration_20260522_relax_not_null_for_drafts.down,
+    name: '20260522_relax_not_null_for_drafts'
   },
 ];
