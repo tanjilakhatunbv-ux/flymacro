@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "FlyMacro — 魔兽世界插件与宏代码服务",
-    "description": "面向魔兽世界玩家的插件下载、宏代码教程与宏配置服务。免费插件、免费基础宏与高级宏配置。"
+    "description": "面向魔兽世界玩家的插件下载、宏代码教程、免费基础宏与宏脚本兑换服务。"
   },
   "nav": {
     "home": "首页",
@@ -26,7 +26,7 @@
   },
   "home": {
     "heroTitle": "魔兽世界插件与宏代码服务",
-    "heroSubtitle": "免费下载插件，在游戏中获得动作技能推荐；学习宏代码教程，使用免费基础宏，也可以用点券兑换高级宏配置。",
+    "heroSubtitle": "免费下载插件，在游戏中获得动作技能推荐；学习宏代码教程，使用免费基础宏，也可以用点券兑换宏脚本。",
     "enterMacros": "进入宏库",
     "pluginDownload": "插件下载",
     "pluginSection": "插件下载",
@@ -49,8 +49,8 @@
       "desc": "网站提供免费基础宏，适合日常游戏和新手入门。"
     },
     "featureLegal": {
-      "title": "高级宏配置",
-      "desc": "使用点券兑换高级宏配置，按职业和专精选择适合自己的方案。"
+      "title": "宏脚本兑换",
+      "desc": "使用点券兑换宏脚本，按职业和专精选择适合自己的方案。"
     }
   },
   "macros": {
@@ -129,18 +129,16 @@
     "metadataTitle": "购买点券 — FlyMacro",
     "pageTitle": "购买点券",
     "subtitleLoggedIn": "当前点券：{credits}",
-    "subtitleGuest": "购买点券后，可用于兑换高级宏配置。",
+    "subtitleGuest": "购买点券后，可用于兑换宏脚本。",
     "currentCredits": "当前点券：",
     "successMessage": "购买成功！点券已添加到账户。请刷新页面查看最新余额。",
     "cancelMessage": "购买已取消。如有问题请联系客服。",
     "noticeTitle": "购买须知",
-    "notice1": "点券购买完成后通常会立即添加到账户。",
-    "notice2": "点券仅用于兑换高级宏配置，不支持提现。",
-    "notice2Bold": "仅用于兑换高级宏配置，不支持提现",
-    "notice3": "兑换后的宏在有效期内可无限次查看代码，过期后需重新兑换或续费。",
-    "notice4": "常规宏兑换后永久有效，高级宏默认有效期 30 天，支持自动续费。",
-    "notice4Bold": "永久有效",
-    "notice5": "如遇支付问题，请通过工单系统联系客服处理。"
+    "notice1": "点券购买完成后通常会立即添加到账户余额。",
+    "notice2": "点券仅用于兑换宏脚本，不支持提现或转让。",
+    "notice3": "点券属于数字内容服务，购买成功后不支持退款，请在购买前确认所需点券包。",
+    "notice4": "兑换后的宏脚本可在个人中心查看，请妥善保管你的账户信息。",
+    "notice5": "如遇支付未到账或订单异常，请通过工单系统联系客服处理。"
   },
   "contact": {
     "metadataTitle": "联系客服 — FlyMacro",
@@ -160,7 +158,7 @@
     "faq1": "购买后点券未到账？请先确认支付已完成，通常 1-5 分钟内自动到账。如超过 10 分钟未到账，请提交工单并附上支付截图。",
     "faq2": "宏代码无法显示？请确认你已兑换该宏且未过期。免费宏无需兑换即可查看。",
     "faq3": "自动续费失败？系统会在到期当天尝试扣除点券，如点券不足会停止自动续费并通知你。购买点券后可手动续费。",
-    "faq4": "点券不支持提现。购买前请阅读购买须知。"
+    "faq4": "点券购买成功后不支持退款。购买前请阅读购买须知。"
   },
   "blog": {
     "metadataTitle": "公告 — FlyMacro",
@@ -177,8 +175,20 @@
   },
   "about": {
     "metadataTitle": "关于 FlyMacro",
-    "metadataDescription": "FlyMacro — 面向魔兽世界玩家的插件下载、宏代码教程与宏配置服务平台。",
-    "pageTitle": "关于 FlyMacro"
+    "metadataDescription": "FlyMacro 提供魔兽世界插件下载、宏代码教程、免费基础宏与点券兑换宏脚本服务。",
+    "pageTitle": "关于 FlyMacro",
+    "intro": "FlyMacro 面向魔兽世界玩家，提供插件下载、宏代码教程、免费基础宏和宏脚本兑换服务。我们希望玩家可以更方便地查看游戏中的动作技能推荐，学习宏代码写法，并按自己的职业和专精选择合适的宏脚本。",
+    "whatWeDoTitle": "我们提供什么",
+    "addonTitle": "免费插件下载",
+    "addonBody": "FlyMacro 插件可在魔兽世界游戏中显示动作技能推荐与循环提示，帮助玩家更清楚地理解当前战斗节奏。插件免费下载，玩家可以根据自己的需要安装使用。",
+    "guidesTitle": "宏代码教程与免费基础宏",
+    "guidesBody": "网站提供宏代码教程，帮助玩家了解常用语法、编写思路和基础使用场景。玩家也可以直接使用网站提供的免费基础宏。",
+    "scriptsTitle": "宏脚本兑换",
+    "scriptsBody": "部分宏脚本按职业、专精和玩法场景整理。玩家可以购买点券，并使用点券兑换需要的宏脚本。",
+    "creditsTitle": "关于点券",
+    "creditsBody": "点券是 FlyMacro 网站内用于兑换宏脚本的数字点数。点券不会用于游戏内交易，也不是游戏币或代充服务。",
+    "supportTitle": "联系我们",
+    "supportBody": "如有账号、点券订单或宏脚本使用问题，请在个人中心提交工单，或发送邮件至"
   },
   "account": {
     "center": "个人中心",
@@ -370,6 +380,7 @@
     "noPaymentLink": "未获得支付链接",
     "requestFailed": "请求失败",
     "empty": "暂无可用点券包。",
+    "packLabel": "{amount} 点券包",
     "creditsAmount": "获得 {amount} 点券",
     "bonusCredits": "赠 {amount} 点券",
     "preparing": "准备支付...",
@@ -377,7 +388,10 @@
     "loginRequired": "登录后购买",
     "hot": "热卖",
     "recommended": "推荐",
-    "newTag": "新品"
+    "newTag": "新品",
+    "limitedOffer": "限时特惠",
+    "bestValue": "最超值",
+    "vipOnly": "VIP专享"
   },
   "exchange" : {
     "renewing": "续费中...",

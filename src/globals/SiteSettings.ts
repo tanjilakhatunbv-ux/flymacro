@@ -32,7 +32,7 @@ export const SiteSettings: GlobalConfig = {
           name: 'subtitle',
           type: 'text',
           label: '副标题',
-          defaultValue: '购买点券后，可用于兑换高级宏配置。',
+          defaultValue: '购买点券后，可用于兑换宏脚本。',
         },
         {
           name: 'promoEnabled',

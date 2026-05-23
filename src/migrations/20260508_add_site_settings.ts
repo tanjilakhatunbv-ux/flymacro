@@ -5,7 +5,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE TABLE IF NOT EXISTS "site_settings" (
       "id" serial PRIMARY KEY NOT NULL,
       "credit_page_title" varchar DEFAULT '购买点券',
-      "credit_page_subtitle" varchar DEFAULT '购买点券后，可用于兑换高级宏配置。',
+      "credit_page_subtitle" varchar DEFAULT '购买点券后，可用于兑换宏脚本。',
       "credit_page_promo_enabled" boolean DEFAULT false,
       "credit_page_promo_banner" varchar,
       "credit_page_notice_enabled" boolean DEFAULT true,

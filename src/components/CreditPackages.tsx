@@ -56,9 +56,10 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
       <div className="models">
         {packages.map((pkg) => {
           const original = pkg.originalAmount
-          const discount = pkg.discountLabel
+          const discount = discountLabel(pkg.discountLabel, t)
           const badge = pkg.badge
           const hasOriginal = original && original > (pkg.amount ?? 0)
+          const packageLabel = t('packLabel', { amount: pkg.creditsGranted })
 
           return (
             <div key={pkg.id} className={`model-card ${badge && badge !== 'none' ? `badge-${badge}` : ''}`}>
@@ -66,7 +67,7 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
                 <span className="package-badge">{badgeLabel(badge, t)}</span>
               )}
               <div className="model-header">
-                <h4>{pkg.label}</h4>
+                <h4>{packageLabel}</h4>
                 <div className="price-row">
                   {hasOriginal && (
                     <span className="original-price">¥{original}</span>
@@ -120,5 +121,15 @@ function badgeLabel(badge: string, t: any): string {
     case 'recommended': return t('recommended')
     case 'new': return t('newTag')
     default: return ''
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function discountLabel(label: string | null | undefined, t: any): string {
+  switch (label) {
+    case '限时特惠': return t('limitedOffer')
+    case '最超值': return t('bestValue')
+    case 'VIP专享': return t('vipOnly')
+    default: return label ?? ''
   }
 }
