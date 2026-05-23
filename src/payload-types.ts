@@ -304,7 +304,7 @@ export interface Media {
   };
 }
 /**
- * 充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。
+ * 点券订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-orders".
@@ -344,7 +344,7 @@ export interface CreditOrder {
   createdAt: string;
 }
 /**
- * 积分流水。仅由系统程序化创建，所有字段只读，用作对账依据。
+ * 点券流水。仅由系统程序化创建，所有字段只读，用作对账依据。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-transactions".
@@ -688,7 +688,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 积分充值档次配置。可设置原价、优惠标签和角标，用于前台营销展示。
+ * 点券包配置。可设置原价、优惠标签和角标，用于前台营销展示。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-packages".
@@ -696,7 +696,7 @@ export interface Page {
 export interface CreditPackage {
   id: number;
   /**
-   * 例如：充值 100 元得 110 积分
+   * 例如：100 点券包
    */
   label: string;
   amount: number;
@@ -705,11 +705,11 @@ export interface CreditPackage {
    */
   originalAmount?: number | null;
   /**
-   * 例如充 100 元送 10 积分，则填 110
+   * 例如购买 100 点券包加赠 10 点券，则填 110
    */
   creditsGranted: number;
   /**
-   * 如：限时8折、首充特惠、VIP专享
+   * 如：限时8折、新用户特惠、VIP专享
    */
   discountLabel?: string | null;
   badge?: ('none' | 'hot' | 'recommended' | 'new') | null;
@@ -1653,7 +1653,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * 全局运营配置：充值页面文案、活动横幅、充值须知等。
+ * 全局运营配置：点券页面文案、活动横幅、购买须知等。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
@@ -1661,7 +1661,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   /**
-   * 控制前台 /credits 页面的标题、副标题、活动横幅与充值须知。
+   * 控制前台 /credits 页面的标题、副标题、活动横幅与购买须知。
    */
   creditPage?: {
     title?: string | null;
@@ -1671,12 +1671,12 @@ export interface SiteSetting {
      */
     promoEnabled?: boolean | null;
     /**
-     * 例如：新用户首充双倍积分、限时全场8折
+     * 例如：新用户点券包加赠、限时全场8折
      */
     promoBanner?: string | null;
     noticeEnabled?: boolean | null;
     /**
-     * 留空则使用系统默认充值须知
+     * 留空则使用系统默认购买须知
      */
     notice?: {
       root: {

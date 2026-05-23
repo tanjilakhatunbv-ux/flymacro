@@ -3,12 +3,12 @@ import { isOwnerOrStaff, isStaff, isSuperAdmin } from '../lib/access'
 
 export const CreditOrders: CollectionConfig = {
   slug: 'credit-orders',
-  labels: { singular: '充值订单', plural: '充值订单' },
+  labels: { singular: '点券订单', plural: '点券订单' },
   admin: {
     useAsTitle: 'orderNumber',
     defaultColumns: ['orderNumber', 'user', 'amount', 'creditsGranted', 'status', 'createdAt'],
     group: '商务',
-    description: '充值订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。',
+    description: '点券订单。仅由支付 webhook 程序化创建，财务字段在后台只读以保护对账完整性。',
     listSearchableFields: ['orderNumber', 'creemCheckoutId'],
   },
   access: {
@@ -51,7 +51,7 @@ export const CreditOrders: CollectionConfig = {
       name: 'creditsGranted',
       type: 'number',
       required: true,
-      label: '获得积分',
+      label: '获得点券',
       admin: { readOnly: true, description: '财务数据不可修改' },
     },
     {

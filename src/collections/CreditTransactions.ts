@@ -5,17 +5,17 @@ const buildLabel = (data: Record<string, unknown> | undefined): string => {
   const type = (data?.type as string) ?? 'unknown'
   const amount = Number(data?.amount ?? 0)
   const sign = amount >= 0 ? '+' : ''
-  return `${type} ${sign}${amount}积分`
+  return `${type} ${sign}${amount}点券`
 }
 
 export const CreditTransactions: CollectionConfig = {
   slug: 'credit-transactions',
-  labels: { singular: '积分流水', plural: '积分流水' },
+  labels: { singular: '点券流水', plural: '点券流水' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'user', 'amount', 'balanceAfter', 'type', 'createdAt'],
     group: '商务',
-    description: '积分流水。仅由系统程序化创建，所有字段只读，用作对账依据。',
+    description: '点券流水。仅由系统程序化创建，所有字段只读，用作对账依据。',
   },
   access: {
     read: isOwnerOrStaff,
@@ -56,7 +56,7 @@ export const CreditTransactions: CollectionConfig = {
       label: '类型',
       options: [
         { label: '注册奖励', value: 'register_bonus' },
-        { label: '充值', value: 'recharge' },
+        { label: '购买', value: 'recharge' },
         { label: '兑换宏', value: 'exchange' },
         { label: '自动续费', value: 'renew' },
         { label: '退款', value: 'refund' },
@@ -68,7 +68,7 @@ export const CreditTransactions: CollectionConfig = {
       name: 'relatedOrder',
       type: 'relationship',
       relationTo: 'credit-orders',
-      label: '关联充值订单',
+      label: '关联点券订单',
       admin: { readOnly: true },
     },
     {

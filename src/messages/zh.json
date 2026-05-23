@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "FlyMacro — 魔兽世界宏命令库",
-    "description": "高质量的魔兽世界宏命令分享与下载，覆盖全部职业专精。免费基础宏 + 付费实战宏。"
+    "title": "FlyMacro — 魔兽世界插件与宏代码服务",
+    "description": "面向魔兽世界玩家的插件下载、宏代码教程与宏配置服务。免费插件、免费基础宏与高级宏配置。"
   },
   "nav": {
     "home": "首页",
@@ -24,8 +24,8 @@
     "backToHome": "返回首页"
   },
   "home": {
-    "heroTitle": "为你的冒险而生",
-    "heroSubtitle": "合法 UI 宏与插件 · 全职业覆盖 · 实战调优",
+    "heroTitle": "魔兽世界插件与宏代码服务",
+    "heroSubtitle": "免费下载插件，在游戏中获得动作技能推荐；学习宏代码教程，使用免费基础宏，也可以用点券兑换高级宏配置。",
     "enterMacros": "进入宏库",
     "pluginDownload": "插件下载",
     "pluginSection": "插件下载",
@@ -36,20 +36,20 @@
     "macroCount": "{count} 个宏包",
     "gettingStarted": "新手入门",
     "featureFree": {
-      "title": "免费下载",
-      "desc": "基础宏完全免费，注册即可获得，从此告别繁杂操作。"
+      "title": "免费插件",
+      "desc": "下载 FlyMacro 插件，在游戏中查看动作技能推荐与循环提示。"
     },
     "featureCoverage": {
-      "title": "全职业覆盖",
-      "desc": "13 个职业 38 个专精，从战士到唤魔师，每个英雄都有专属宏包。"
+      "title": "免费教程",
+      "desc": "学习魔兽世界宏代码写法，从基础语法到常用场景逐步上手。"
     },
     "featureOptimized": {
-      "title": "实战调优",
-      "desc": "200+ 小时副本/竞技场实测，基于优先级判断，响应延迟 <16ms。"
+      "title": "免费基础宏",
+      "desc": "网站提供免费基础宏，适合日常游戏和新手入门。"
     },
     "featureLegal": {
-      "title": "合法合规",
-      "desc": "仅基于暴雪官方 API 开发，不修改客户端，不会触发反作弊系统。"
+      "title": "高级宏配置",
+      "desc": "使用点券兑换高级宏配置，按职业和专精选择适合自己的方案。"
     }
   },
   "macros": {
@@ -63,7 +63,7 @@
   "macroCard": {
     "permanent": "永久",
     "days": "{days}天",
-    "credits": "{price} 积分",
+    "credits": "{price} 点券",
     "exchanged": "已兑换",
     "owned": "已拥有"
   },
@@ -125,17 +125,17 @@
     "backToList": "返回教程列表"
   },
   "credits": {
-    "metadataTitle": "充值积分 — FlyMacro",
-    "pageTitle": "充值积分",
-    "subtitleLoggedIn": "当前积分：{credits}",
-    "subtitleGuest": "登录后即可充值积分，兑换宏使用权。",
-    "currentCredits": "当前积分：",
-    "successMessage": "充值成功！积分已到账。请刷新页面查看最新余额。",
-    "cancelMessage": "充值已取消。如有问题请联系客服。",
-    "noticeTitle": "充值须知",
-    "notice1": "1 元人民币 = 1 积分，充值后立即到账。",
-    "notice2": "积分仅用于兑换宏使用权，不支持提现或退款。",
-    "notice2Bold": "仅用于兑换宏使用权，不支持提现或退款",
+    "metadataTitle": "购买点券 — FlyMacro",
+    "pageTitle": "购买点券",
+    "subtitleLoggedIn": "当前点券：{credits}",
+    "subtitleGuest": "购买点券后，可用于兑换高级宏配置。",
+    "currentCredits": "当前点券：",
+    "successMessage": "购买成功！点券已添加到账户。请刷新页面查看最新余额。",
+    "cancelMessage": "购买已取消。如有问题请联系客服。",
+    "noticeTitle": "购买须知",
+    "notice1": "点券购买完成后通常会立即添加到账户。",
+    "notice2": "点券仅用于兑换高级宏配置，不支持提现。",
+    "notice2Bold": "仅用于兑换高级宏配置，不支持提现",
     "notice3": "兑换后的宏在有效期内可无限次查看代码，过期后需重新兑换或续费。",
     "notice4": "常规宏兑换后永久有效，高级宏默认有效期 30 天，支持自动续费。",
     "notice4Bold": "永久有效",
@@ -147,7 +147,7 @@
     "pageTitle": "联系客服",
     "pageSubtitle": "我们随时为你解答问题",
     "ticketTitle": "推荐：提交工单",
-    "ticketDesc": "对于账号问题、充值异常、宏使用疑问等，提交工单是最快获得正式回复的方式。我们的客服团队通常在 24 小时内回复。",
+    "ticketDesc": "对于账号问题、点券订单、宏使用疑问等，提交工单是最快获得正式回复的方式。我们的客服团队通常在 24 小时内回复。",
     "ticketButton": "提交新工单",
     "imTitle": "即时通讯",
     "telegramDesc": "适合英文/中文交流，响应较快。",
@@ -156,10 +156,10 @@
     "wechatDesc": "扫码添加客服微信。",
     "wechatAlt": "微信客服二维码",
     "faqTitle": "常见问题",
-    "faq1": "充值后积分未到账？请先确认支付已完成，通常 1-5 分钟内自动到账。如超过 10 分钟未到账，请提交工单并附上支付截图。",
+    "faq1": "购买后点券未到账？请先确认支付已完成，通常 1-5 分钟内自动到账。如超过 10 分钟未到账，请提交工单并附上支付截图。",
     "faq2": "宏代码无法显示？请确认你已兑换该宏且未过期。免费宏无需兑换即可查看。",
-    "faq3": "自动续费失败？系统会在到期当天尝试扣款，如积分不足会停止自动续费并通知你。充值积分后可手动续费。",
-    "faq4": "积分不支持退款。充值前请阅读充值须知。"
+    "faq3": "自动续费失败？系统会在到期当天尝试扣除点券，如点券不足会停止自动续费并通知你。购买点券后可手动续费。",
+    "faq4": "点券不支持提现。购买前请阅读购买须知。"
   },
   "blog": {
     "metadataTitle": "公告 — FlyMacro",
@@ -176,18 +176,18 @@
   },
   "about": {
     "metadataTitle": "关于 FlyMacro",
-    "metadataDescription": "FlyMacro — 魔兽世界合法插件下载、宏命令编写工具与高级宏产品购买平台。",
+    "metadataDescription": "FlyMacro — 面向魔兽世界玩家的插件下载、宏代码教程与宏配置服务平台。",
     "pageTitle": "关于 FlyMacro"
   },
   "account": {
     "center": "个人中心",
-    "credits": "充值积分",
+    "credits": "购买点券",
     "exchanges": "我的兑换",
-    "orders": "充值记录",
+    "orders": "点券订单",
     "tickets": "我的工单",
     "notifications": "通知",
     "adminPanel": "运营后台",
-    "creditsDisplay": "{credits} 积分",
+    "creditsDisplay": "{credits} 点券",
     "unreadNotifications": "{count} 条未读通知"
   },
   "tier": {
@@ -288,7 +288,7 @@
     "accountLocked": "账号已被锁定，请联系客服",
     "emailRegistered": "该邮箱已注册，请直接登录",
     "verificationBannerTitle": "请验证你的邮箱 — 修改密码时需要验证，验证后还可获得",
-"verificationBannerReward": "20 积分",
+"verificationBannerReward": "20 点券",
     "verificationBannerCta": "重发验证邮件",
     "resendSuccess": "验证邮件已发送，请查收邮箱",
     "resendRateLimited": "请求过于频繁，请稍后再试",
@@ -332,9 +332,9 @@
     "validDays": "有效期 {days} 天",
     "supportAutoRenew": "支持自动续费",
     "loginToExchange": "登录后兑换",
-    "buyCredits": "充值积分",
+    "buyCredits": "购买点券",
     "renewManage": "续费管理",
-    "exchangePrice": "兑换 {price} 积分"
+    "exchangePrice": "兑换 {price} 点券"
   },
   "macroFilters" : {
     "searchPlaceholder": "搜索宏名称或简介...",
@@ -368,12 +368,12 @@
     "sessionFailed": "创建支付会话失败",
     "noPaymentLink": "未获得支付链接",
     "requestFailed": "请求失败",
-    "empty": "暂无可用充值档次。",
-    "creditsAmount": "到账 {amount} 积分",
-    "bonusCredits": "赠 {amount} 积分",
+    "empty": "暂无可用点券包。",
+    "creditsAmount": "获得 {amount} 点券",
+    "bonusCredits": "赠 {amount} 点券",
     "preparing": "准备支付...",
-    "buyNow": "立即充值",
-    "loginRequired": "登录后充值",
+    "buyNow": "立即购买",
+    "loginRequired": "登录后购买",
     "hot": "热卖",
     "recommended": "推荐",
     "newTag": "新品"
@@ -381,10 +381,10 @@
   "exchange" : {
     "renewing": "续费中...",
     "exchanging": "兑换中...",
-    "insufficientCredits": "积分不足",
-    "renewPrice": "续费 {price} 积分",
-    "exchangePrice": "兑换 {price} 积分",
-    "renewButton": "续费 ({price} 积分)"
+    "insufficientCredits": "点券不足",
+    "renewPrice": "续费 {price} 点券",
+    "exchangePrice": "兑换 {price} 点券",
+    "renewButton": "续费 ({price} 点券)"
   },
   "ticket" : {
     "myTickets": "我的工单",
@@ -433,22 +433,22 @@
   "accountPage" : {
     "title": "个人中心 — FlyMacro",
     "welcome": "欢迎回来，{name}",
-    "subtitle": "在这里管理你的积分、兑换、订单、工单与通知。",
+    "subtitle": "在这里管理你的点券、兑换、订单、工单与通知。",
     "emailUnverified": "你的邮箱尚未验证。请前往邮箱点击注册时收到的验证链接。",
-    "currentCredits": "当前积分",
+    "currentCredits": "当前点券",
     "exchangedMacros": "已兑换宏",
-    "paymentOrders": "充值订单",
+    "paymentOrders": "点券订单",
     "activeTickets": "处理中工单",
     "unreadNotifications": "未读通知",
     "browseMacros": "浏览宏库",
-    "buyCredits": "充值积分",
+    "buyCredits": "购买点券",
     "submitTicket": "提交工单",
     "viewExchanges": "查看已兑换宏",
     "accountInfo": "账号信息",
     "emailField": "邮箱",
     "nicknameField": "昵称",
     "notSet": "（未设置）",
-    "creditsField": "积分",
+    "creditsField": "点券",
     "roleField": "角色",
     "emailStatus": "邮箱状态",
     "verified": "已验证",
@@ -467,7 +467,7 @@
     "expired": "已过期",
     "active": "有效中",
     "permanent": "永久",
-    "costCredits": "花费 {price} 积分",
+    "costCredits": "花费 {price} 点券",
     "remaining": "剩余 {days} 天",
     "permanentValid": "永久有效",
     "autoRenew": "自动续费",
@@ -475,14 +475,14 @@
     "expiresAt": "过期于"
   },
   "orders" : {
-    "title": "充值记录 — FlyMacro",
-    "heading": "充值记录",
-    "subtitle": "查看你的所有充值订单及积分到账情况。",
-    "empty": "你还没有任何充值记录。",
-    "goBuy": "去充值",
+    "title": "点券订单 — FlyMacro",
+    "heading": "点券订单",
+    "subtitle": "查看你的所有点券订单及点券到账情况。",
+    "empty": "你还没有任何点券订单。",
+    "goBuy": "购买点券",
     "orderField": "订单",
     "paymentField": "支付",
-    "creditsField": "积分",
+    "creditsField": "点券",
     "createdAt": "创建于",
     "paidAt": "支付于",
     "statusPending": "待支付",
@@ -490,17 +490,17 @@
     "statusFailed": "失败"
   },
   "transactions" : {
-    "title": "积分明细 — FlyMacro",
-    "heading": "积分明细",
-    "subtitle": "查看每一笔积分变动，包括充值、兑换、续费和注册奖励。",
-    "empty": "暂无积分变动记录。",
+    "title": "点券明细 — FlyMacro",
+    "heading": "点券明细",
+    "subtitle": "查看每一笔点券变动，包括购买、兑换、续费和注册奖励。",
+    "empty": "暂无点券变动记录。",
     "timeField": "时间",
     "typeField": "类型",
     "changeField": "变动",
     "balanceField": "余额",
     "noteField": "备注",
     "typeSignup": "注册奖励",
-    "typeTopup": "充值",
+    "typeTopup": "购买",
     "typeExchange": "兑换",
     "typeRenew": "续费",
     "typeRefund": "退款",
@@ -534,10 +534,10 @@
   },
   "sideNav" : {
     "overview": "总览",
-    "credits": "充值积分",
+    "credits": "购买点券",
     "exchanges": "我的兑换",
-    "orders": "充值记录",
-    "transactions": "积分明细",
+    "orders": "点券订单",
+    "transactions": "点券明细",
     "tickets": "我的工单",
     "notifications": "通知中心",
     "settings": "账号设置",
@@ -571,12 +571,12 @@
     "turnstile_failed": "人机验证失败，请刷新重试",
     "account_suspended": "账号已被停用，请联系客服",
     "account_banned": "账号已被封禁，请联系客服",
-    "insufficient_credits": "积分不足",
+    "insufficient_credits": "点券不足",
     "already_exchanged": "你已经兑换过此宏",
     "macro_not_found": "宏不存在",
     "exchange_not_found": "兑换记录不存在",
-    "package_not_found": "充值档次不存在或已下架",
-    "invalid_package": "无效的充值档次",
+    "package_not_found": "点券包不存在或已下架",
+    "invalid_package": "无效的点券包",
     "payment_not_configured": "支付功能暂未开放",
     "checkout_failed": "创建支付订单失败，请稍后重试",
     "unauthenticated": "请先登录",

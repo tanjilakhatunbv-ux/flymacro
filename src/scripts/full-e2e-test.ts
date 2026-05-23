@@ -209,7 +209,7 @@ async function main() {
       balanceAfter: testPackage.creditsGranted,
       type: 'recharge',
       relatedOrder: (order as any).id,
-      reason: `充值 ¥1.00 获得 ${testPackage.creditsGranted} 积分`,
+      reason: `购买点券包 ¥1.00，获得 ${testPackage.creditsGranted} 点券`,
     } as any,
     overrideAccess: true,
   })
@@ -573,7 +573,7 @@ async function main() {
         data: {
           recipient: testUser.id,
           title: '自动续费失败',
-          body: `积分不足（当前 ${failCredits}，需要 ${cm.price}）`,
+          body: `点券不足（当前 ${failCredits}，需要 ${cm.price}）`,
           link: `/macros/${cm.slug}`,
           category: 'order',
           read: false,

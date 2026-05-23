@@ -53,7 +53,7 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
         {user ? (
           <>
             {pageSubtitle.replace(/\{credits\}/g, String((user.credits as number) ?? 0))}
-            {!pageSubtitle.includes('积分') && !pageSubtitle.includes('credit') && (
+            {!pageSubtitle.includes('积分') && !pageSubtitle.includes('点券') && !pageSubtitle.includes('credit') && (
               <>
                 {' '}{t('currentCredits')}
                 <strong style={{ color: 'var(--gold-bright)' }}>{(user.credits as number) ?? 0}</strong>

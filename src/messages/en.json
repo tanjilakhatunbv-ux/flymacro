@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "FlyMacro — World of Warcraft Macro Library",
-    "description": "High-quality World of Warcraft macro commands for sharing and download, covering all class specializations. Free basic macros + premium raid-tested macros."
+    "title": "FlyMacro — World of Warcraft AddOns & Macro Services",
+    "description": "AddOn downloads, macro coding guides, and macro setup services for World of Warcraft players. Free AddOn, free basic macros, and premium macro setups."
   },
   "nav": {
     "home": "Home",
@@ -24,8 +24,8 @@
     "backToHome": "Back to Home"
   },
   "home": {
-    "heroTitle": "Born for Your Adventure",
-    "heroSubtitle": "Legal UI Macros & Addons · All Classes · Raid-Tested",
+    "heroTitle": "World of Warcraft AddOns & Macro Services",
+    "heroSubtitle": "Download the free AddOn for in-game action suggestions, learn macro coding, use free basic macros, or redeem premium macro setups with Credits.",
     "enterMacros": "Browse Macros",
     "pluginDownload": "Download Plugin",
     "pluginSection": "Plugin Download",
@@ -36,20 +36,20 @@
     "macroCount": "{count} macros",
     "gettingStarted": "Getting Started",
     "featureFree": {
-      "title": "Free to Download",
-      "desc": "Basic macros are completely free — sign up and get them instantly. Say goodbye to clunky manual play."
+      "title": "Free AddOn",
+      "desc": "Download the FlyMacro AddOn to see action suggestions and rotation hints in game."
     },
     "featureCoverage": {
-      "title": "All Classes Covered",
-      "desc": "13 classes, 38 specs — from Warrior to Evoker, every hero has a dedicated macro pack."
+      "title": "Free Guides",
+      "desc": "Learn World of Warcraft macro coding from basic syntax to common play scenarios."
     },
     "featureOptimized": {
-      "title": "Raid-Tested",
-      "desc": "200+ hours of raid & arena testing, priority-based logic, response latency <16ms."
+      "title": "Free Basic Macros",
+      "desc": "Use free basic macros for daily gameplay and beginner-friendly setups."
     },
     "featureLegal": {
-      "title": "Fully Legal",
-      "desc": "Built exclusively on Blizzard's official API. No client modification, no anti-cheat triggers."
+      "title": "Premium Macro Setups",
+      "desc": "Redeem premium macro setups with Credits and choose plans by class and specialization."
     }
   },
   "macros": {
@@ -125,17 +125,17 @@
     "backToList": "Back to Guides"
   },
   "credits": {
-    "metadataTitle": "Buy Credits — FlyMacro",
-    "pageTitle": "Buy Credits",
+    "metadataTitle": "Credits — FlyMacro",
+    "pageTitle": "Credit Packs",
     "subtitleLoggedIn": "Current credits: {credits}",
-    "subtitleGuest": "Log in to purchase credits and redeem macro access.",
+    "subtitleGuest": "Credits can be used to redeem premium macro setups.",
     "currentCredits": "Current credits: ",
-    "successMessage": "Payment successful! Credits have been added. Please refresh the page to see your updated balance.",
-    "cancelMessage": "Payment cancelled. Please contact support if you have any issues.",
+    "successMessage": "Purchase successful! Credits have been added to your account. Please refresh the page to see your updated balance.",
+    "cancelMessage": "Purchase cancelled. Please contact support if you have any issues.",
     "noticeTitle": "Purchase Notice",
-    "notice1": "1 CNY = 1 credit. Credits are added instantly after payment.",
-    "notice2": "Credits can only be used to redeem macro access and cannot be withdrawn or refunded.",
-    "notice2Bold": "only be used to redeem macro access and cannot be withdrawn or refunded",
+    "notice1": "Credits are usually added to your account immediately after purchase.",
+    "notice2": "Credits can only be used to redeem premium macro setups and cannot be withdrawn.",
+    "notice2Bold": "only be used to redeem premium macro setups and cannot be withdrawn",
     "notice3": "Redeemed macros can be viewed unlimited times during their validity period. After expiration, you need to redeem again or renew.",
     "notice4": "Regular macros are permanent after redemption. Premium macros default to a 30-day validity period with auto-renewal support.",
     "notice4Bold": "permanent",
@@ -147,7 +147,7 @@
     "pageTitle": "Contact Support",
     "pageSubtitle": "We're here to help",
     "ticketTitle": "Recommended: Submit a Ticket",
-    "ticketDesc": "For account issues, payment problems, or macro usage questions, submitting a ticket is the fastest way to get a formal response. Our support team typically replies within 24 hours.",
+    "ticketDesc": "For account issues, Credit orders, or macro usage questions, submitting a ticket is the fastest way to get a formal response. Our support team typically replies within 24 hours.",
     "ticketButton": "Submit New Ticket",
     "imTitle": "Instant Messaging",
     "telegramDesc": "Suitable for English/Chinese communication, fast response.",
@@ -156,10 +156,10 @@
     "wechatDesc": "Scan the QR code to add our support on WeChat.",
     "wechatAlt": "WeChat Support QR Code",
     "faqTitle": "FAQ",
-    "faq1": "Credits not arriving after payment? Please confirm the payment is complete. Credits usually arrive within 1-5 minutes. If not received after 10 minutes, please submit a ticket with a payment screenshot.",
+    "faq1": "Credits not arriving after purchase? Please confirm the payment is complete. Credits usually arrive within 1-5 minutes. If not received after 10 minutes, please submit a ticket with a payment screenshot.",
     "faq2": "Macro code not showing? Please confirm you have redeemed the macro and it hasn't expired. Free macros don't require redemption.",
-    "faq3": "Auto-renewal failed? The system will attempt to deduct credits on the expiration date. If insufficient, auto-renewal stops and you'll be notified. You can manually renew after topping up credits.",
-    "faq4": "Credits are non-refundable. Please read the purchase notice before buying."
+    "faq3": "Auto-renewal failed? The system will attempt to deduct Credits on the expiration date. If there are not enough Credits, auto-renewal stops and you'll be notified. You can manually renew after buying Credits.",
+    "faq4": "Credits cannot be withdrawn. Please read the purchase notice before buying."
   },
   "blog": {
     "metadataTitle": "Blog — FlyMacro",
@@ -176,12 +176,12 @@
   },
   "about": {
     "metadataTitle": "About FlyMacro",
-    "metadataDescription": "FlyMacro — Legal World of Warcraft addon downloads, macro command authoring tools, and premium macro products.",
+    "metadataDescription": "FlyMacro — AddOn downloads, macro coding guides, and macro setup services for World of Warcraft players.",
     "pageTitle": "About FlyMacro"
   },
   "account": {
     "center": "Account",
-    "credits": "Buy Credits",
+    "credits": "Credits",
     "exchanges": "My Exchanges",
     "orders": "Order History",
     "tickets": "My Tickets",
@@ -332,7 +332,7 @@
     "validDays": "Valid for {days} days",
     "supportAutoRenew": "Supports auto-renewal",
     "loginToExchange": "Log in to Redeem",
-    "buyCredits": "Buy Credits",
+    "buyCredits": "Credits",
     "renewManage": "Manage Renewal",
     "exchangePrice": "Redeem ({price} credits)"
   },
@@ -369,11 +369,11 @@
     "noPaymentLink": "No payment link received",
     "requestFailed": "Request failed",
     "empty": "No credit packages available.",
-    "creditsAmount": "Get {amount} credits",
+    "creditsAmount": "Includes {amount} Credits for redeeming premium macro setups.",
     "bonusCredits": "+{amount} bonus",
     "preparing": "Preparing payment...",
     "buyNow": "Buy Now",
-    "loginRequired": "Log in to purchase",
+    "loginRequired": "Log in to buy",
     "hot": "Hot",
     "recommended": "Recommended",
     "newTag": "New"
@@ -441,7 +441,7 @@
     "activeTickets": "Active Tickets",
     "unreadNotifications": "Unread",
     "browseMacros": "Browse Macros",
-    "buyCredits": "Buy Credits",
+    "buyCredits": "Credits",
     "submitTicket": "Submit Ticket",
     "viewExchanges": "View Exchanged Macros",
     "accountInfo": "Account Info",
@@ -479,7 +479,7 @@
     "heading": "Order History",
     "subtitle": "View all your payment orders and credit delivery status.",
     "empty": "You don't have any orders yet.",
-    "goBuy": "Buy Credits",
+    "goBuy": "View Credit Packs",
     "orderField": "Order",
     "paymentField": "Payment",
     "creditsField": "Credits",
@@ -492,7 +492,7 @@
   "transactions": {
     "title": "Credit History — FlyMacro",
     "heading": "Credit History",
-    "subtitle": "View every credit transaction, including top-ups, exchanges, renewals, and signup bonuses.",
+    "subtitle": "View every Credit change, including purchases, exchanges, renewals, and signup bonuses.",
     "empty": "No transaction history yet.",
     "timeField": "Time",
     "typeField": "Type",
@@ -500,7 +500,7 @@
     "balanceField": "Balance",
     "noteField": "Note",
     "typeSignup": "Signup Bonus",
-    "typeTopup": "Top-up",
+    "typeTopup": "Purchase",
     "typeExchange": "Exchange",
     "typeRenew": "Renewal",
     "typeRefund": "Refund",
@@ -534,7 +534,7 @@
   },
   "sideNav": {
     "overview": "Overview",
-    "credits": "Buy Credits",
+    "credits": "Credits",
     "exchanges": "My Exchanges",
     "orders": "Order History",
     "transactions": "Credit History",

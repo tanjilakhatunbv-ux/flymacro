@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       if (!rows || rows.length === 0) {
         await payload.db.drizzle.execute(sql`ROLLBACK`)
         return forbidden(
-          `积分不足，需要 ${price} 积分`,
+          `点券不足，需要 ${price} 点券`,
           'insufficient-credits',
         )
       }
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
       data: {
         recipient: user.id,
         title: '兑换成功',
-        body: `你已成功兑换「${macro.title}」，花费 ${price} 积分。${expiresAt ? '有效期至 ' + expiresAt.slice(0, 10) : '永久有效'}。`,
+        body: `你已成功兑换「${macro.title}」，花费 ${price} 点券。${expiresAt ? '有效期至 ' + expiresAt.slice(0, 10) : '永久有效'}。`,
         link: `/macros/${macroSlug}`,
         category: 'order',
         read: false,
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
       docId: String(macro.id),
       operator: user.id,
       ip: getClientIP(req),
-      reason: `兑换「${macro.title}」花费 ${price} 积分`,
+      reason: `兑换「${macro.title}」花费 ${price} 点券`,
       metadata: { credits: newCredits, exchangeId: exchange.id },
     })
 

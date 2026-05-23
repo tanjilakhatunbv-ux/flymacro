@@ -7,7 +7,7 @@ export const SiteSettings: GlobalConfig = {
   label: '站点设置',
   admin: {
     group: '设置',
-    description: '全局运营配置：充值页面文案、活动横幅、充值须知等。',
+    description: '全局运营配置：点券页面文案、活动横幅、购买须知等。',
   },
   access: {
     read: () => true,
@@ -17,22 +17,22 @@ export const SiteSettings: GlobalConfig = {
     {
       type: 'group',
       name: 'creditPage',
-      label: '充值页面设置',
+      label: '点券页面设置',
       admin: {
-        description: '控制前台 /credits 页面的标题、副标题、活动横幅与充值须知。',
+        description: '控制前台 /credits 页面的标题、副标题、活动横幅与购买须知。',
       },
       fields: [
         {
           name: 'title',
           type: 'text',
           label: '页面标题',
-          defaultValue: '充值积分',
+          defaultValue: '购买点券',
         },
         {
           name: 'subtitle',
           type: 'text',
           label: '副标题',
-          defaultValue: '登录后即可充值积分，兑换宏使用权。',
+          defaultValue: '购买点券后，可用于兑换高级宏配置。',
         },
         {
           name: 'promoEnabled',
@@ -46,7 +46,7 @@ export const SiteSettings: GlobalConfig = {
           type: 'text',
           label: '活动横幅文案',
           admin: {
-            description: '例如：新用户首充双倍积分、限时全场8折',
+            description: '例如：新用户点券包加赠、限时全场8折',
             condition: (_, sib) => sib?.promoEnabled === true,
           },
         },
@@ -54,15 +54,15 @@ export const SiteSettings: GlobalConfig = {
           name: 'noticeEnabled',
           type: 'checkbox',
           defaultValue: true,
-          label: '显示充值须知',
+          label: '显示购买须知',
         },
         {
           name: 'notice',
           type: 'richText',
-          label: '充值须知内容',
+          label: '购买须知内容',
           editor: lexicalEditor({}),
           admin: {
-            description: '留空则使用系统默认充值须知',
+            description: '留空则使用系统默认购买须知',
             condition: (_, sib) => sib?.noticeEnabled === true,
           },
         },

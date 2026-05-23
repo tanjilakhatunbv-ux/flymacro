@@ -196,7 +196,7 @@ export const Users: CollectionConfig = {
               on: 'user',
               defaultLimit: 5,
               maxDepth: 0,
-              label: '充值订单',
+              label: '点券订单',
             },
             {
               name: 'creditTransactionsJoin',

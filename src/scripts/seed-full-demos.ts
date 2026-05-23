@@ -904,14 +904,14 @@ const PAGES = [
 ]
 
 // ═══════════════════════════════════════════════════════════
-//  积分包
+//  点券包
 // ═══════════════════════════════════════════════════════════
 
 const CREDIT_PACKAGES = [
-  { label: '充值 10 元得 12 积分',      amount: 10,  originalAmount: 12,  creditsGranted: 12,  creemProductId: 'prod_6Ww3phKb8k0vR7lq3TDVc6', currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
-  { label: '充值 50 元得 60 积分',      amount: 50,  originalAmount: 60,  creditsGranted: 60,  creemProductId: 'prod_78dxlqqlgx9L5cBogqTFkq', currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: '限时特惠', badge: 'hot' },
-  { label: '充值 100 元得 125 积分',    amount: 100, originalAmount: 120, creditsGranted: 125, creemProductId: 'prod_2HMhpCtZLpT0Pt1ZYCSYAr', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '最超值', badge: 'recommended' },
-  { label: '充值 300 元得 400 积分',    amount: 300, originalAmount: 400, creditsGranted: 400, creemProductId: 'prod_7HyLoOKySZUgExRgSmrIN5', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: 'VIP专享', badge: 'recommended' },
+  { label: '12 点券包',      amount: 10,  originalAmount: 12,  creditsGranted: 12,  creemProductId: 'prod_6Ww3phKb8k0vR7lq3TDVc6', currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
+  { label: '60 点券包',      amount: 50,  originalAmount: 60,  creditsGranted: 60,  creemProductId: 'prod_78dxlqqlgx9L5cBogqTFkq', currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: '限时特惠', badge: 'hot' },
+  { label: '125 点券包',    amount: 100, originalAmount: 120, creditsGranted: 125, creemProductId: 'prod_2HMhpCtZLpT0Pt1ZYCSYAr', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '最超值', badge: 'recommended' },
+  { label: '400 点券包',    amount: 300, originalAmount: 400, creditsGranted: 400, creemProductId: 'prod_7HyLoOKySZUgExRgSmrIN5', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: 'VIP专享', badge: 'recommended' },
 ]
 
 // ═══════════════════════════════════════════════════════════
@@ -927,11 +927,11 @@ const GUIDES = [
     body: '## 什么是宏命令？\n\n宏命令是魔兽世界内置的脚本系统，允许玩家将多个命令绑定到一个按键上。\n\n## 基本语法\n\n```\n#showtooltip 技能名称\n/cast [条件] 技能名称\n/use [条件] 物品名称\n/script 脚本代码\n```\n\n## 常用条件\n- `@mouseover` — 对鼠标指向目标施法\n- `[@player]` — 对自己施法\n- `[mod:shift]` — 按住Shift键时\n- `[combat]` — 战斗状态中\n- `[nostealth]` — 不在潜行状态时',
   },
   {
-    title: '如何购买和兑换宏',
+    title: '如何购买点券并兑换宏',
     slug: 'how-to-purchase',
-    summary: '详细的购买流程说明：从注册账户到积分充值，再到宏兑换的完整指南。',
+    summary: '详细的购买流程说明：从注册账户到购买点券，再到宏兑换的完整指南。',
     weight: 2,
-    body: '## 注册账户\n\n点击右上角「注册」按钮，填写邮箱和密码即可完成注册。新用户自动获得20积分。\n\n## 充值积分\n\n进入「我的账户」→「充值积分」，选择适合的积分包完成支付。\n\n## 兑换宏\n\n1. 浏览宏库，找到感兴趣的宏\n2. 点击「兑换」按钮\n3. 确认扣除积分\n4. 刷新页面即可查看完整宏代码',
+    body: '## 注册账户\n\n点击右上角「注册」按钮，填写邮箱和密码即可完成注册。新用户自动获得20点券。\n\n## 购买点券\n\n进入「我的账户」→「购买点券」，选择适合的点券包完成支付。\n\n## 兑换宏\n\n1. 浏览宏库，找到感兴趣的宏\n2. 点击「兑换」按钮\n3. 确认扣除点券\n4. 刷新页面即可查看完整宏代码',
   },
   {
     title: '宏代码使用指南',
@@ -1305,8 +1305,8 @@ async function main() {
       slug: 'site-settings',
       data: {
         creditPage: {
-          title: '充值积分',
-          subtitle: '登录后即可充值积分，兑换宏使用权。',
+          title: '购买点券',
+          subtitle: '购买点券后，可用于兑换高级宏配置。',
           promoEnabled: false,
           promoBanner: '',
           noticeEnabled: true,

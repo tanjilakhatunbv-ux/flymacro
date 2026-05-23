@@ -92,7 +92,7 @@ export async function GET(req: Request) {
           data: {
             recipient: userId,
             title: '自动续费失败',
-            body: `「${macroDoc.title}」自动续费失败：积分不足（需要 ${price}）。请充值后手动续费。`,
+            body: `「${macroDoc.title}」自动续费失败：点券不足（需要 ${price}）。请购买点券后手动续费。`,
             link: `/macros/${macroDoc.slug}`,
             category: 'order',
             read: false,
@@ -106,7 +106,7 @@ export async function GET(req: Request) {
           docId: String(ex.id),
           operator: userId,
           ip: 'cron',
-          reason: `自动续费失败：积分不足（需要 ${price}）`,
+          reason: `自动续费失败：点券不足（需要 ${price}）`,
           metadata: { macroId: macroDoc.id, macroTitle: macroDoc.title },
         })
 
@@ -145,7 +145,7 @@ export async function GET(req: Request) {
         data: {
           recipient: userId,
           title: '自动续费成功',
-          body: `「${macroDoc.title}」已自动续费，扣除 ${price} 积分。有效期延至 ${newExpiresAt ? newExpiresAt.slice(0, 10) : '永久'}。`,
+          body: `「${macroDoc.title}」已自动续费，扣除 ${price} 点券。有效期延至 ${newExpiresAt ? newExpiresAt.slice(0, 10) : '永久'}。`,
           link: `/macros/${macroDoc.slug}`,
           category: 'order',
           read: false,
@@ -159,7 +159,7 @@ export async function GET(req: Request) {
         docId: String(ex.id),
         operator: userId,
         ip: 'cron',
-        reason: `自动续费「${macroDoc.title}」扣除 ${price} 积分`,
+        reason: `自动续费「${macroDoc.title}」扣除 ${price} 点券`,
         metadata: { macroId: macroDoc.id, macroTitle: macroDoc.title, credits: newCredits },
       })
 
