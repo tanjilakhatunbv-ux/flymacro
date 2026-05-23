@@ -30,12 +30,13 @@ const findScripts = unstable_cache(
         and: [
           { status: { equals: 'published' } },
           { _status: { equals: 'published' } },
+          { type: { equals: 'addon' } },
         ],
       },
       sort: '-publishedAt',
       page,
       limit: PAGE_SIZE,
-      depth: 1,
+      depth: 2,
       overrideAccess: true,
     })
     const docs = result.docs as Script[]
@@ -46,7 +47,7 @@ const findScripts = unstable_cache(
       page: result.page ?? page,
     }
   },
-  ['scripts-list-v1'],
+  ['scripts-addon-downloads-v1'],
   { revalidate: 60, tags: ['scripts'] },
 )
 
@@ -84,7 +85,13 @@ export default async function ScriptsListPage({
           <>
             <div className="script-grid">
               {result.docs.map((script) => (
-                <ScriptCard key={script.id} script={script} typeLabel={typeLabel} locale={locale} />
+                <ScriptCard
+                  key={script.id}
+                  script={script}
+                  typeLabel={typeLabel}
+                  locale={locale}
+                  downloadLabel={t('downloadFile')}
+                />
               ))}
             </div>
             {result.totalPages > 1 && (

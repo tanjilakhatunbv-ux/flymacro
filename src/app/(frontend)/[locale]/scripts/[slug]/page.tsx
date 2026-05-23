@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import { getPayload } from '../../../../../lib/payload'
 import { RichText } from '../../../../../components/RichText'
 import { BackLink } from '../../../../../components/BackLink'
-import type { Script, ScriptVersion, ScriptFile } from '../../../../../payload-types'
+import type { Script, ScriptFile } from '../../../../../payload-types'
 
 export const revalidate = 3600
 
@@ -27,38 +27,17 @@ const findScriptBySlugCached = unstable_cache(
           { slug: { equals: slug } },
           { status: { equals: 'published' } },
           { _status: { equals: 'published' } },
+          { type: { equals: 'addon' } },
         ],
       },
       limit: 1,
-      depth: 1,
+      depth: 2,
       overrideAccess: true,
     })
     return (result.docs[0] as Script | undefined) ?? null
   },
-  ['script-by-slug-v1'],
+  ['addon-script-by-slug-v1'],
   { revalidate: 3600, tags: ['scripts'] },
-)
-
-const findScriptVersions = unstable_cache(
-  async (scriptId: number | string) => {
-    const payload = await getPayload()
-    const result = await payload.find({
-      collection: 'script-versions',
-      where: {
-        and: [
-          { script: { equals: scriptId } },
-          { status: { equals: 'published' } },
-        ],
-      },
-      sort: '-publishedAt',
-      limit: 50,
-      depth: 1,
-      overrideAccess: true,
-    })
-    return result.docs as ScriptVersion[]
-  },
-  ['script-versions-v1'],
-  { revalidate: 3600, tags: ['script-versions'] },
 )
 
 export async function generateStaticParams() {
@@ -70,6 +49,7 @@ export async function generateStaticParams() {
         and: [
           { status: { equals: 'published' } },
           { _status: { equals: 'published' } },
+          { type: { equals: 'addon' } },
         ],
       },
       limit: 200,
@@ -122,8 +102,9 @@ export default async function ScriptDetailPage({ params }: { params: Promise<{ s
   const script = await findScriptBySlugCached(slug)
   if (!script) notFound()
 
-  const versions = await findScriptVersions(script.id)
-  const latestVersion = versions.find((v) => v.isLatest) ?? versions[0]
+  const latestVersion = script.latestVersion && typeof script.latestVersion === 'object'
+    ? script.latestVersion
+    : null
 
   const typeMap: Record<string, string> = {
     macro: t('typeMacro'),
@@ -142,9 +123,9 @@ export default async function ScriptDetailPage({ params }: { params: Promise<{ s
           <div className="detail-meta">
             <span className="tag-chip">{typeMap[script.type] ?? script.type}</span>
             {script.author && <span className="meta-item">{t('author')}: {script.author}</span>}
-            {script.publishedAt && (
+            {(latestVersion?.publishedAt ?? latestVersion?.updatedAt ?? script.publishedAt) && (
               <span className="meta-item">
-                {t('publishedAt')}: {new Date(script.publishedAt).toLocaleDateString(locale)}
+                {t('updatedAt')}: {new Date(latestVersion?.publishedAt ?? latestVersion?.updatedAt ?? script.publishedAt ?? '').toLocaleDateString(locale)}
               </span>
             )}
           </div>
@@ -180,41 +161,6 @@ export default async function ScriptDetailPage({ params }: { params: Promise<{ s
           <div className="detail-content">
             <RichText content={script.description} />
           </div>
-        )}
-
-        {versions.length > 1 && (
-          <section className="script-versions-section">
-            <h2>{t('versionHistory')}</h2>
-            <div className="version-list">
-              {versions.map((v) => {
-                const url = getFileUrl(v.scriptFile)
-                const filename = getFileName(v.scriptFile)
-                const file = typeof v.scriptFile === 'object' ? v.scriptFile : null
-                return (
-                  <div key={v.id} className={`version-item ${v.isLatest ? 'version-latest' : ''}`}>
-                    <div className="version-info">
-                      <span className="version-number">{v.version}</span>
-                      {v.isLatest && <span className="version-badge">{t('latestBadge')}</span>}
-                      {v.publishedAt && (
-                        <span className="version-date">
-                          {new Date(v.publishedAt).toLocaleDateString(locale)}
-                        </span>
-                      )}
-                    </div>
-                    {v.changelog && <p className="version-changelog">{v.changelog}</p>}
-                    {url ? (
-                      <a href={url} download={filename ?? true} className="btn download-btn-sm">
-                        {t('downloadFile')}
-                        {file?.filesize ? ` (${formatFileSize(file.filesize)})` : ''}
-                      </a>
-                    ) : (
-                      <span className="text-muted">{t('noDownload')}</span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </section>
         )}
       </article>
     </div>
