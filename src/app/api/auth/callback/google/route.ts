@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { authLoginUrl } from '../../../../../lib/auth-urls'
 import {
   isGoogleOAuthConfigured,
   exchangeGoogleCode,
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
   const limit = rateLimit(`oauth-cb:${ip}`, { max: 5, windowMs: 60_000 })
   if (!limit.allowed) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=rate_limited', req.url),
+      new URL(authLoginUrl('rate_limited'), req.url),
     )
   }
 
@@ -32,13 +33,13 @@ export async function GET(req: Request) {
 
   if (error) {
     return NextResponse.redirect(
-      new URL(`/login?error=oauth&message=${encodeURIComponent(error)}`, req.url),
+      new URL(authLoginUrl(error), req.url),
     )
   }
 
   if (!code || !stateParam) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=missing_code_or_state', req.url),
+      new URL(authLoginUrl('missing_code_or_state'), req.url),
     )
   }
 
@@ -47,7 +48,7 @@ export async function GET(req: Request) {
   const stateCookie = cookieStore.get('oauth-state')?.value
   if (!stateCookie) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=state_expired', req.url),
+      new URL(authLoginUrl('state_expired'), req.url),
     )
   }
 
@@ -56,13 +57,13 @@ export async function GET(req: Request) {
     parsedState = JSON.parse(stateCookie)
   } catch {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=invalid_state', req.url),
+      new URL(authLoginUrl('invalid_state'), req.url),
     )
   }
 
   if (parsedState.state !== stateParam) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=state_mismatch', req.url),
+      new URL(authLoginUrl('state_mismatch'), req.url),
     )
   }
 
@@ -74,7 +75,7 @@ export async function GET(req: Request) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'token_exchange_failed'
     return NextResponse.redirect(
-      new URL(`/login?error=oauth&message=${encodeURIComponent(msg)}`, req.url),
+      new URL(authLoginUrl(msg), req.url),
     )
   }
 
@@ -91,13 +92,13 @@ export async function GET(req: Request) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'userinfo_failed'
     return NextResponse.redirect(
-      new URL(`/login?error=oauth&message=${encodeURIComponent(msg)}`, req.url),
+      new URL(authLoginUrl(msg), req.url),
     )
   }
 
   if (!googleUser.email) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=no_email', req.url),
+      new URL(authLoginUrl('no_email'), req.url),
     )
   }
 
@@ -161,7 +162,7 @@ export async function GET(req: Request) {
 
   if (!user) {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=user_creation_failed', req.url),
+      new URL(authLoginUrl('user_creation_failed'), req.url),
     )
   }
 
@@ -170,12 +171,12 @@ export async function GET(req: Request) {
   // Check account status
   if (userDoc.status === 'suspended') {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=account_suspended', req.url),
+      new URL(authLoginUrl('account_suspended'), req.url),
     )
   }
   if (userDoc.status === 'banned') {
     return NextResponse.redirect(
-      new URL('/login?error=oauth&message=account_banned', req.url),
+      new URL(authLoginUrl('account_banned'), req.url),
     )
   }
 

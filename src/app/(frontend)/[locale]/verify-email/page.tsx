@@ -30,7 +30,7 @@ export default async function VerifyEmailPage({ params, searchParams }: { params
           ) : (
             <p className="auth-help">
               {tVerify('invalidLink')}
-              <Link href="/login" style={{ marginLeft: 4 }}>
+              <Link href="/auth?mode=login" style={{ marginLeft: 4 }}>
                 {tVerify('backToLogin')}
               </Link>
               。

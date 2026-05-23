@@ -77,10 +77,10 @@ export function HeaderAuth() {
   if (user === null) {
     return (
       <>
-        <Link href="/login" prefetch={false} className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
+        <Link href="/auth?mode=login" prefetch={false} className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
           {t('login')}
         </Link>
-        <Link href="/register" prefetch={false} className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
+        <Link href="/auth?mode=register" prefetch={false} className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
           {t('register')}
         </Link>
       </>

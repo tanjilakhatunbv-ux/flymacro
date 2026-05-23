@@ -102,7 +102,7 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           setSuccess(t('resetSent'))
         } else if (mode === 'reset') {
           setSuccess(t('resetDone'))
-          setTimeout(() => router.push('/login'), 1500)
+          setTimeout(() => router.push('/auth?mode=login'), 1500)
         }
       } catch (err) {
         setErrors([{ message: err instanceof Error ? err.message : t('requestFailed') }])
@@ -177,17 +177,17 @@ export function AuthForm({ mode, returnUrl = '/account', resetToken, turnstileSi
           <>
             <Link href="/forgot-password">{t('forgotLink')}</Link>
             <span aria-hidden="true">·</span>
-            <Link href="/register">{t('noAccount')}</Link>
+            <Link href="/auth?mode=register">{t('noAccount')}</Link>
           </>
         )}
         {mode === 'register' && (
           <>
-            <Link href="/login">{t('hasAccount')}</Link>
+            <Link href="/auth?mode=login">{t('hasAccount')}</Link>
           </>
         )}
         {(mode === 'forgot' || mode === 'reset') && (
           <>
-            <Link href="/login">{t('backToLogin')}</Link>
+            <Link href="/auth?mode=login">{t('backToLogin')}</Link>
           </>
         )}
       </div>

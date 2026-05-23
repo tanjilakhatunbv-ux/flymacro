@@ -82,10 +82,10 @@ export function VerifyEmailRunner({ token }: { token: string }) {
         {t('expiredHelp')}
       </p>
       <div style={{ display: 'flex', gap: '0.75rem' }}>
-        <Link href="/register" className="btn">
+        <Link href="/auth?mode=register" className="btn">
           {t('reRegister')}
         </Link>
-        <Link href="/login" className="btn">
+        <Link href="/auth?mode=login" className="btn">
           {t('backToLogin')}
         </Link>
       </div>
