@@ -17,13 +17,20 @@ assert(existsSync(join(process.cwd(), authPagePath)), 'Unified /auth page must e
 
 const headerAuth = read('src/components/HeaderAuth.tsx')
 assert(
-  headerAuth.includes('href="/auth?mode=login"') && headerAuth.includes('href="/auth?mode=register"'),
-  'Header auth buttons must point to the unified /auth page with mode query params.',
+  headerAuth.includes('href="/auth?mode=login"'),
+  'Header auth button must point to the unified /auth login mode.',
 )
 assert(
-  /href="\/auth\?mode=login"\s+prefetch=\{false\}/.test(headerAuth)
-    && /href="\/auth\?mode=register"\s+prefetch=\{false\}/.test(headerAuth),
-  'Header auth links must keep prefetch disabled after moving to /auth.',
+  !headerAuth.includes('href="/auth?mode=register"'),
+  'Header auth must expose one unified entry instead of separate login and register buttons.',
+)
+assert(
+  (headerAuth.match(/href="\/auth\?mode=login"/g) ?? []).length === 1,
+  'Header auth must render exactly one unified auth link.',
+)
+assert(
+  /href="\/auth\?mode=login"\s+prefetch=\{false\}/.test(headerAuth),
+  'Header auth link must keep prefetch disabled after moving to /auth.',
 )
 
 const authForm = read('src/components/AuthForm.tsx')

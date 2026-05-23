@@ -14,6 +14,7 @@
     "about": "关于",
     "login": "登录",
     "register": "注册",
+    "authEntry": "登录 / 注册",
     "loggingIn": "登录",
     "logout": "退出登录",
     "loggingOut": "退出中…",
