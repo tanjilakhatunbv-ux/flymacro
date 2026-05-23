@@ -63,27 +63,17 @@ export function HeaderAuth() {
 
   if (user === undefined) {
     return (
-      <>
-        <span className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
-          {t('login')}
-        </span>
-        <span className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
-          {t('register')}
-        </span>
-      </>
+      <span className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
+        {t('authEntry')}
+      </span>
     )
   }
 
   if (user === null) {
     return (
-      <>
-        <Link href="/auth?mode=login" prefetch={false} className="btn" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
-          {t('login')}
-        </Link>
-        <Link href="/auth?mode=register" prefetch={false} className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
-          {t('register')}
-        </Link>
-      </>
+      <Link href="/auth?mode=login" prefetch={false} className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
+        {t('authEntry')}
+      </Link>
     )
   }
 

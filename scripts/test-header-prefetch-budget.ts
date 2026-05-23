@@ -14,8 +14,13 @@ if (!/href=\{navHrefs\[i\]\}\s+prefetch=\{false\}/.test(header)) {
   process.exit(1)
 }
 
-if (!/href="\/auth\?mode=login"\s+prefetch=\{false\}/.test(headerAuth) || !/href="\/auth\?mode=register"\s+prefetch=\{false\}/.test(headerAuth)) {
-  console.error('Header auth links must disable prefetch to keep logged-out page loads lean.')
+if (!/href="\/auth\?mode=login"\s+prefetch=\{false\}/.test(headerAuth)) {
+  console.error('Header auth link must disable prefetch to keep logged-out page loads lean.')
+  process.exit(1)
+}
+
+if ((headerAuth.match(/href="\/auth\?mode=/g) ?? []).length !== 1) {
+  console.error('Header must expose one unified auth entry instead of separate login/register links.')
   process.exit(1)
 }
 
