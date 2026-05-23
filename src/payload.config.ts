@@ -30,6 +30,8 @@ import { ScriptVersions } from './collections/ScriptVersions'
 import { AuditLogs } from './collections/AuditLogs'
 import { News } from './collections/News'
 import { SiteSettings } from './globals/SiteSettings'
+import { assertPayloadOriginAllowed, getPayloadAllowedOrigins, getServerUrl } from './lib/allowed-origins'
+import { getPayloadPostgresPool } from './lib/payload-db-pool'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -38,20 +40,9 @@ const useResend = !!process.env.RESEND_API_KEY
 const useS3 = !!process.env.S3_BUCKET && !!process.env.S3_ACCESS_KEY_ID
 
 // Resolve the actual public URL — critical for cookie, CORS and CSRF to work
-const serverUrl =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-
-// Collect all possible origins for CORS/CSRF
-const allOrigins = [
-  serverUrl,
-  'http://localhost:3000',
-  'https://flymacro.qzz.io',
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
-].filter(Boolean) as string[]
-
-// Deduplicate
-const uniqueOrigins = [...new Set(allOrigins)]
+const serverUrl = getServerUrl()
+const payloadAllowedOrigins = getPayloadAllowedOrigins()
+assertPayloadOriginAllowed(serverUrl, payloadAllowedOrigins)
 
 export default buildConfig({
   admin: {
@@ -103,17 +94,7 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URI || '',
-      // Neon free tier allows ~10 concurrent connections.
-      // Vercel serverless can spawn many concurrent functions,
-      // so keep this low to avoid "too many connections" errors.
-      max: 5,
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 3000,
-      // Allow queueing a few requests before failing
-      allowExitOnIdle: false,
-    },
+    pool: getPayloadPostgresPool(),
     push: false,
   }),
   serverURL: serverUrl,
@@ -168,6 +149,6 @@ export default buildConfig({
         ]
       : []),
   ],
-  cors: uniqueOrigins,
-  csrf: uniqueOrigins,
+  cors: payloadAllowedOrigins,
+  csrf: payloadAllowedOrigins,
 })

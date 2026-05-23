@@ -95,6 +95,9 @@ export default function middleware(request: NextRequest) {
   const adminRedirect = redirectUnauthenticatedAdmin(request)
   if (adminRedirect) return adminRedirect
 
+  const { pathname } = request.nextUrl
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return NextResponse.next()
+
   const fixed = fixMojibakePathname(request.nextUrl.pathname)
   if (fixed && fixed !== request.nextUrl.pathname) {
     const url = request.nextUrl.clone()
