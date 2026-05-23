@@ -74,7 +74,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="container-page">
           <h2>{t('featuredMacros')}</h2>
           <div className="section-divider" aria-hidden="true">
-            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
+            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" style={{ width: 'auto', height: 'auto' }} />
           </div>
           {featured.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -99,7 +99,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="container-page">
           <h2>{t('browseByClass')}</h2>
           <div className="section-divider" aria-hidden="true">
-            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
+            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" style={{ width: 'auto', height: 'auto' }} />
           </div>
           <div className="class-panel">
             {classSlugs.map((slug) => {
@@ -127,7 +127,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="container-page">
           <h2>{t('gettingStarted')}</h2>
           <div className="section-divider" aria-hidden="true">
-            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
+            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" style={{ width: 'auto', height: 'auto' }} />
           </div>
           <div className="feature-grid">
             <div className="feature">
