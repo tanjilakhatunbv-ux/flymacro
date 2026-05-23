@@ -3,12 +3,12 @@ import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
 
 export const CreditPackages: CollectionConfig = {
   slug: 'credit-packages',
-  labels: { singular: '充值档次', plural: '充值档次' },
+  labels: { singular: '点券包', plural: '点券包' },
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'amount', 'originalAmount', 'creditsGranted', 'enabled', 'sort'],
     group: '商务',
-    description: '积分充值档次配置。可设置原价、优惠标签和角标，用于前台营销展示。',
+    description: '点券包配置。可设置原价、优惠标签和角标，用于前台营销展示。',
   },
   access: {
     read: () => true,
@@ -22,7 +22,7 @@ export const CreditPackages: CollectionConfig = {
       type: 'text',
       required: true,
       label: '显示名称',
-      admin: { description: '例如：充值 100 元得 110 积分' },
+      admin: { description: '例如：100 点券包' },
     },
     {
       name: 'amount',
@@ -45,16 +45,16 @@ export const CreditPackages: CollectionConfig = {
       name: 'creditsGranted',
       type: 'number',
       required: true,
-      label: '获得积分',
+      label: '获得点券',
       min: 0,
-      admin: { description: '例如充 100 元送 10 积分，则填 110' },
+      admin: { description: '例如购买 100 点券包加赠 10 点券，则填 110' },
     },
     {
       name: 'discountLabel',
       type: 'text',
       label: '优惠标签',
       admin: {
-        description: '如：限时8折、首充特惠、VIP专享',
+        description: '如：限时8折、新用户特惠、VIP专享',
         position: 'sidebar',
       },
     },

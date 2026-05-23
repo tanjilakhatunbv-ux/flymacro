@@ -39,12 +39,12 @@ export async function POST(req: Request) {
 
   const { packageId } = body
   if (!packageId) {
-    return badRequest('请选择充值档次', 'missing-package')
+    return badRequest('请选择点券包', 'missing-package')
   }
 
   const parsed = parseParam(IdParam, packageId)
   if (!parsed.ok) {
-    return badRequest('无效的充值档次 ID', 'invalid-package-id')
+    return badRequest('无效的点券包 ID', 'invalid-package-id')
   }
 
   const pkg = await payload
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     .catch(() => null)
 
   if (!pkg || !pkg.enabled) {
-    return notFound('充值档次不存在或已下架', 'package-not-found')
+    return notFound('点券包不存在或已下架', 'package-not-found')
   }
 
   const successUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`

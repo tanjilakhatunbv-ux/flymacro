@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     const rows = result.rows as Array<{ credits: number }> | undefined
     if (!rows || rows.length === 0) {
       return forbidden(
-        `积分不足，需要 ${price} 积分续费`,
+        `点券不足，需要 ${price} 点券续费`,
         'insufficient-credits',
       )
     }
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
       docId: String(macro.id),
       operator: user.id,
       ip: getClientIP(req),
-      reason: `续费「${macro.title}」花费 ${price} 积分`,
+      reason: `续费「${macro.title}」花费 ${price} 点券`,
       metadata: { credits: newCredits, exchangeId },
     })
 

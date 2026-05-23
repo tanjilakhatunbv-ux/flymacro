@@ -202,7 +202,7 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
       balanceAfter: newCredits,
       type: 'recharge',
       relatedOrder: order.id,
-      reason: `充值 ¥${amount.toFixed(2)} 获得 ${creditsGranted} 积分`,
+      reason: `购买点券包 ¥${amount.toFixed(2)}，获得 ${creditsGranted} 点券`,
     },
     overrideAccess: true,
   })
@@ -211,8 +211,8 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
     collection: 'notifications',
     data: {
       recipient: userId,
-      title: '充值成功',
-      body: `你已成功充值 ${creditsGranted} 积分，当前余额 ${newCredits} 积分。`,
+      title: '购买成功',
+      body: `你已成功获得 ${creditsGranted} 点券，当前余额 ${newCredits} 点券。`,
       link: '/account/credits',
       category: 'order',
       read: false,
@@ -226,7 +226,7 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
     docId: String(order.id),
     operator: userId,
     ip: 'webhook',
-    reason: `充值 ¥${amount.toFixed(2)} 获得 ${creditsGranted} 积分`,
+    reason: `购买点券包 ¥${amount.toFixed(2)}，获得 ${creditsGranted} 点券`,
     metadata: { checkoutId, creditsGranted, currency },
   })
 
