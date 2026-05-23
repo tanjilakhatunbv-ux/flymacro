@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "FlyMacro — World of Warcraft AddOns & Macro Services",
-    "description": "AddOn downloads, macro coding guides, and macro setup services for World of Warcraft players. Free AddOn, free basic macros, and premium macro setups."
+    "description": "AddOn downloads, macro coding guides, free basic macros, and macro script redemption for World of Warcraft players."
   },
   "nav": {
     "home": "Home",
@@ -26,7 +26,7 @@
   },
   "home": {
     "heroTitle": "World of Warcraft AddOns & Macro Services",
-    "heroSubtitle": "Download the free AddOn for in-game action suggestions, learn macro coding, use free basic macros, or redeem premium macro setups with Credits.",
+    "heroSubtitle": "Download the free AddOn for in-game action suggestions, learn macro coding, use free basic macros, or redeem macro scripts with Credits.",
     "enterMacros": "Browse Macros",
     "pluginDownload": "Download Plugin",
     "pluginSection": "Plugin Download",
@@ -50,7 +50,7 @@
     },
     "featureLegal": {
       "title": "Premium Macro Setups",
-      "desc": "Redeem premium macro setups with Credits and choose plans by class and specialization."
+      "desc": "Redeem macro scripts with Credits and choose options by class and specialization."
     }
   },
   "macros": {
@@ -129,18 +129,16 @@
     "metadataTitle": "Credits — FlyMacro",
     "pageTitle": "Credit Packs",
     "subtitleLoggedIn": "Current credits: {credits}",
-    "subtitleGuest": "Credits can be used to redeem premium macro setups.",
+    "subtitleGuest": "Credits can be used to redeem macro scripts.",
     "currentCredits": "Current credits: ",
     "successMessage": "Purchase successful! Credits have been added to your account. Please refresh the page to see your updated balance.",
     "cancelMessage": "Purchase cancelled. Please contact support if you have any issues.",
     "noticeTitle": "Purchase Notice",
-    "notice1": "Credits are usually added to your account immediately after purchase.",
-    "notice2": "Credits can only be used to redeem premium macro setups and cannot be withdrawn.",
-    "notice2Bold": "only be used to redeem premium macro setups and cannot be withdrawn",
-    "notice3": "Redeemed macros can be viewed unlimited times during their validity period. After expiration, you need to redeem again or renew.",
-    "notice4": "Regular macros are permanent after redemption. Premium macros default to a 30-day validity period with auto-renewal support.",
-    "notice4Bold": "permanent",
-    "notice5": "For payment issues, please contact support via the ticket system."
+    "notice1": "Credits are usually added to your account balance immediately after purchase.",
+    "notice2": "Credits can only be used to redeem macro scripts on FlyMacro.",
+    "notice3": "Credits are a digital content service. Purchases are non-refundable after successful payment, so please confirm the pack you need before buying.",
+    "notice4": "Redeemed macro scripts can be viewed from your account center. Please keep your account information secure.",
+    "notice5": "For payment delivery issues or order exceptions, please contact support via the ticket system."
   },
   "contact": {
     "metadataTitle": "Contact Support — FlyMacro",
@@ -160,7 +158,7 @@
     "faq1": "Credits not arriving after purchase? Please confirm the payment is complete. Credits usually arrive within 1-5 minutes. If not received after 10 minutes, please submit a ticket with a payment screenshot.",
     "faq2": "Macro code not showing? Please confirm you have redeemed the macro and it hasn't expired. Free macros don't require redemption.",
     "faq3": "Auto-renewal failed? The system will attempt to deduct Credits on the expiration date. If there are not enough Credits, auto-renewal stops and you'll be notified. You can manually renew after buying Credits.",
-    "faq4": "Credits cannot be withdrawn. Please read the purchase notice before buying."
+    "faq4": "Credit purchases are non-refundable after successful payment. Please read the purchase notice before buying."
   },
   "blog": {
     "metadataTitle": "Blog — FlyMacro",
@@ -177,8 +175,20 @@
   },
   "about": {
     "metadataTitle": "About FlyMacro",
-    "metadataDescription": "FlyMacro — AddOn downloads, macro coding guides, and macro setup services for World of Warcraft players.",
-    "pageTitle": "About FlyMacro"
+    "metadataDescription": "FlyMacro provides World of Warcraft AddOn downloads, macro coding guides, free basic macros, and Credit-based macro script redemption.",
+    "pageTitle": "About FlyMacro",
+    "intro": "FlyMacro serves World of Warcraft players with AddOn downloads, macro coding guides, free basic macros, and macro script redemption. We help players view in-game action suggestions, learn how macros work, and choose macro scripts that fit their class and specialization.",
+    "whatWeDoTitle": "What We Offer",
+    "addonTitle": "Free AddOn Download",
+    "addonBody": "The FlyMacro AddOn shows action suggestions and rotation hints inside World of Warcraft, helping players read the current combat flow more clearly. The AddOn is free to download and use.",
+    "guidesTitle": "Macro Coding Guides & Free Basic Macros",
+    "guidesBody": "The website provides macro coding guides for common syntax, setup ideas, and beginner-friendly use cases. Players can also use the free basic macros available on the site.",
+    "scriptsTitle": "Macro Script Redemption",
+    "scriptsBody": "Some macro scripts are organized by class, specialization, and gameplay scenario. Players can buy Credits and use Credits to redeem the macro scripts they need.",
+    "creditsTitle": "About Credits",
+    "creditsBody": "Credits are digital points used on FlyMacro to redeem macro scripts. They are not used for in-game trading, game currency, or top-up services.",
+    "supportTitle": "Contact Us",
+    "supportBody": "For account questions, Credit orders, or macro script support, please submit a ticket from the account center or email us at"
   },
   "account": {
     "center": "Account",
@@ -370,14 +380,18 @@
     "noPaymentLink": "No payment link received",
     "requestFailed": "Request failed",
     "empty": "No credit packages available.",
-    "creditsAmount": "Includes {amount} Credits for redeeming premium macro setups.",
+    "packLabel": "{amount} Credits Pack",
+    "creditsAmount": "Includes {amount} Credits for redeeming macro scripts.",
     "bonusCredits": "+{amount} bonus",
     "preparing": "Preparing payment...",
     "buyNow": "Buy Now",
     "loginRequired": "Log in to buy",
     "hot": "Hot",
     "recommended": "Recommended",
-    "newTag": "New"
+    "newTag": "New",
+    "limitedOffer": "Limited offer",
+    "bestValue": "Best value",
+    "vipOnly": "VIP only"
   },
   "exchange": {
     "renewing": "Renewing...",

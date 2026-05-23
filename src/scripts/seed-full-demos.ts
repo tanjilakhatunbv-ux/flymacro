@@ -1306,7 +1306,7 @@ async function main() {
       data: {
         creditPage: {
           title: '购买点券',
-          subtitle: '购买点券后，可用于兑换高级宏配置。',
+          subtitle: '购买点券后，可用于兑换宏脚本。',
           promoEnabled: false,
           promoBanner: '',
           noticeEnabled: true,

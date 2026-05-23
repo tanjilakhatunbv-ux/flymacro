@@ -16,8 +16,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export const revalidate = 300
 
-export default async function CreditsPage({ searchParams }: { searchParams: Promise<{ paid?: string }> }) {
-  const t = await getTranslations('credits')
+export default async function CreditsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ paid?: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'credits' })
   const user = await getCurrentUser()
   const sp = await searchParams
   const paidStatus = sp.paid
@@ -36,15 +43,16 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
 
   const packages = pkgResult.docs as CreditPackage[]
   const creditPage = (settingsResult as SiteSetting | null)?.creditPage ?? {}
+  const useCustomCreditCopy = locale === 'zh'
 
-  const pageTitle = creditPage.title || t('pageTitle')
-  const pageSubtitle = creditPage.subtitle || (user
+  const pageTitle = useCustomCreditCopy && creditPage.title ? creditPage.title : t('pageTitle')
+  const pageSubtitle = useCustomCreditCopy && creditPage.subtitle ? creditPage.subtitle : (user
     ? t('subtitleLoggedIn', { credits: (user.credits as number) ?? 0 })
     : t('subtitleGuest'))
   const promoEnabled = creditPage.promoEnabled === true
   const promoBanner = creditPage.promoBanner || ''
   const noticeEnabled = creditPage.noticeEnabled !== false
-  const customNotice = creditPage.notice
+  const customNotice = useCustomCreditCopy ? creditPage.notice : null
 
   return (
     <div className="container-page page-single">
@@ -53,7 +61,7 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
         {user ? (
           <>
             {pageSubtitle.replace(/\{credits\}/g, String((user.credits as number) ?? 0))}
-            {!pageSubtitle.includes('积分') && !pageSubtitle.includes('点券') && !pageSubtitle.includes('credit') && (
+            {!hasCreditBalanceLabel(pageSubtitle) && (
               <>
                 {' '}{t('currentCredits')}
                 <strong style={{ color: 'var(--gold-bright)' }}>{(user.credits as number) ?? 0}</strong>
@@ -104,4 +112,9 @@ export default async function CreditsPage({ searchParams }: { searchParams: Prom
       )}
     </div>
   )
+}
+
+function hasCreditBalanceLabel(text: string): boolean {
+  const normalized = text.toLowerCase()
+  return normalized.includes('点券') || normalized.includes('credits') || normalized.includes('credit')
 }

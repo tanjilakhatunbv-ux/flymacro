@@ -20,6 +20,7 @@ import * as migration_20260520_fix_payload_locked_documents_rels from './2026052
 import * as migration_20260521_rename_dodo_to_creem from './20260521_rename_dodo_to_creem';
 import * as migration_20260522_relax_not_null_for_drafts from './20260522_relax_not_null_for_drafts';
 import * as migration_20260523_update_credit_copy_to_points from './20260523_update_credit_copy_to_points';
+import * as migration_20260523_update_credit_page_notice_copy from './20260523_update_credit_page_notice_copy';
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20260523_update_credit_copy_to_points.up,
     down: migration_20260523_update_credit_copy_to_points.down,
     name: '20260523_update_credit_copy_to_points'
+  },
+  {
+    up: migration_20260523_update_credit_page_notice_copy.up,
+    down: migration_20260523_update_credit_page_notice_copy.down,
+    name: '20260523_update_credit_page_notice_copy'
   },
 ];
