@@ -97,7 +97,7 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
                     {isPending && pendingId === pkg.id ? t('preparing') : t('buyNow')}
                   </button>
                 ) : (
-                  <Link href="/login?return=/account/credits" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }}>
+                  <Link href="/auth?mode=login&return=/account/credits" className="btn btn-primary" style={{ width: '100%', textAlign: 'center' }}>
                     {t('loginRequired')}
                   </Link>
                 )}

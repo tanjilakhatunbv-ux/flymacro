@@ -5,7 +5,7 @@ import { AccountSideNav } from '../../../../components/AccountSideNav'
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
-  if (!user) redirect('/login?return=/account')
+  if (!user) redirect('/auth?mode=login&return=/account')
 
   const unreadCount = await getCachedUnreadCount(user.id)
 

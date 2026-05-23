@@ -121,7 +121,7 @@ export function MacroDetailActions({
                 />
               ) : (
                 <Link
-                  href={`/login?return=/macros/${macroSlug}`}
+                  href={`/auth?mode=login&return=${encodeURIComponent(`/macros/${macroSlug}`)}`}
                   className="btn btn-primary"
                   style={{ width: '100%', display: 'block', textAlign: 'center' }}
                 >

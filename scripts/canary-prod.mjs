@@ -30,8 +30,8 @@ const pages = [
     assertion: "location.pathname.includes('/macros') && document.querySelectorAll('a[href*=\"/macros/\"]').length >= 3",
   },
   {
-    path: '/login',
-    signal: 'frontend login form',
+    path: '/auth?mode=login',
+    signal: 'frontend unified auth login form',
     waitFor: 'form input[type="email"]',
     assertion: "!!document.querySelector('form input[type=\"email\"]') && !!document.querySelector('form input[type=\"password\"]')",
   },

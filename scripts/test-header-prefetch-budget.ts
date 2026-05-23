@@ -14,7 +14,7 @@ if (!/href=\{navHrefs\[i\]\}\s+prefetch=\{false\}/.test(header)) {
   process.exit(1)
 }
 
-if (!/href="\/login"\s+prefetch=\{false\}/.test(headerAuth) || !/href="\/register"\s+prefetch=\{false\}/.test(headerAuth)) {
+if (!/href="\/auth\?mode=login"\s+prefetch=\{false\}/.test(headerAuth) || !/href="\/auth\?mode=register"\s+prefetch=\{false\}/.test(headerAuth)) {
   console.error('Header auth links must disable prefetch to keep logged-out page loads lean.')
   process.exit(1)
 }

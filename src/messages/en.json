@@ -245,6 +245,9 @@
     "fury": "Fury"
   },
   "auth": {
+    "authTitle": "Account Access",
+    "loginTab": "Log In",
+    "registerTab": "Sign Up",
     "loginTitle": "Log In",
     "loginSubtitle": "Welcome back to FlyMacro",
     "registerTitle": "Sign Up",

@@ -245,6 +245,9 @@
     "fury": "狂怒"
   },
   "auth": {
+    "authTitle": "账号入口",
+    "loginTab": "登录",
+    "registerTab": "注册",
     "loginTitle": "登 录",
     "loginSubtitle": "欢迎回到 FlyMacro",
     "registerTitle": "注 册",
