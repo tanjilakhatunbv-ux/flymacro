@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { anyone, isOperatorOrAbove, isSuperAdmin } from '../lib/access'
+import { anyone, isOperatorOrAbove } from '../lib/access'
 
 export const ScriptFiles: CollectionConfig = {
   slug: 'script-files',
@@ -14,7 +14,7 @@ export const ScriptFiles: CollectionConfig = {
     read: anyone,
     create: isOperatorOrAbove,
     update: isOperatorOrAbove,
-    delete: isSuperAdmin,
+    delete: isOperatorOrAbove,
   },
   upload: {
     staticDir: 'script-files',

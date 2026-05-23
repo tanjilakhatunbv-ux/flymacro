@@ -1,12 +1,20 @@
 import type { CollectionConfig, Where } from 'payload'
 import { revalidateTag } from 'next/cache'
-import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
+import { isOperatorOrAbove } from '../lib/access'
 import type { UserRole } from '../lib/access'
 
 type AnyUser = { id: string | number; role?: UserRole }
 
 const hasRole = (user: AnyUser | null | undefined, ...roles: UserRole[]) =>
   !!user && !!user.role && roles.includes(user.role)
+
+const getRelationshipId = (value: unknown): number | string | null => {
+  if (typeof value === 'object' && value !== null) {
+    const id = (value as Record<string, unknown>).id
+    return typeof id === 'number' || typeof id === 'string' ? id : null
+  }
+  return typeof value === 'number' || typeof value === 'string' ? value : null
+}
 
 export const ScriptVersions: CollectionConfig = {
   slug: 'script-versions',
@@ -25,7 +33,7 @@ export const ScriptVersions: CollectionConfig = {
     },
     create: isOperatorOrAbove,
     update: isOperatorOrAbove,
-    delete: isSuperAdmin,
+    delete: isOperatorOrAbove,
   },
   versions: {
     drafts: {
@@ -154,10 +162,7 @@ export const ScriptVersions: CollectionConfig = {
     afterChange: [
       async ({ doc, req, previousDoc, operation }) => {
         const docData = doc as Record<string, unknown>
-        const rawScript = docData.script
-        const scriptId = typeof rawScript === 'object' && rawScript !== null
-          ? (rawScript as Record<string, unknown>).id as number | string
-          : rawScript as number | string
+        const scriptId = getRelationshipId(docData.script)
         const isLatest = docData.isLatest
         const status = docData.status
         const versionId = docData.id as number | string
@@ -270,14 +275,40 @@ export const ScriptVersions: CollectionConfig = {
     afterDelete: [
       async ({ doc, req }) => {
         const docData = doc as Record<string, unknown>
-        const rawScript = docData.script
-        const scriptId = typeof rawScript === 'object' && rawScript !== null
-          ? (rawScript as Record<string, unknown>).id as number | string
-          : rawScript as number | string
-        const wasLatest = docData.isLatest === true
+        const scriptId = getRelationshipId(docData.script)
 
-        if (wasLatest && scriptId) {
+        if (scriptId) {
           try {
+            const previousLatest = await req.payload.find({
+              collection: 'script-versions',
+              where: {
+                and: [
+                  { script: { equals: scriptId } },
+                  { isLatest: { equals: true } },
+                ],
+              },
+              limit: 100,
+              depth: 0,
+              overrideAccess: true,
+            })
+
+            for (const previous of previousLatest.docs) {
+              const previousId = ((previous as unknown) as Record<string, unknown>).id as number
+              if (!req.context) req.context = {}
+              req.context.scriptVersionInternalUpdate = true
+              try {
+                await req.payload.update({
+                  collection: 'script-versions',
+                  id: previousId,
+                  data: { isLatest: false },
+                  overrideAccess: true,
+                  req,
+                })
+              } finally {
+                delete req.context.scriptVersionInternalUpdate
+              }
+            }
+
             const remaining = await req.payload.find({
               collection: 'script-versions',
               where: {

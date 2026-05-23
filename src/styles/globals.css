@@ -2576,7 +2576,9 @@ main { min-height: calc(100vh - 200px); }
 .script-grid > *:nth-child(6) { animation-delay: 0.3s; }
 
 .script-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -2598,7 +2600,7 @@ main { min-height: calc(100vh - 200px); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
 .script-type {
@@ -2621,16 +2623,25 @@ main { min-height: calc(100vh - 200px); }
 .script-card-title {
   font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin: 0;
   line-height: 1.35;
   color: var(--text);
+}
+
+.script-card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.script-card-title a:hover {
+  color: var(--gold-bright);
 }
 
 .script-card-summary {
   font-size: 0.9rem;
   color: var(--text-muted);
   line-height: 1.5;
-  margin-bottom: 0.75rem;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2649,6 +2660,15 @@ main { min-height: calc(100vh - 200px); }
 
 .script-author {
   font-weight: 500;
+}
+
+.script-card-download {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  white-space: normal;
 }
 
 .script-detail .script-summary {
@@ -2682,79 +2702,6 @@ main { min-height: calc(100vh - 200px); }
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.script-versions-section {
-  margin-top: 2rem;
-}
-
-.script-versions-section h2 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.version-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.version-item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-}
-
-.version-item.version-latest {
-  border-color: var(--gold-dim);
-}
-
-.version-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-.version-number {
-  font-weight: 700;
-  font-family: var(--font-mono);
-  font-size: 1rem;
-}
-
-.version-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--gold);
-  background: rgba(201, 165, 88, 0.15);
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-}
-
-.version-date {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.version-changelog {
-  width: 100%;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.download-btn-sm {
-  font-size: 0.85rem;
-  padding: 0.4rem 0.9rem;
 }
 
 .text-muted {
