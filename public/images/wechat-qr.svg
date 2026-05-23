@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">WeChat support QR placeholder</title>
+  <desc id="desc">Default contact QR placeholder for FlyMacro support.</desc>
+  <rect width="240" height="240" fill="#f8f1df"/>
+  <rect x="12" y="12" width="216" height="216" rx="6" fill="#16120c"/>
+  <rect x="24" y="24" width="192" height="192" fill="#f8f1df"/>
+  <g fill="#16120c">
+    <path d="M36 36h48v48H36zM156 36h48v48h-48zM36 156h48v48H36z"/>
+    <path d="M48 48h24v24H48zM168 48h24v24h-24zM48 168h24v24H48z" fill="#f8f1df"/>
+    <path d="M96 36h12v12H96zM120 36h12v24h-12zM96 60h36v12H96zM144 96h24v12h-24zM180 96h24v24h-24z"/>
+    <path d="M96 84h12v36H96zM120 96h12v12h-12zM132 120h36v12h-36zM180 132h12v24h-12zM204 132h12v36h-12z"/>
+    <path d="M96 144h24v12H96zM132 144h12v24h-12zM156 156h24v12h-24zM96 180h36v24H96zM144 180h12v12h-12zM168 180h48v24h-48z"/>
+  </g>
+  <rect x="52" y="109" width="136" height="22" rx="11" fill="#f8f1df"/>
+  <text x="120" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#16120c">FlyMacro</text>
+</svg>
