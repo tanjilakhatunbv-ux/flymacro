@@ -49,6 +49,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     'macroGrid', 'codeBlock', 'pagination', 'video',
     'news', 'scripts', 'guide', 'blog', 'about', 'plugins',
     'credits', 'creditPackages', 'contact', 'error', 'metadata', 'oauth',
+    'sideNav', 'exchange', 'notifications', 'settings', 'ticket', 'verify',
   ]
   const messages = Object.fromEntries(
     publicNamespaces.filter((k) => k in allMessages).map((k) => [k, allMessages[k as keyof typeof allMessages]]),
