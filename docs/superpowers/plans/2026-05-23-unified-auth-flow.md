@@ -73,4 +73,3 @@
 - [ ] Run `pnpm exec tsx scripts/test-auth-form-error-codes.ts`.
 - [ ] Run `pnpm exec tsx scripts/test-auth-form-client-submit.ts`.
 - [ ] Run `pnpm exec tsc --noEmit`.
-

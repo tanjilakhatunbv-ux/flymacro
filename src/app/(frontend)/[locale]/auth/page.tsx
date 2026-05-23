@@ -57,10 +57,9 @@ export default async function AuthPage({ params, searchParams }: { params: Promi
           ) : (
             <p className="auth-help">
               {t('termsAgree')}
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a href="/about" style={{ margin: '0 4px' }}>
+              <Link href="/about" style={{ margin: '0 4px' }}>
                 {t('termsLink')}
-              </a>
+              </Link>
               {t('termsAfter')}
             </p>
           )}
