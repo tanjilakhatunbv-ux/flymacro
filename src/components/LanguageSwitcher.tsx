@@ -9,18 +9,9 @@ export function LanguageSwitcher() {
   const label = locale === 'zh' ? '中文' : 'EN'
 
   return (
-    <details style={{ position: 'relative', marginLeft: '0.25rem' }}>
+    <details className="language-menu">
       <summary
         className="btn lang-switcher"
-        style={{
-          padding: '0.35rem 0.6rem',
-          fontSize: '0.78rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.3rem',
-          cursor: 'pointer',
-          listStyle: 'none',
-        }}
         aria-label={t('switchLang')}
       >
         <svg
@@ -52,43 +43,17 @@ export function LanguageSwitcher() {
         </svg>
       </summary>
 
-      <div
-        style={{
-          position: 'absolute',
-          top: '100%',
-          right: 0,
-          marginTop: '0.35rem',
-          background: 'var(--bg-surface, #1a1a2e)',
-          border: '1px solid var(--border-soft, #2a2a3e)',
-          borderRadius: 4,
-          minWidth: '6.5rem',
-          zIndex: 100,
-          overflow: 'hidden',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-        }}
-      >
+      <div className="language-menu-pop">
         <Link
           href={pathname}
           locale="zh"
           prefetch={false}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            fontSize: '0.8rem',
-            background: locale === 'zh' ? 'var(--gold-dim, rgba(255,215,0,0.08))' : 'transparent',
-            color: locale === 'zh' ? 'var(--gold-bright)' : 'var(--text-muted)',
-            cursor: 'pointer',
-            textAlign: 'left',
-            textDecoration: 'none',
-          }}
+          className={locale === 'zh' ? 'language-option language-option-active' : 'language-option'}
         >
-          <span style={{ fontSize: '1rem' }}>🇨🇳</span>
+          <span className="language-flag">🇨🇳</span>
           中文
           {locale === 'zh' && (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginLeft: 'auto' }}>
+            <svg className="language-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M5 13l4 4L19 7" />
             </svg>
           )}
@@ -97,24 +62,12 @@ export function LanguageSwitcher() {
           href={pathname}
           locale="en"
           prefetch={false}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            fontSize: '0.8rem',
-            background: locale === 'en' ? 'var(--gold-dim, rgba(255,215,0,0.08))' : 'transparent',
-            color: locale === 'en' ? 'var(--gold-bright)' : 'var(--text-muted)',
-            cursor: 'pointer',
-            textAlign: 'left',
-            textDecoration: 'none',
-          }}
+          className={locale === 'en' ? 'language-option language-option-active' : 'language-option'}
         >
-          <span style={{ fontSize: '1rem' }}>🇺🇸</span>
+          <span className="language-flag">🇺🇸</span>
           English
           {locale === 'en' && (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginLeft: 'auto' }}>
+            <svg className="language-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M5 13l4 4L19 7" />
             </svg>
           )}

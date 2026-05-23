@@ -24,20 +24,25 @@ export function Header() {
           FlyMacro
         </Link>
         <nav className="site-nav" aria-label={t('mainNav')}>
-          {navKeys.map((key, i) => (
-            <Link
-              key={key}
-              href={navHrefs[i]}
-              prefetch={false}
-              className={isActive(pathname, navHrefs[i]) ? 'nav-active' : undefined}
-              aria-current={isActive(pathname, navHrefs[i]) ? 'page' : undefined}
-            >
-              {t(key)}
-            </Link>
-          ))}
+          {navKeys.map((key, i) => {
+            const active = isActive(pathname, navHrefs[i])
+            return (
+              <Link
+                key={key}
+                href={navHrefs[i]}
+                prefetch={false}
+                className={active ? 'nav-active' : undefined}
+                aria-current={active ? 'page' : undefined}
+              >
+                {t(key)}
+              </Link>
+            )
+          })}
+        </nav>
+        <div className="site-actions">
           <LanguageSwitcher />
           <HeaderAuth />
-        </nav>
+        </div>
       </div>
     </header>
   )

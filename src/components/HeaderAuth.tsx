@@ -63,7 +63,7 @@ export function HeaderAuth() {
 
   if (user === undefined) {
     return (
-      <span className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem', opacity: 0.4 }}>
+      <span className="btn btn-primary header-auth-link header-auth-link-loading">
         {t('authEntry')}
       </span>
     )
@@ -71,7 +71,7 @@ export function HeaderAuth() {
 
   if (user === null) {
     return (
-      <Link href="/auth?mode=login" prefetch={false} className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.78rem' }}>
+      <Link href="/auth?mode=login" prefetch={false} className="btn btn-primary header-auth-link">
         {t('authEntry')}
       </Link>
     )
