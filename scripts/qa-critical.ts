@@ -4,7 +4,17 @@ import { join } from 'node:path'
 type Env = Record<string, string>
 
 const baseUrl = (process.env.QA_BASE_URL || 'http://localhost:3003').replace(/\/$/, '')
-const routes = ['/', '/macros', '/scripts', '/guide', '/news', '/about', '/login', '/register', '/admin/login']
+const routes: Array<{ path: string; allowRedirects?: boolean }> = [
+  { path: '/' },
+  { path: '/macros' },
+  { path: '/scripts' },
+  { path: '/guide' },
+  { path: '/news' },
+  { path: '/about' },
+  { path: '/login', allowRedirects: true },
+  { path: '/register', allowRedirects: true },
+  { path: '/admin/login' },
+]
 const serverErrPath = join(process.cwd(), 'server.err.log')
 const initialErrSize = existsSync(serverErrPath) ? readFileSync(serverErrPath, 'utf8').length : 0
 
@@ -22,19 +32,19 @@ function loadDotEnv(): Env {
   return env
 }
 
-async function expectOk(pathname: string): Promise<void> {
-  const response = await fetch(`${baseUrl}${pathname}`, {
-    redirect: 'manual',
+async function expectOk({ path, allowRedirects }: { path: string; allowRedirects?: boolean }): Promise<void> {
+  const response = await fetch(`${baseUrl}${path}`, {
+    redirect: allowRedirects ? 'follow' : 'manual',
     headers: { accept: 'text/html,application/xhtml+xml' },
   })
 
   if (response.status !== 200) {
-    throw new Error(`${pathname} returned HTTP ${response.status}`)
+    throw new Error(`${path} returned HTTP ${response.status}`)
   }
 
   const body = await response.text()
   if (/404|Not Found|Internal Server Error/i.test(body.slice(0, 4000))) {
-    throw new Error(`${pathname} rendered an error page`)
+    throw new Error(`${path} rendered an error page`)
   }
 }
 

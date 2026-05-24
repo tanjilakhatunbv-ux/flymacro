@@ -67,8 +67,6 @@ export async function POST(req: Request) {
 
   const obj = (evt.object ?? {}) as Record<string, unknown>
   const order = (obj.order ?? {}) as Record<string, unknown>
-  const product = (obj.product ?? {}) as Record<string, unknown>
-  const customer = (obj.customer ?? {}) as Record<string, unknown>
   const metadata = (obj.metadata ?? {}) as Record<string, string>
 
   const userId = metadata.userId

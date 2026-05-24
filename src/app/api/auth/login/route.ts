@@ -220,7 +220,13 @@ export async function POST(req: Request) {
     }
 
     // Strip sensitive fields from response
-    const { hash, salt, resetPasswordToken, resetPasswordExpiration, ...safeUser } = user as User & Record<string, unknown>
+    const {
+      hash: _hash,
+      salt: _salt,
+      resetPasswordToken: _resetPasswordToken,
+      resetPasswordExpiration: _resetPasswordExpiration,
+      ...safeUser
+    } = user as User & Record<string, unknown>
 
     const response = NextResponse.json(success({
       user: safeUser,
