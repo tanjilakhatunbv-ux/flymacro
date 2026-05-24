@@ -61,7 +61,7 @@ export function useExchange({
         }
       })
     },
-    [mode, price, insufficient, onSuccess, t],
+    [mode, insufficient, onSuccess, t],
   )
 
   return { execute, error, isPending, insufficient }

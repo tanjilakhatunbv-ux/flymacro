@@ -18,7 +18,6 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'metadata' })
   const baseUrl = 'https://flymacro.qzz.io'
-  const alternateLocale = locale === 'zh' ? 'en' : 'zh'
 
   return {
     title: t('title'),

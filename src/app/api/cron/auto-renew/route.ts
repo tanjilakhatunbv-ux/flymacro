@@ -79,7 +79,6 @@ export async function GET(req: Request) {
 
       if (!creditRows || creditRows.length === 0) {
         // Insufficient credits — disable auto-renew and notify
-        const userForMsg = typeof ex.user === 'object' && ex.user !== null ? ex.user as User : null
         await payload.update({
           collection: 'macro-exchanges',
           id: ex.id,

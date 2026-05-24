@@ -17,4 +17,9 @@ if (!existsSync(publicPath)) {
   process.exit(1)
 }
 
-console.log('Contact page default WeChat QR asset exists.')
+if (!contactPage.includes("process.env.NEXT_PUBLIC_WECHAT_QR_URL === '/images/wechat-qr.png'")) {
+  console.error('Contact page must map the legacy /images/wechat-qr.png env override to the bundled QR asset.')
+  process.exit(1)
+}
+
+console.log('Contact page default and legacy WeChat QR assets resolve.')

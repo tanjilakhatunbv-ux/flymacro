@@ -14,7 +14,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function ContactPage() {
   const t = await getTranslations('contact')
   const telegramUrl = process.env.NEXT_PUBLIC_TELEGRAM_URL || 'https://t.me/flymacro'
-  const wechatQrUrl = process.env.NEXT_PUBLIC_WECHAT_QR_URL || '/images/wechat-qr.svg'
+  const wechatQrUrl = process.env.NEXT_PUBLIC_WECHAT_QR_URL === '/images/wechat-qr.png'
+    ? '/images/wechat-qr.svg'
+    : process.env.NEXT_PUBLIC_WECHAT_QR_URL || '/images/wechat-qr.svg'
 
   return (
     <div className="container-page page-single">
