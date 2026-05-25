@@ -908,10 +908,12 @@ const PAGES = [
 // ═══════════════════════════════════════════════════════════
 
 const CREDIT_PACKAGES = [
-  { label: '12 点券包',      amount: 10,  originalAmount: 12,  creditsGranted: 12,  creemProductId: 'prod_6Ww3phKb8k0vR7lq3TDVc6', currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
-  { label: '60 点券包',      amount: 50,  originalAmount: 60,  creditsGranted: 60,  creemProductId: 'prod_78dxlqqlgx9L5cBogqTFkq', currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: '限时特惠', badge: 'hot' },
-  { label: '125 点券包',    amount: 100, originalAmount: 120, creditsGranted: 125, creemProductId: 'prod_2HMhpCtZLpT0Pt1ZYCSYAr', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '最超值', badge: 'recommended' },
-  { label: '400 点券包',    amount: 300, originalAmount: 400, creditsGranted: 400, creemProductId: 'prod_7HyLoOKySZUgExRgSmrIN5', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: 'VIP专享', badge: 'recommended' },
+  { label: '10 点券包',     amount: 10,  originalAmount: 10,  creditsGranted: 10,  creemProductId: 'prod_6Ww3phKb8k0vR7lq3TDVc6', currency: 'CNY' as const, enabled: true, sort: 1, discountLabel: null, badge: 'none' },
+  { label: '20 点券包',     amount: 20,  originalAmount: 20,  creditsGranted: 20,  creemProductId: 'prod_78dxlqqlgx9L5cBogqTFkq', currency: 'CNY' as const, enabled: true, sort: 2, discountLabel: null, badge: 'none' },
+  { label: '50 点券包',     amount: 50,  originalAmount: 60,  creditsGranted: 50,  creemProductId: 'prod_2HMhpCtZLpT0Pt1ZYCSYAr', currency: 'CNY' as const, enabled: true, sort: 3, discountLabel: '限时特惠', badge: 'hot' },
+  { label: '100 点券包',    amount: 100, originalAmount: 120, creditsGranted: 100, creemProductId: 'prod_7HyLoOKySZUgExRgSmrIN5', currency: 'CNY' as const, enabled: true, sort: 4, discountLabel: '最超值', badge: 'recommended' },
+  { label: '200 点券包',    amount: 200, originalAmount: 240, creditsGranted: 200, creemProductId: 'prod_demo_200_credits', currency: 'CNY' as const, enabled: true, sort: 5, discountLabel: 'VIP专享', badge: 'recommended' },
+  { label: '500 点券包',    amount: 500, originalAmount: 600, creditsGranted: 500, creemProductId: 'prod_demo_500_credits', currency: 'CNY' as const, enabled: true, sort: 6, discountLabel: 'VIP专享', badge: 'recommended' },
 ]
 
 // ═══════════════════════════════════════════════════════════
