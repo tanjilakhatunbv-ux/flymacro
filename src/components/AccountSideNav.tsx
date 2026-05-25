@@ -9,6 +9,7 @@ type Role = 'admin' | 'operator' | 'user'
 const itemKeys = [
   { href: '/account', labelKey: 'overview' },
   { href: '/account/credits', labelKey: 'credits' },
+  { href: '/account/redeem', labelKey: 'redeemCodes' },
   { href: '/account/exchanges', labelKey: 'exchanges' },
   { href: '/account/orders', labelKey: 'orders' },
   { href: '/account/transactions', labelKey: 'transactions' },

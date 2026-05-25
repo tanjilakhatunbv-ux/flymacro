@@ -207,6 +207,15 @@ export const Users: CollectionConfig = {
               maxDepth: 0,
               label: '积分流水',
             },
+            {
+              name: 'redeemCodeRedemptionsJoin',
+              type: 'join',
+              collection: 'redeem-code-redemptions',
+              on: 'user',
+              defaultLimit: 5,
+              maxDepth: 0,
+              label: '兑换码记录',
+            },
           ],
         },
         {

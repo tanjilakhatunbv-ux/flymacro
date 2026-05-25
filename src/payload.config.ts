@@ -21,6 +21,8 @@ import { CreditPackages } from './collections/CreditPackages'
 import { CreditOrders } from './collections/CreditOrders'
 import { MacroExchanges } from './collections/MacroExchanges'
 import { CreditTransactions } from './collections/CreditTransactions'
+import { RedeemCodes } from './collections/RedeemCodes'
+import { RedeemCodeRedemptions } from './collections/RedeemCodeRedemptions'
 import { Tickets } from './collections/Tickets'
 import { TicketMessages } from './collections/TicketMessages'
 import { Notifications } from './collections/Notifications'
@@ -78,6 +80,8 @@ export default buildConfig({
     CreditOrders,
     MacroExchanges,
     CreditTransactions,
+    RedeemCodes,
+    RedeemCodeRedemptions,
     Tickets,
     TicketMessages,
     Notifications,

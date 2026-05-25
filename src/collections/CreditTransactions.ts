@@ -59,6 +59,7 @@ export const CreditTransactions: CollectionConfig = {
         { label: '购买', value: 'recharge' },
         { label: '兑换宏', value: 'exchange' },
         { label: '自动续费', value: 'renew' },
+        { label: '兑换码', value: 'redeem_code' },
         { label: '退款', value: 'refund' },
         { label: '运营调整', value: 'admin_adjust' },
       ],

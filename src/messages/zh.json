@@ -296,7 +296,7 @@
     "accountLocked": "账号已被锁定，请联系客服",
     "emailRegistered": "该邮箱已注册，请直接登录",
     "verificationBannerTitle": "请验证你的邮箱 — 修改密码时需要验证，验证后还可获得",
-"verificationBannerReward": "20 点券",
+    "verificationBannerReward": "20 点券",
     "verificationBannerCta": "重发验证邮件",
     "resendSuccess": "验证邮件已发送，请查收邮箱",
     "resendRateLimited": "请求过于频繁，请稍后再试",
@@ -305,13 +305,13 @@
     "passwordChangeLocked": "修改密码前需要先验证邮箱。请查看收件箱中的验证邮件，或点击页面顶部的提醒栏重发。",
     "unknownFormType": "未知的表单类型"
   },
-  "error" : {
+  "error": {
     "title": "出错了",
     "message": "页面加载时遇到了问题，请稍后重试或返回首页。",
     "retry": "重试",
     "backHome": "返回首页"
   },
-  "verify" : {
+  "verify": {
     "verifying": "正在验证你的邮箱...",
     "success": "邮箱验证成功！",
     "goLogin": "前往登录",
@@ -324,7 +324,7 @@
     "invalidLink": "链接无效或缺少 token。请重新检查邮件，或",
     "expiredLink": "链接无效或已过期。请重新申请："
   },
-  "macroDetail" : {
+  "macroDetail": {
     "loading": "加载中...",
     "alreadyExchanged": "你已兑换此宏",
     "validUntil": "有效期至",
@@ -344,7 +344,7 @@
     "renewManage": "续费管理",
     "exchangePrice": "兑换 {price} 点券"
   },
-  "macroFilters" : {
+  "macroFilters": {
     "searchPlaceholder": "搜索宏名称或简介...",
     "searchAria": "搜索宏",
     "search": "搜索",
@@ -359,20 +359,20 @@
     "tagFilter": "标签",
     "clearAll": "清除全部筛选"
   },
-  "macroGrid" : {
+  "macroGrid": {
     "totalCount": "共 {count} 个宏",
     "empty": "当前条件下暂无宏包。"
   },
-  "codeBlock" : {
+  "codeBlock": {
     "copied": "已复制",
     "copy": "复制"
   },
-  "pagination" : {
+  "pagination": {
     "aria": "分页",
     "prev": "上一页",
     "next": "下一页"
   },
-  "creditPackages" : {
+  "creditPackages": {
     "sessionFailed": "创建支付会话失败",
     "noPaymentLink": "未获得支付链接",
     "requestFailed": "请求失败",
@@ -390,7 +390,7 @@
     "bestValue": "最超值",
     "vipOnly": "VIP专享"
   },
-  "exchange" : {
+  "exchange": {
     "renewing": "续费中...",
     "exchanging": "兑换中...",
     "insufficientCredits": "点券不足",
@@ -398,7 +398,7 @@
     "exchangePrice": "兑换 {price} 点券",
     "renewButton": "续费 ({price} 点券)"
   },
-  "ticket" : {
+  "ticket": {
     "myTickets": "我的工单",
     "subtitle": "在这里查看你提交的所有工单及客服回复进度。",
     "newTicket": "提交新工单",
@@ -442,7 +442,7 @@
     "sendReply": "发送回复",
     "sending": "发送中..."
   },
-  "accountPage" : {
+  "accountPage": {
     "title": "个人中心 — FlyMacro",
     "welcome": "欢迎回来，{name}",
     "subtitle": "在这里管理你的点券、兑换、订单、工单与通知。",
@@ -469,7 +469,7 @@
     "roleOperator": "运营",
     "roleUser": "普通用户"
   },
-  "exchanges" : {
+  "exchanges": {
     "title": "我的兑换 — FlyMacro",
     "heading": "我的兑换",
     "subtitle": "这里展示你已兑换的宏及有效期，可随时查看代码或续费。",
@@ -486,7 +486,7 @@
     "exchangedAt": "兑换于",
     "expiresAt": "过期于"
   },
-  "orders" : {
+  "orders": {
     "title": "点券订单 — FlyMacro",
     "heading": "点券订单",
     "subtitle": "查看你的所有点券订单及点券到账情况。",
@@ -501,7 +501,7 @@
     "statusPaid": "已支付",
     "statusFailed": "失败"
   },
-  "transactions" : {
+  "transactions": {
     "title": "点券明细 — FlyMacro",
     "heading": "点券明细",
     "subtitle": "查看每一笔点券变动，包括购买、兑换、续费和注册奖励。",
@@ -516,9 +516,10 @@
     "typeExchange": "兑换",
     "typeRenew": "续费",
     "typeRefund": "退款",
-    "typeAdjust": "系统调整"
+    "typeAdjust": "系统调整",
+    "typeRedeemCode": "兑换码"
   },
-  "notifications" : {
+  "notifications": {
     "title": "通知中心 — FlyMacro",
     "heading": "通知中心",
     "subtitle": "来自系统和客服的最新消息。",
@@ -527,7 +528,7 @@
     "markAllRead": "全部已读",
     "markRead": "标记已读"
   },
-  "settings" : {
+  "settings": {
     "heading": "账号设置",
     "subtitle": "管理你的个人资料与账号安全。",
     "changeNickname": "修改昵称",
@@ -544,7 +545,7 @@
     "changePasswordButton": "修改密码",
     "changing": "修改中..."
   },
-  "sideNav" : {
+  "sideNav": {
     "overview": "总览",
     "credits": "购买点券",
     "exchanges": "我的兑换",
@@ -556,14 +557,15 @@
     "navAria": "个人中心导航",
     "accountLabel": "账号",
     "opsLabel": "运营",
-    "opsPanel": "运营后台"
+    "opsPanel": "运营后台",
+    "redeemCodes": "兑换码"
   },
-  "video" : {
+  "video": {
     "demoVideo": "演示视频",
     "youtubeDemo": "YouTube 演示视频",
     "bilibiliDemo": "B站 演示视频"
   },
-  "oauth" : {
+  "oauth": {
     "or": "或",
     "googleLogin": "使用 Google 登录",
     "githubLogin": "使用 GitHub 登录"
@@ -594,6 +596,30 @@
     "unauthenticated": "请先登录",
     "internal_error": "服务器内部错误，请稍后重试",
     "invalid_token": "Token 无效或已过期",
-    "email_not_verified": "请先验证邮箱后再操作"
+    "email_not_verified": "请先验证邮箱后再操作",
+    "missing_redeem_code": "请输入兑换码",
+    "redeem_code_not_found": "兑换码不存在",
+    "redeem_code_disabled": "兑换码已停用",
+    "redeem_code_exhausted": "兑换码已用完",
+    "redeem_code_failed": "兑换失败，请稍后重试"
+  },
+  "redeemCode": {
+    "title": "兑换码 - FlyMacro",
+    "heading": "兑换码",
+    "subtitle": "使用客服或活动发放的兑换码，为账户添加点券。",
+    "formTitle": "使用兑换码",
+    "formSubtitle": "请输入兑换码。兑换码会以 F010、F020、F050、F100、F200、F500 开头。",
+    "codeField": "兑换码",
+    "placeholder": "F100-XXXX-XXXX",
+    "submit": "立即兑换",
+    "submitting": "兑换中...",
+    "loginRequired": "登录后兑换",
+    "requestFailed": "请求失败",
+    "successMessage": "已兑换 {credits} 点券，当前余额 {balance}。",
+    "historyTitle": "兑换记录",
+    "historyEmpty": "你还没有兑换过兑换码。",
+    "creditsField": "点券",
+    "redeemedAt": "兑换于",
+    "balanceChange": "余额 {before} -> {after}"
   }
 }
