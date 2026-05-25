@@ -5,8 +5,8 @@ import { Link, usePathname } from '@/i18n/routing'
 import { HeaderAuth } from './HeaderAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
 
-const navKeys = ['home', 'macros', 'scripts', 'guide', 'news', 'about'] as const
-const navHrefs = ['/', '/macros', '/scripts', '/guide', '/news', '/about'] as const
+const navKeys = ['home', 'macros', 'scripts', 'guide', 'news', 'about', 'contact'] as const
+const navHrefs = ['/', '/macros', '/scripts', '/guide', '/news', '/about', '/contact'] as const
 
 function isActive(pathname: string, href: string) {
   if (href === '/') return pathname === '/'
