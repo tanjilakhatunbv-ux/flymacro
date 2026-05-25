@@ -100,6 +100,7 @@ function typeLabel(type: string, t: any): string {
     recharge: t('typeTopup'),
     exchange: t('typeExchange'),
     renew: t('typeRenew'),
+    redeem_code: t('typeRedeemCode'),
     refund: t('typeRefund'),
     admin_adjust: t('typeAdjust'),
   }

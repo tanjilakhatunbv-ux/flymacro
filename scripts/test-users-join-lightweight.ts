@@ -6,6 +6,7 @@ const source = readFileSync(join(process.cwd(), 'src/collections/Users.ts'), 'ut
 const joinFields = [
   'creditOrdersJoin',
   'creditTransactionsJoin',
+  'redeemCodeRedemptionsJoin',
   'macroExchangesJoin',
   'ticketsJoin',
   'notificationsJoin',

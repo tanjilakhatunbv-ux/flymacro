@@ -47,7 +47,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     'home', 'macros', 'macroCard', 'macroDetail', 'macroFilters',
     'macroGrid', 'codeBlock', 'pagination', 'video',
     'news', 'scripts', 'guide', 'blog', 'about', 'plugins',
-    'credits', 'creditPackages', 'contact', 'error', 'metadata', 'oauth',
+    'credits', 'creditPackages', 'redeemCode', 'contact', 'error', 'metadata', 'oauth',
     'sideNav', 'exchange', 'notifications', 'settings', 'ticket', 'verify',
   ]
   const messages = Object.fromEntries(

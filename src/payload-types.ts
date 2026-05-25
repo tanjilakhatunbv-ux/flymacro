@@ -80,6 +80,8 @@ export interface Config {
     'credit-orders': CreditOrder;
     'macro-exchanges': MacroExchange;
     'credit-transactions': CreditTransaction;
+    'redeem-codes': RedeemCode;
+    'redeem-code-redemptions': RedeemCodeRedemption;
     tickets: Ticket;
     'ticket-messages': TicketMessage;
     notifications: Notification;
@@ -97,6 +99,7 @@ export interface Config {
     users: {
       creditOrdersJoin: 'credit-orders';
       creditTransactionsJoin: 'credit-transactions';
+      redeemCodeRedemptionsJoin: 'redeem-code-redemptions';
       macroExchangesJoin: 'macro-exchanges';
       ticketsJoin: 'tickets';
       notificationsJoin: 'notifications';
@@ -119,6 +122,8 @@ export interface Config {
     'credit-orders': CreditOrdersSelect<false> | CreditOrdersSelect<true>;
     'macro-exchanges': MacroExchangesSelect<false> | MacroExchangesSelect<true>;
     'credit-transactions': CreditTransactionsSelect<false> | CreditTransactionsSelect<true>;
+    'redeem-codes': RedeemCodesSelect<false> | RedeemCodesSelect<true>;
+    'redeem-code-redemptions': RedeemCodeRedemptionsSelect<false> | RedeemCodeRedemptionsSelect<true>;
     tickets: TicketsSelect<false> | TicketsSelect<true>;
     'ticket-messages': TicketMessagesSelect<false> | TicketMessagesSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
@@ -207,6 +212,11 @@ export interface User {
   };
   creditTransactionsJoin?: {
     docs?: (number | CreditTransaction)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  redeemCodeRedemptionsJoin?: {
+    docs?: (number | RedeemCodeRedemption)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -361,7 +371,7 @@ export interface CreditTransaction {
    */
   amount: number;
   balanceAfter: number;
-  type: 'register_bonus' | 'recharge' | 'exchange' | 'renew' | 'refund' | 'admin_adjust';
+  type: 'register_bonus' | 'recharge' | 'exchange' | 'renew' | 'redeem_code' | 'refund' | 'admin_adjust';
   relatedOrder?: (number | null) | CreditOrder;
   relatedExchange?: (number | null) | MacroExchange;
   reason?: string | null;
@@ -540,6 +550,54 @@ export interface Version {
   codename?: string | null;
   releasedAt?: string | null;
   isCurrent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 用户兑换码使用记录。账务字段只读，仅允许后台编辑备注。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redeem-code-redemptions".
+ */
+export interface RedeemCodeRedemption {
+  id: number;
+  label?: string | null;
+  user: number | User;
+  redeemCode: number | RedeemCode;
+  creditsGranted: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  adminNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 点券兑换码管理。支持一次性单码和通用码，可批量生成并查询兑换情况。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redeem-codes".
+ */
+export interface RedeemCode {
+  id: number;
+  /**
+   * 例如：微信客服补偿、五一活动 F100 批次
+   */
+  title: string;
+  /**
+   * 前缀必须匹配点券额度：F010/F020/F050/F100/F200/F500
+   */
+  code: string;
+  /**
+   * 只支持固定点券包，必须与兑换码前缀一致。
+   */
+  creditsGranted: '10' | '20' | '50' | '100' | '200' | '500';
+  /**
+   * 一次性单码填 1；通用码填总可兑换次数。
+   */
+  maxRedemptions: number;
+  redeemedCount: number;
+  enabled?: boolean | null;
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1099,6 +1157,14 @@ export interface PayloadLockedDocument {
         value: number | CreditTransaction;
       } | null)
     | ({
+        relationTo: 'redeem-codes';
+        value: number | RedeemCode;
+      } | null)
+    | ({
+        relationTo: 'redeem-code-redemptions';
+        value: number | RedeemCodeRedemption;
+      } | null)
+    | ({
         relationTo: 'tickets';
         value: number | Ticket;
       } | null)
@@ -1189,6 +1255,7 @@ export interface UsersSelect<T extends boolean = true> {
   oauthId?: T;
   creditOrdersJoin?: T;
   creditTransactionsJoin?: T;
+  redeemCodeRedemptionsJoin?: T;
   macroExchangesJoin?: T;
   ticketsJoin?: T;
   notificationsJoin?: T;
@@ -1463,6 +1530,36 @@ export interface CreditTransactionsSelect<T extends boolean = true> {
   relatedOrder?: T;
   relatedExchange?: T;
   reason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redeem-codes_select".
+ */
+export interface RedeemCodesSelect<T extends boolean = true> {
+  title?: T;
+  code?: T;
+  creditsGranted?: T;
+  maxRedemptions?: T;
+  redeemedCount?: T;
+  enabled?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redeem-code-redemptions_select".
+ */
+export interface RedeemCodeRedemptionsSelect<T extends boolean = true> {
+  label?: T;
+  user?: T;
+  redeemCode?: T;
+  creditsGranted?: T;
+  balanceBefore?: T;
+  balanceAfter?: T;
+  adminNote?: T;
   updatedAt?: T;
   createdAt?: T;
 }

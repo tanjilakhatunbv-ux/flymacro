@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../lib/auth'
 import { getPayload } from '../../../../lib/payload'
 import { CreditPackages } from '../../../../components/CreditPackages'
+import { RedeemCodeForm } from '../../../../components/RedeemCodeForm'
 import { RichText } from '../../../../components/RichText'
 import type { CreditPackage, SiteSetting } from '../../../../payload-types'
 
@@ -89,6 +90,8 @@ export default async function CreditsPage({
           {t('cancelMessage')}
         </div>
       )}
+
+      <RedeemCodeForm loggedIn={!!user} returnPath="/credits" />
 
       <CreditPackages packages={packages} loggedIn={!!user} />
 

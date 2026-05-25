@@ -296,7 +296,7 @@
     "accountLocked": "Account has been locked. Please contact support.",
     "emailRegistered": "This email is already registered. Please log in directly.",
     "verificationBannerTitle": "Please verify your email — required to change password, plus earn",
-"verificationBannerReward": "20 credits",
+    "verificationBannerReward": "20 credits",
     "verificationBannerCta": "Resend verification email",
     "resendSuccess": "Verification email sent. Please check your inbox.",
     "resendRateLimited": "Too many requests. Please try again later.",
@@ -516,7 +516,8 @@
     "typeExchange": "Exchange",
     "typeRenew": "Renewal",
     "typeRefund": "Refund",
-    "typeAdjust": "System Adjustment"
+    "typeAdjust": "System Adjustment",
+    "typeRedeemCode": "Redeem Code"
   },
   "notifications": {
     "title": "Notifications — FlyMacro",
@@ -556,7 +557,8 @@
     "navAria": "Account navigation",
     "accountLabel": "Account",
     "opsLabel": "Operations",
-    "opsPanel": "Admin Panel"
+    "opsPanel": "Admin Panel",
+    "redeemCodes": "Redeem Code"
   },
   "video": {
     "demoVideo": "Demo Video",
@@ -594,6 +596,30 @@
     "unauthenticated": "Please log in first.",
     "internal_error": "Internal server error. Please try again later.",
     "invalid_token": "Token is invalid or has expired.",
-    "email_not_verified": "Please verify your email before proceeding."
+    "email_not_verified": "Please verify your email before proceeding.",
+    "missing_redeem_code": "Please enter a redeem code.",
+    "redeem_code_not_found": "Redeem code not found.",
+    "redeem_code_disabled": "This redeem code is disabled.",
+    "redeem_code_exhausted": "This redeem code has already been used up.",
+    "redeem_code_failed": "Failed to redeem code. Please try again."
+  },
+  "redeemCode": {
+    "title": "Redeem Code - FlyMacro",
+    "heading": "Redeem Code",
+    "subtitle": "Use a FlyMacro redeem code to add Credits to your account.",
+    "formTitle": "Have a redeem code?",
+    "formSubtitle": "Enter the code from support or an event. Codes start with F010, F020, F050, F100, F200, or F500.",
+    "codeField": "Redeem code",
+    "placeholder": "F100-XXXX-XXXX",
+    "submit": "Redeem",
+    "submitting": "Redeeming...",
+    "loginRequired": "Log in to redeem",
+    "requestFailed": "Request failed",
+    "successMessage": "Redeemed {credits} credits. Current balance: {balance}.",
+    "historyTitle": "Redeem History",
+    "historyEmpty": "You have not redeemed any codes yet.",
+    "creditsField": "credits",
+    "redeemedAt": "Redeemed",
+    "balanceChange": "Balance {before} -> {after}"
   }
 }
