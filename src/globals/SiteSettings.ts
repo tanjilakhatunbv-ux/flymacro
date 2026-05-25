@@ -1,4 +1,4 @@
-import type { GlobalConfig } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { isOperatorOrAbove } from '../lib/access'
 
@@ -68,5 +68,96 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    {
+      type: 'group',
+      name: 'contactPage',
+      label: '联系方式页面设置',
+      admin: {
+        description: '控制前台 /contact 页面展示的联系渠道和开启状态。',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          defaultValue: true,
+          label: '启用联系方式页面渠道展示',
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'email',
+              type: 'group',
+              label: 'Email',
+              fields: contactChannelFields('邮箱地址', false, true),
+            },
+            {
+              name: 'telegram',
+              type: 'group',
+              label: 'Telegram',
+              fields: contactChannelFields('Telegram 显示名称或链接', true, true),
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'discord',
+              type: 'group',
+              label: 'Discord',
+              fields: contactChannelFields('Discord 邀请链接或服务器名', true, false),
+            },
+            {
+              name: 'qq',
+              type: 'group',
+              label: 'QQ',
+              fields: contactChannelFields('QQ 号或 QQ 群号', false, false),
+            },
+          ],
+        },
+      ],
+    },
   ],
+}
+
+function contactChannelFields(valueLabel: string, includeUrl: boolean, enabledByDefault: boolean): Field[] {
+  const enabledCondition = (_: unknown, siblingData: { enabled?: boolean } | undefined) => siblingData?.enabled === true
+
+  return [
+    {
+      name: 'enabled',
+      type: 'checkbox',
+      defaultValue: enabledByDefault,
+      label: '启用',
+    },
+    {
+      name: 'value',
+      type: 'text',
+      label: valueLabel,
+      admin: {
+        condition: enabledCondition,
+      },
+    },
+    ...(includeUrl
+      ? ([
+          {
+            name: 'url',
+            type: 'text',
+            label: '跳转链接',
+            admin: {
+              condition: enabledCondition,
+            },
+          },
+        ] satisfies Field[])
+      : []),
+    {
+      name: 'note',
+      type: 'text',
+      label: '说明',
+      admin: {
+        condition: enabledCondition,
+      },
+    },
+  ]
 }

@@ -1,25 +1,29 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const contactPage = readFileSync(join(process.cwd(), 'src/app/(frontend)/[locale]/contact/page.tsx'), 'utf8')
-const defaultQrMatch = contactPage.match(/NEXT_PUBLIC_WECHAT_QR_URL\s*\|\|\s*'(?<path>\/images\/[^']+)'/)
-const defaultQrPath = defaultQrMatch?.groups?.path
+const settings = readFileSync(join(process.cwd(), 'src/globals/SiteSettings.ts'), 'utf8')
 
-if (!defaultQrPath) {
-  console.error('Contact page must define a relative default WeChat QR image path.')
+if (!contactPage.includes('resolveContactChannels(contactPage)')) {
+  console.error('Contact page must resolve channels from site-settings contactPage config.')
   process.exit(1)
 }
 
-const publicPath = join(process.cwd(), 'public', defaultQrPath.replace(/^\//, ''))
+for (const channel of ['email', 'telegram', 'discord', 'qq']) {
+  if (!settings.includes(`name: '${channel}'`)) {
+    console.error(`Site settings must expose a ${channel} contact channel group.`)
+    process.exit(1)
+  }
+}
 
-if (!existsSync(publicPath)) {
-  console.error(`Default WeChat QR image is missing at ${defaultQrPath}.`)
+if (!settings.includes("name: 'contactPage'") || !settings.includes("label: '联系方式页面设置'")) {
+  console.error('Site settings must expose contactPage controls in the admin.')
   process.exit(1)
 }
 
-if (!contactPage.includes("process.env.NEXT_PUBLIC_WECHAT_QR_URL === '/images/wechat-qr.png'")) {
-  console.error('Contact page must map the legacy /images/wechat-qr.png env override to the bundled QR asset.')
+if (contactPage.includes('NEXT_PUBLIC_WECHAT_QR_URL')) {
+  console.error('Contact page should use the configured Email, Telegram, Discord, and QQ channels instead of the legacy WeChat QR env.')
   process.exit(1)
 }
 
-console.log('Contact page default and legacy WeChat QR assets resolve.')
+console.log('Contact page uses configurable Email, Telegram, Discord, and QQ channels.')
