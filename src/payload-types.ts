@@ -1694,6 +1694,34 @@ export interface SiteSetting {
       [k: string]: unknown;
     } | null;
   };
+  /**
+   * 控制前台 /contact 页面展示的联系渠道和开启状态。
+   */
+  contactPage?: {
+    enabled?: boolean | null;
+    email?: {
+      enabled?: boolean | null;
+      value?: string | null;
+      note?: string | null;
+    };
+    telegram?: {
+      enabled?: boolean | null;
+      value?: string | null;
+      url?: string | null;
+      note?: string | null;
+    };
+    discord?: {
+      enabled?: boolean | null;
+      value?: string | null;
+      url?: string | null;
+      note?: string | null;
+    };
+    qq?: {
+      enabled?: boolean | null;
+      value?: string | null;
+      note?: string | null;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1711,6 +1739,41 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         promoBanner?: T;
         noticeEnabled?: T;
         notice?: T;
+      };
+  contactPage?:
+    | T
+    | {
+        enabled?: T;
+        email?:
+          | T
+          | {
+              enabled?: T;
+              value?: T;
+              note?: T;
+            };
+        telegram?:
+          | T
+          | {
+              enabled?: T;
+              value?: T;
+              url?: T;
+              note?: T;
+            };
+        discord?:
+          | T
+          | {
+              enabled?: T;
+              value?: T;
+              url?: T;
+              note?: T;
+            };
+        qq?:
+          | T
+          | {
+              enabled?: T;
+              value?: T;
+              note?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;
