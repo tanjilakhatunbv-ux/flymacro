@@ -5,8 +5,8 @@ const source = readFileSync(join(process.cwd(), 'src/app/(frontend)/[locale]/pag
 
 const dividerImages = source.match(/<Image src="\/images\/ornaments\/gem-divider\.svg"[\s\S]*?\/>/g) ?? []
 
-if (dividerImages.length !== 3) {
-  console.error('Home page should render three gem divider images.')
+if (dividerImages.length !== 2) {
+  console.error('Home page should render two gem divider images.')
   process.exit(1)
 }
 

@@ -596,96 +596,6 @@ main { min-height: calc(100vh - 200px); }
 }
 
 /* ============================================================
-   Class Panel - class-color showcase
-   ============================================================ */
-.class-panel {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem;
-  margin-top: 2rem;
-}
-
-.class-tile {
-  position: relative;
-  padding: 1.25rem 1rem 1.1rem 3.6rem;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--class-color, var(--gold));
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  overflow: hidden;
-  text-decoration: none;
-}
-
-.class-tile .class-crest {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--class-color, var(--gold-bright));
-  opacity: 0.85;
-  transition: opacity 0.2s, transform 0.3s;
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
-}
-
-.class-tile .class-crest img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.class-tile:hover .class-crest {
-  opacity: 1;
-  transform: translateY(-50%) rotate(-6deg) scale(1.08);
-}
-
-.class-tile:hover {
-  background: var(--bg-parchment);
-  border-color: var(--class-color, var(--gold));
-  box-shadow: 0 0 16px rgba(255, 209, 0, 0.15);
-  transform: translateX(2px);
-}
-
-.class-tile .class-name {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--class-color, var(--gold-bright));
-  text-shadow: 0 1px 0 rgba(0,0,0,0.6);
-}
-
-.class-tile .class-count {
-  font-family: var(--font-decor);
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* WoW class colors */
-.class-deathknight  { --class-color: #C41E3A; }
-.class-demonhunter  { --class-color: #A330C9; }
-.class-druid        { --class-color: #FF7C0A; }
-.class-evoker       { --class-color: #33937F; }
-.class-hunter       { --class-color: #AAD372; }
-.class-mage         { --class-color: #3FC7EB; }
-.class-monk         { --class-color: #00FF98; }
-.class-paladin      { --class-color: #F48CBA; }
-.class-priest       { --class-color: #FFFFFF; }
-.class-rogue        { --class-color: #FFF468; }
-.class-shaman       { --class-color: #0070DD; }
-.class-warlock      { --class-color: #8788EE; }
-.class-warrior      { --class-color: #C69B6D; }
-
-/* ============================================================
    Macro Grid (item bag)
    ============================================================ */
 .macro-grid {
@@ -1658,7 +1568,6 @@ main { min-height: calc(100vh - 200px); }
   .hero-actions .btn { width: 100%; }
   .macro-grid { grid-template-columns: 1fr; }
   .feature-grid { grid-template-columns: 1fr; }
-  .class-panel { grid-template-columns: repeat(2, 1fr); }
   .page-list {
     padding-top: 1.15rem;
   }
