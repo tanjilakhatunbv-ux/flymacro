@@ -83,11 +83,20 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
             {tAcct('creditsDisplay', { credits })}
           </span>
         )}
-        {unread > 0 && (
-          <span className="user-badge" aria-label={tAcct('unreadNotifications', { count: unread })}>
-            {unread > 99 ? '99+' : unread}
-          </span>
-        )}
+        <svg
+          className="user-menu-chevron"
+          aria-hidden="true"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </button>
       {open && (
         <div role="menu" className="user-menu-pop">
