@@ -77,11 +77,6 @@ export function CreditPackages({ packages, loggedIn }: { packages: CreditPackage
               </div>
               <div className="credit-granted-row">
                 {t('creditsAmount', { amount: pkg.creditsGranted })}
-                {pkg.creditsGranted > (pkg.amount ?? 0) && (
-                  <span className="credit-bonus">
-                    {t('bonusCredits', { amount: pkg.creditsGranted - (pkg.amount ?? 0) })}
-                  </span>
-                )}
               </div>
               {discount && (
                 <div className="discount-label">{discount}</div>
