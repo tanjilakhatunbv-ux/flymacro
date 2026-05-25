@@ -3,10 +3,8 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getPayload } from '../../../lib/payload'
-import { getCachedClassMacroCounts } from '../../../lib/class-counts'
 import { MacroCard } from '../../../components/MacroCard'
-import { classSlugs } from '../../../lib/wow'
-import type { Macro, Class } from '../../../payload-types'
+import type { Macro } from '../../../payload-types'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -38,22 +36,15 @@ async function loadHomeData() {
     depth: 1,
     overrideAccess: true,
   })
-  const classesList = await payload.find({ collection: 'classes', sort: 'sort', limit: 50, depth: 0, overrideAccess: true })
-  const counts = await getCachedClassMacroCounts(classesList.docs as Class[])
-
   return {
     featured: featured.docs as Macro[],
-    classes: classesList.docs as Class[],
-    counts,
   }
 }
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'home' })
-  const tWow = await getTranslations({ locale, namespace: 'wow' })
-  const { featured, classes, counts } = await loadHomeData()
-  const classBySlug = new Map(classes.map((c) => [c.slug, c] as const))
+  const { featured } = await loadHomeData()
 
   return (
     <>
@@ -91,34 +82,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link href="/macros" className="btn">
               {t('viewAllMacros')}
             </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-alt">
-        <div className="container-page">
-          <h2>{t('browseByClass')}</h2>
-          <div className="section-divider" aria-hidden="true">
-            <Image src="/images/ornaments/gem-divider.svg" width={380} height={20} alt="" />
-          </div>
-          <div className="class-panel">
-            {classSlugs.map((slug) => {
-              const cls = classBySlug.get(slug)
-              const name = locale === 'en'
-                ? (cls?.nameEn ?? tWow(slug) ?? slug)
-                : (cls?.nameZh ?? tWow(slug) ?? slug)
-              const count = counts[slug] ?? 0
-              return (
-                <Link key={slug} href={`/macros?class=${slug}`} className={`class-tile class-${slug}`}>
-                  <span className="class-crest" aria-hidden="true">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/images/classes/${slug}.svg`} alt="" />
-                  </span>
-                  <span className="class-name">{name}</span>
-                  <span className="class-count">{t('macroCount', { count })}</span>
-                </Link>
-              )
-            })}
           </div>
         </div>
       </section>

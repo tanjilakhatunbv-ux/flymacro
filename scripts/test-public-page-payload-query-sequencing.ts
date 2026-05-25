@@ -8,6 +8,21 @@ const checks = [
     message: 'Home page Payload queries must run sequentially to avoid exhausting the small Postgres connection pool.',
   },
   {
+    file: 'src/app/(frontend)/[locale]/page.tsx',
+    pattern: /browseByClass|class-panel|getCachedClassMacroCounts/,
+    message: 'Home page must not render or query the browse-by-class section.',
+  },
+  {
+    file: 'src/messages/en.json',
+    pattern: /browseByClass|macroCount/,
+    message: 'Home page messages must not keep browse-by-class copy.',
+  },
+  {
+    file: 'src/messages/zh.json',
+    pattern: /browseByClass|macroCount/,
+    message: 'Home page messages must not keep browse-by-class copy.',
+  },
+  {
     file: 'src/lib/class-counts.ts',
     pattern: /payload\.find[\s\S]*Promise\.all|Promise\.all[\s\S]*payload\.find/,
     message: 'Class count lookup must not run Payload queries in parallel.',
