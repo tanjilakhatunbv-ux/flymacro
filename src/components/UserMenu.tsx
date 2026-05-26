@@ -79,7 +79,7 @@ export function UserMenu({ email, name, role, unread, credits }: Props) {
         </span>
         <span className="user-display">{display}</span>
         {credits > 0 && (
-          <span style={{ fontSize: '0.7rem', color: 'var(--gold-bright)', marginLeft: 4 }}>
+          <span className="user-credit-pill">
             {tAcct('creditsDisplay', { credits })}
           </span>
         )}
