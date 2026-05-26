@@ -7,6 +7,7 @@ const devScriptSrc = process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  reactCompiler: false,
   poweredByHeader: false,
   images: {
     remotePatterns: [
@@ -29,7 +30,6 @@ const nextConfig = {
     ],
   },
   experimental: {
-    reactCompiler: false,
     serverActions: {
       allowedOrigins: ['flymacro.qzz.io', 'localhost:3000'],
     },
