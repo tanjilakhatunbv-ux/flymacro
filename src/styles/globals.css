@@ -1,8 +1,9 @@
+@import './tokens.css';
+@import './skeleton.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './tokens.css';
 
 
 @layer base {
@@ -2912,4 +2913,3 @@ main { min-height: calc(100vh - 200px); }
   }
 }
 
-@import './skeleton.css';
