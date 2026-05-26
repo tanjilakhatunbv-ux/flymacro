@@ -35,7 +35,11 @@ const assertFieldAccess = (
 }
 
 const users = read('src/collections/Users.ts')
-assert(users.includes('isAdminField, isStaffField'), 'Users must import isStaffField.')
+assert(users.includes('isAdminField, isStaff, isStaffField'), 'Users must import isStaff and isStaffField.')
+assert(
+  /access:\s*{\s*create:\s*isStaff/.test(users),
+  'Users collection create access must be staff-only so public REST cannot bypass the custom registration flow.',
+)
 assertFieldAccess(users, 'role', ['create: isAdminField', 'update: isAdminField'], 'Users')
 for (const field of [
   'status',
@@ -111,5 +115,9 @@ const successEnd = login.indexOf('}))', successStart)
 const successBody = login.slice(successStart, successEnd)
 assert(successStart !== -1, 'Login route must build a success response.')
 assert(!successBody.includes('token'), 'Login response body must not expose the JWT token.')
+
+const register = read('src/app/api/auth/register/route.ts')
+assert(register.includes('overrideAccess: true'), 'Custom register route must use overrideAccess after collection create is staff-only.')
+assert(register.includes("role: 'user'"), 'Custom register route must force new registrations to role user.')
 
 console.log('Prelaunch security hardening checks passed.')

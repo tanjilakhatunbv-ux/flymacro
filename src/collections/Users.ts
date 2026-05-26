@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isAdminField, isStaffField } from '../lib/access'
+import { isAdminField, isStaff, isStaffField } from '../lib/access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -39,7 +39,7 @@ export const Users: CollectionConfig = {
     },
   },
   access: {
-    create: () => true,
+    create: isStaff,
     read: ({ req: { user } }) => {
       if (!user) return false
       if (user.role === 'admin' || user.role === 'operator') return true
