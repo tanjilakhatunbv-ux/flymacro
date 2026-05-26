@@ -1,0 +1,24 @@
+# Local secrets and environment snapshots
+.env
+.env*
+!.env.example
+.vercel/
+
+# Local automation state and temporary workspaces
+.gstack/
+.claude/
+.worktrees/
+
+# Dependency installs and build outputs
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Logs and editor files
+*.log
+.DS_Store
+.idea/
+.vscode/
