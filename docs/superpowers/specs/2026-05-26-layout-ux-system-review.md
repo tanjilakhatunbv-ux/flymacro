@@ -1,164 +1,383 @@
-# FlyMacro 前台与后台整体排版布局优化建议
+# FlyMacro 视觉与交互设计审计报告
 
 日期：2026-05-26  
 分支：`design/layout-ux-system-review`  
-审视范围：Next.js 前台网站、账户中心、Payload 后台系统与自定义后台组件。
+审计范围：前台网站、宏资源目录、账户中心、Payload 后台、自定义后台运营组件。
 
-## 结论摘要
+## 工具状态
 
-FlyMacro 当前视觉识别度很强：深色奇幻、金色边框、物品 tooltip 式卡片，很适合 WoW 宏资源站的品牌定位。主要问题不是“缺少风格”，而是风格层级过满：前台几乎所有页面都在使用高装饰标题、边框、发光、卡片和动画，导致目录页、详情页、账户页、运营后台之间缺少明确的信息密度分层。
+已修复 Codex 侧 UI/UX Pro Max 安装。原问题是 `C:\Users\Administrator\.codex\skills\ui-ux-pro-max\scripts` 和 `data` 被安装成普通文本文件，内容指向不存在的相对路径。已从完整的 `C:\Users\Administrator\.claude\skills\ui-ux-pro-max` 复制真实 `scripts/` 与 `data/` 目录到 Codex 技能目录。
 
-建议保留“游戏世界观”作为前台营销和资源浏览的品牌资产，同时给操作型页面建立更安静的布局系统。前台应分为品牌展示层、资源检索层、内容阅读层和账户操作层；后台应回归 Payload 的管理工具属性，使用更稳定的表单、表格、状态和确认模式。
+修复后已成功运行：
 
-## 当前优势
+```powershell
+python C:/Users/Administrator/.codex/skills/ui-ux-pro-max/scripts/search.py "gaming addon macro marketplace directory dark fantasy developer tool dashboard admin panel" --design-system -p "FlyMacro" -f markdown
+python C:/Users/Administrator/.codex/skills/ui-ux-pro-max/scripts/search.py "marketplace directory search filters card grid" --domain product -n 8
+python C:/Users/Administrator/.codex/skills/ui-ux-pro-max/scripts/search.py "animation accessibility z-index loading filters mobile navigation forms" --domain ux -n 12
+python C:/Users/Administrator/.codex/skills/ui-ux-pro-max/scripts/search.py "dark gaming marketplace professional dashboard" --domain style -n 8
+python C:/Users/Administrator/.codex/skills/ui-ux-pro-max/scripts/search.py "marketplace search hero CTA categories featured listings trust safety" --domain landing -n 8
+```
 
-- 品牌记忆点明确：`src/styles/tokens.css` 已建立暗色、金色、职业颜色和品质色 token，适合宏资源站。
-- 页面结构完整：已有首页 hero、资源列表、筛选、详情、积分购买、账户中心、工单、通知等核心流。
-- 响应式基础存在：`container-page`、网格列表、移动端导航横滑、账户布局降为单栏等已有雏形。
-- 资源卡片有稳定媒体比例：宏卡片使用 16:9 图片区域，利于降低列表页布局跳动。
-- 后台与前台已分离路由：Payload 管理端使用独立 route group，可单独优化而不污染前台主题。
+## UI/UX Pro Max 设计系统结论
 
-## 核心问题
+FlyMacro 更接近 `Marketplace / Directory`，不是传统企业 SaaS。核心转化应当围绕“搜索、筛选、浏览资源、兑换/下载”展开。UI/UX Pro Max 对该类型的建议是：Hero 搜索优先、分类清晰、精选资源、信任/安全说明、降低搜索摩擦。
 
-### 1. 前台风格层级过满
+适配 FlyMacro 后，推荐方向是：
 
-首页、列表、详情、价格卡、账户中心大量复用金色标题、边角装饰、发光阴影、深色渐变和 uppercase 字距。结果是所有内容都像“重点”，用户很难快速判断：哪里是主行动、哪里是辅助信息、哪里只是装饰。
+- 前台：`Marketplace / Directory` + `Dark Mode (OLED)` + 轻量游戏质感。
+- 资源列表：搜索框是主 CTA，筛选是辅助工具。
+- 后台：`Data-Dense Dashboard`，强调表格、表单、状态、批量操作，不套用前台暗黑奇幻装饰。
+- 视觉原则：保留 WoW 金色与职业色作为品牌资产，但减少全站泛化发光、边角装饰、uppercase 和阴影。
 
-建议建立四级视觉强度：
+## 总体评分
 
-- Level 1：品牌冲击层，只给首页 hero、精选区标题、核心下载 CTA 使用高发光和装饰分割线。
-- Level 2：资源浏览层，宏卡片保留品质色和边框，但降低 hover 发光与角标装饰密度。
-- Level 3：内容阅读层，指南、新闻、博客、详情正文减少 uppercase 和装饰线，提高行距与阅读宽度控制。
-- Level 4：操作工具层，账户中心、表单、订单、工单使用安静卡片、清晰表格和明确状态，不再过度游戏化。
+- 品牌辨识度：8/10。暗黑、金色、职业色和宏卡片气质明确。
+- 信息架构：6/10。页面齐全，但前台、账户中心、后台的信息密度没有分层。
+- 视觉层级：5/10。装饰强度过于平均，很多页面都像重点区域。
+- 交互可用性：6/10。基本状态有，但筛选、菜单、后台高风险动作还不够稳。
+- 移动端体验：5/10。响应式基础存在，但筛选、账户表格、横向滚动区需要重新设计。
+- 可访问性：5/10。已有 aria 与部分 focus，但全局 focus-visible、触控尺寸、键盘菜单、颜色语义仍需补齐。
+- 后台运营效率：4/10。Payload 基础可用，自定义组件编码、内联样式和高风险操作确认是主要短板。
 
-### 2. 列表与筛选的信息架构需要升级
+## P0 必修问题
 
-宏列表的筛选能力很强，但目前所有筛选项以横向 chip 群平铺。职业、专精、版本、标签一多，移动端会变成多条横向滚动区，发现性和可控性都会下降。
+### 1. 修复中文乱码与结构性 icon 问题
 
-建议：
+多个后台组件与语言切换源码出现乱码，例如：
 
-- 桌面端改为“两列操作带”：左侧搜索和已选条件摘要，右侧 tier/排序/重置等高频操作；职业、版本、标签进入可折叠筛选组。
-- 移动端使用筛选抽屉或底部 sheet，列表页顶部只保留搜索框、筛选按钮、结果数量和已选条件 chips。
-- 增加“已选条件摘要”行，例如：`牧师 / 神圣 / 11.0.7 / #raid`，旁边提供单项移除。
-- 给筛选区设置 sticky 方案时要谨慎：可在桌面端吸顶，但移动端不要让筛选条长期占据首屏。
+- `src/components/admin/CreditsField.tsx`
+- `src/components/admin/RedeemCodeBatchGenerator.tsx`
+- `src/components/admin/ResetPasswordButton.tsx`
+- `src/components/admin/RedeemCodeField.tsx`
+- `src/components/admin/StatusField.tsx`
+- `src/components/LanguageSwitcher.tsx`
 
-### 3. 账户中心应从“主题页面”转成“任务控制台”
+风险：
 
-`account-layout` 目前是 240px 侧栏加内容卡片，基础正确，但视觉上仍然偏“装饰卡片”。账户页承载积分、订单、兑换、工单、通知等任务，需要更强的扫描效率。
-
-建议：
-
-- 账户首页改为仪表盘式摘要：积分余额、可用宏、未读通知、待处理工单四个状态块，再给最近订单/最近兑换/快捷操作。
-- 侧栏改成更明确的信息分组：账户资产、宏服务、支持与通知、设置。后台入口作为低频管理入口，放在底部并弱化。
-- 表格类页面统一为“桌面表格 + 移动卡片列表”，避免小屏横向挤压。
-- 账户操作页的标题不再使用营销级标题尺度，建议固定 `28-32px` 桌面、`24px` 移动端。
-
-### 4. 后台 Payload 自定义组件不够系统
-
-Payload 默认管理 UI 只覆盖了中文字体，整体是可接受的。真正风险在自定义组件：`CreditsField`、`RedeemCodeBatchGenerator`、`ResetPasswordButton` 等大量使用内联样式，按钮颜色、弹窗、错误提示、表单 spacing 都各自定义，难以保持后台一致性。
-
-更严重的是，部分后台组件源码在当前读取结果中显示为乱码中文，例如 `CreditsField.tsx` 和 `ResetPasswordButton.tsx` 中的提示文案。这会直接影响运营人员对高风险操作的判断。
+- 后台运营人员看不懂确认信息，容易误操作积分、兑换码、密码重置。
+- 语言切换使用 emoji 旗帜，违反 UI/UX Pro Max 的“结构性图标不用 emoji”原则，也会受系统字体影响。
 
 建议：
 
-- 先修复后台组件中文编码，确保源码、构建、浏览器显示一致为 UTF-8。
-- 建立 `admin-ui` 级别的轻量 CSS class，而不是继续堆内联样式：`admin-panel`、`admin-grid`、`admin-field-row`、`admin-button-primary`、`admin-button-danger`、`admin-dialog`、`admin-alert`。
-- 信用积分调整、密码重置、批量兑换码生成都属于高风险动作，应使用统一确认模式：动作说明、影响对象、不可逆说明、原因输入、确认按钮。
-- 后台不应套用前台 fantasy 风格；它应该更接近运营控制台：白/灰基础、清晰层级、状态色谨慎、强表单可读性。
+1. 统一源码为 UTF-8，修复所有乱码文案。
+2. 语言切换使用文本 `中文 / EN` 或 SVG globe/check 图标，不使用 emoji flag。
+3. 对高风险后台操作文案做统一格式：对象、动作、后果、是否可撤销。
 
-### 5. Token 系统需要补齐语义层
+### 2. 建立语义 token 层
 
-当前 token 很偏品牌色：`--bg-base`、`--gold`、`--q-epic` 等足够表达主题，但缺少跨页面语义 token，例如 surface、border、text、danger、success、focus、radius、spacing、shadow 的分层命名。CSS 中也出现了 `--bg-card`、`--border-soft`、`--card-bg`、`--radius` 等未在 `tokens.css` 中统一定义的变量使用，说明系统正在自然扩张但缺少源头。
+当前 `tokens.css` 有品牌色，但语义层不足。源码中已经出现大量未统一定义或依赖 fallback 的变量：
 
-建议新增语义层：
+- `--border-soft`
+- `--bg-card`
+- `--card-bg`
+- `--radius`
+- `--bg-primary`
+- `--text-primary`
+- `--bg-secondary`
+- `--success`
+- `--danger`
+- `--error`
 
-- Surface：`--surface-page`、`--surface-card`、`--surface-card-muted`、`--surface-input`。
-- Border：`--border-subtle`、`--border-default`、`--border-emphasis`、`--border-focus`。
-- Text：`--text-primary`、`--text-secondary`、`--text-tertiary`、`--text-accent`。
-- State：`--state-success`、`--state-warning`、`--state-danger`、`--state-info`。
-- Shape and spacing：`--radius-sm/md/lg`、`--space-1/2/3/4/6/8/12`。
-- Motion：`--motion-fast`、`--motion-base`、`--ease-standard`。
+这些变量散落在 CSS 和 TSX 内联样式里，说明设计系统正在自然扩张，但源头未收敛。
 
-## 前台优化路线
+建议新增：
 
-### P0：先做布局系统收敛
+```css
+:root {
+  --surface-page: #0a0807;
+  --surface-panel: #15110d;
+  --surface-card: #1a1817;
+  --surface-input: #0f0c09;
 
-1. 统一页面壳：为列表页、详情页、账户页、表单页建立专用 layout class，而不是每页重复内联样式。
-2. 统一标题层级：限制营销标题、页面标题、卡片标题、表单标题的字号、字重、间距。
-3. 统一内容宽度：列表最大宽度继续 1240px，详情正文建议限制到 760-840px，账户内容建议 960-1040px。
-4. 统一移动端页边距：375px 视口下保持 16px gutter，表格和长文本转为卡片或摘要布局。
+  --border-subtle: rgba(212, 175, 55, 0.14);
+  --border-default: #3a2f24;
+  --border-emphasis: #8c7339;
+  --border-focus: #ffd100;
 
-### P1：重做资源列表体验
+  --text-primary: #f4e6c8;
+  --text-secondary: #a89880;
+  --text-tertiary: #75695a;
+  --text-inverse: #120a00;
 
-1. 让搜索成为主入口，筛选成为次级入口。
-2. 结果数量与空状态放在筛选后、列表前，用户一眼知道当前条件是否有效。
-3. 宏卡片减少装饰层级：保留职业色、品质色、价格和持续时间，弱化角标动画。
-4. 标签过多时保持三项展示是正确方向，但要提供一致的 tooltip 或详情入口，不要让 `+N` 变成死信息。
+  --state-success: #22c55e;
+  --state-warning: #f97316;
+  --state-danger: #ef4444;
+  --state-info: #3b82f6;
 
-### P2：提升阅读页面
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+}
+```
 
-1. 指南、博客、新闻详情减少发光标题和过度边框。
-2. 正文保持 1.7-1.85 行距，但控制行宽，代码块与图片有稳定间距。
-3. 详情页可以采用“主内容 + 右侧操作栏”：下载/购买/积分状态放到右侧 sticky 卡片，移动端放到标题后。
+### 3. 全局补齐 focus-visible 与触控尺寸
 
-### P3：完善交互状态
+UI/UX Pro Max 将 Focus States 和 Touch Target Size 标为高优先级。当前 `.btn`、`.filter-btn`、`.tag-link`、`.user-menu-trigger`、`.language-menu summary` 等都有 hover/active，但全局 `:focus-visible` 不完整。
 
-1. 所有按钮、链接、chip、菜单项补齐 `:focus-visible`。
-2. 已有 reduced-motion 规则很好，但当前很多动画仍批量应用到列表项；建议只保留关键出现动画。
-3. loading skeleton 尺寸应贴近真实卡片和表格，避免加载完成后页面大幅跳动。
+建议：
 
-## 后台系统优化路线
+- 全局定义 `:focus-visible`，至少 2px 外环，颜色用 `--border-focus`。
+- 移动端所有交互目标最小 44px 高度。
+- 横向 chip 列表保持 8px 以上间距，避免误触。
 
-### P0：修复可信度问题
+## 前台网站审计
 
-1. 修复后台自定义组件中文乱码。
-2. 统一高风险操作文案：清楚说明“将给谁执行什么动作”。
-3. 禁止高风险操作只用浏览器 `confirm`，改成项目内统一 dialog。
+### 首页
 
-### P1：建立后台组件小系统
+当前优势：
 
-后台不需要完整设计系统，但至少需要：
+- Hero 有强品牌记忆点。
+- Featured Macros 与 Getting Started 结构清楚。
+- 图标和装饰资源与主题一致。
 
-- Panel：标题、说明、内容、操作区。
-- Field row：label、help、control、error。
-- Button：primary、secondary、danger、ghost。
-- Alert：success、warning、danger。
-- Dialog：标题、说明、表单、取消、确认。
-- Code output：兑换码结果、复制成功状态、可滚动区域。
+主要问题：
 
-### P2：优化后台布局
+- UI/UX Pro Max 对 marketplace/directory 的建议是“Hero Search Bar 是 CTA”，但当前首页主 CTA 只有“进入宏列表”，搜索入口没有出现在首屏。
+- `hero-rune` 使用无限 pulse 动画，虽然 reduced-motion 下会关闭，但常态下属于装饰性持续动画。UI/UX Pro Max 建议 infinite animation 只用于 loading。
+- 首页两个 section 都使用同等级装饰标题、分割线、卡片动画，层级略满。
 
-1. 批量生成兑换码：从简单 grid 改为“参数区 + 预览区 + 结果区”，生成前展示将创建多少码、每码积分、可兑换次数。
-2. 积分调整：弹窗内突出当前积分、调整后积分、原因必填；正负数用颜色和符号明确区分。
-3. 密码重置：按钮应标记为 secondary/warning，并在确认弹窗中展示用户邮箱。
+优化建议：
 
-## 可访问性与响应式建议
+1. 首屏增加宏搜索框：输入关键词后进入 `/macros?q=...`。
+2. CTA 从单按钮改成“搜索 + 浏览全部 + 热门职业/版本快捷入口”。
+3. Hero 保留装饰，但把 rune pulse 改为一次性进入动画或静态图标。
+4. Featured Macros 卡片保留完整主题；Getting Started 降低装饰强度，像帮助模块而不是同级营销模块。
 
-- 普通正文与按钮文本需检查对比度，尤其是 `--text-muted` 在深色渐变卡片上的可读性。
-- 图标按钮、语言切换、用户菜单、横向 chip 区域需要完整键盘路径。
-- 移动端不建议隐藏横向滚动条而无提示。可以用渐隐遮罩或“更多筛选”按钮表达还有内容。
-- 表单错误应靠近字段展示，并使用 `aria-live` 或 `role="alert"`。
-- 表格在移动端应避免横向滚动成为默认方案，优先转成信息卡片。
+### 全站导航
 
-## 建议的实施顺序
+当前优势：
 
-1. 修复后台中文乱码和高风险操作弹窗，这是信任问题，优先级最高。
-2. 补齐 token 语义层，并把散落的未定义变量收敛到 `tokens.css`。
-3. 建立前台页面壳和标题尺度，减少页面之间的重复内联样式。
-4. 重构宏列表筛选区，优先移动端体验。
-5. 优化账户中心为任务控制台。
-6. 最后再做视觉细节微调，例如 hover、动效、阴影和装饰分割线。
+- `Header.tsx` 使用 `aria-current` 和 nav aria-label。
+- 桌面端三列布局清楚。
+
+主要问题：
+
+- 移动端导航变成横向滚动，但隐藏 scrollbar，用户不一定知道还有更多项。
+- 7 个主导航项对移动端偏多。
+- `site-nav a` 字距较大并 uppercase，在中文界面下会降低可读性。
+- 语言切换 `details/summary` 可用但缺少更精细的键盘菜单管理。
+
+优化建议：
+
+1. 桌面保留当前导航结构，移动端改为“核心 4 项 + 更多”或抽屉菜单。
+2. 中文 locale 下取消 uppercase 风格影响，英文可保留小字距。
+3. 横向滚动如果保留，要加渐隐遮罩或“更多”提示。
+4. 用户菜单支持方向键导航，打开后 focus 进入菜单或至少 Escape/Tab 路径明确。
+
+### 宏列表与筛选
+
+当前优势：
+
+- 搜索、职业、专精、版本、标签、tier 都已具备。
+- 使用 query string，URL 可分享。
+- `aria-pressed` 和 `aria-busy` 已存在。
+
+主要问题：
+
+- 筛选项平铺过多，移动端变成多条横向滚动 chip 区。
+- 搜索框没有成为 marketplace 的主 CTA。
+- 没有“已选条件摘要”和“一键清除某个条件”。
+- `router.push(..., { scroll: false })` 会保留滚动位置，筛选后用户可能不知道结果变化。
+- `filter-strip-label` 最小宽度只有 2.5rem，中文标签与长文本容易拥挤。
+
+优化建议：
+
+1. 桌面端：搜索区独占第一行，筛选折叠为 `职业 / 专精 / 版本 / 标签 / 高级筛选`。
+2. 移动端：顶部只保留搜索、筛选按钮、结果数量；筛选项进入 bottom sheet。
+3. 增加 selected chips：`牧师 x`、`11.0.7 x`、`#raid x`。
+4. 筛选后滚动到结果标题或更新结果计数区域，避免用户停在旧滚动位置。
+5. 标签过多时不要一次平铺全部，按热度展示 Top N，剩余用搜索或展开。
+
+### 宏卡片
+
+当前优势：
+
+- 16:9 媒体比例稳定，图片 lazy load。
+- 品质色和职业色增强了 WoW 语义。
+- 价格、持续时间、owned 状态都有信息位。
+
+主要问题：
+
+- 卡片整体 `cursor: pointer`，但实际可点击区域分散在图片、标题、标签；会造成“看起来整卡可点但不是整卡可点”的错觉。
+- hover 同时改变边框、阴影、transform、角标尺寸、图片 scale，动效层级过多。
+- `aria-hidden="true"` 用在图片链接上，但链接仍可聚焦的可能性需要确认。若链接可聚焦却 aria-hidden，会对读屏不友好。
+- `+N` 标签只是静态数量，没有展开或说明。
+
+优化建议：
+
+1. 让整张卡片主区域成为一个明确链接，标签作为次级链接时视觉上与主点击分开。
+2. hover 只保留 1-2 个变化：边框高亮 + 轻微阴影，不再放大角标。
+3. 如果图片链接只是重复标题链接，应移除其可聚焦性或改成装饰图，不要 `aria-hidden` 包住可交互链接。
+4. `+N` 支持 hover/focus tooltip 或详情页完整标签。
+
+### 内容阅读页
+
+当前问题：
+
+- 详情、指南、新闻、博客复用大量金色标题、边框、发光，长文阅读容易疲劳。
+- 正文宽度、代码块、图片、blockquote 基础不错，但标题装饰仍偏强。
+
+优化建议：
+
+1. 详情页采用“正文阅读容器 760-840px + 右侧操作栏”。
+2. 下载/兑换/购买放入 sticky action panel，移动端放在标题后。
+3. 阅读页只保留一层品牌装饰，正文标题不要每级都发光。
+
+## 账户中心审计
+
+当前优势：
+
+- 侧栏 + 内容区的结构正确。
+- 概览页已有积分、兑换、订单、工单、通知数据。
+
+主要问题：
+
+- 账户中心仍像主题卡片页，不像高效任务控制台。
+- 账户页和交易页大量内联样式，扫描结果显示全项目约 285 处 `style={{...}}`，账户与后台是重灾区。
+- 交易页用 CSS grid 模拟表格，列宽固定：`140px 100px 80px 100px 1fr`，移动端容易溢出或压缩。
+- `var(--success)` / `var(--danger)` 被使用但 token 未定义，金额颜色可能失效。
+
+优化建议：
+
+1. 账户首页改为 operational dashboard：余额、可用宏、未读通知、待处理工单四个 KPI + 最近动作。
+2. 账户侧栏分组：资产、宏服务、支持、设置；后台入口固定底部并弱化。
+3. 桌面使用真正表格或统一 list row；移动端改为交易卡片。
+4. 将账户页面的内联布局抽成 class：`account-actions-grid`、`account-info-list`、`account-data-list`。
+5. 标题尺度降级：账户页 H1 不用营销级 uppercase 或强发光。
+
+## 后台系统审计
+
+当前优势：
+
+- Payload 后台 route 独立，前后台样式不会天然混在一起。
+- `custom.css` 已处理中文字体栈。
+- 批量兑换码、积分调整、状态字段、密码重置等运营能力已经具备。
+
+主要问题：
+
+- 后台组件大量内联样式，缺少统一 admin UI primitives。
+- 多处乱码影响操作信任。
+- 高风险操作使用浏览器 `confirm` 或轻量弹层，缺少统一确认模型。
+- 弹窗 z-index 使用 `9999`，UI/UX Pro Max 明确建议定义 z-index scale，避免任意大值。
+- 表单缺少必填标识、帮助文本、提交后的可恢复路径。
+
+优化建议：
+
+1. 新建后台小型组件样式层：
+   - `admin-panel`
+   - `admin-panel__header`
+   - `admin-field-grid`
+   - `admin-field`
+   - `admin-button`
+   - `admin-button--primary`
+   - `admin-button--danger`
+   - `admin-alert`
+   - `admin-dialog`
+   - `admin-code-output`
+2. 积分调整弹窗增加“调整后余额”预览，原因必填，负数显示 danger。
+3. 批量兑换码生成改成三段式：参数输入、生成预览、结果输出。
+4. 密码重置弹窗展示目标用户邮箱，并说明只发送邮件不直接修改密码。
+5. z-index 定义 token：dropdown 50、sticky 60、dialog 100、toast 120。
+
+## 可访问性审计
+
+高优先级问题：
+
+- 缺少统一 `:focus-visible`。
+- 移动端部分 chip/button 小于 44px 或间距偏紧。
+- 横向滚动区域隐藏 scrollbar，缺少替代提示。
+- 色彩语义依赖颜色，部分状态没有图标/文本强化。
+- 自定义菜单没有完整 menu keyboard pattern。
+
+建议：
+
+1. 全局 focus ring。
+2. 所有 icon-only 或紧凑按钮补 `aria-label`。
+3. Toast/错误/成功消息使用 `aria-live="polite"` 或 `role="alert"`。
+4. 状态色旁边加文字或图标，不只靠颜色。
+5. 表单错误自动 focus 到第一个错误字段。
+
+## 视觉系统建议
+
+### 保留
+
+- 暗色基调。
+- 金色作为品牌强调。
+- WoW 职业色与品质色。
+- 宏卡片的物品感。
+- 首页和精选区的 fantasy 资产。
+
+### 减少
+
+- 全站 uppercase 和过大字距。
+- 每个标题都发光。
+- 所有卡片都有角标装饰。
+- hover 同时触发多种运动。
+- 运营后台使用前台游戏化视觉。
+
+### 新增
+
+- 搜索优先的 marketplace 首页。
+- 页面类型分层：营销、目录、阅读、账户、后台。
+- 账户中心任务控制台。
+- 后台 admin UI primitives。
+- 语义 token 层和 z-index scale。
+
+## 优化路线图
+
+### 第一阶段：信任和基础系统
+
+1. 修复乱码。
+2. 修复 UI/UX Pro Max 安装已完成。
+3. 补齐语义 token 和 z-index scale。
+4. 增加全局 focus-visible。
+5. 将后台高风险操作改为统一 dialog。
+
+### 第二阶段：Marketplace 核心体验
+
+1. 首页增加搜索 Hero。
+2. 重构宏筛选为桌面分组 + 移动 bottom sheet。
+3. 增加已选筛选摘要。
+4. 简化宏卡片 hover 和链接结构。
+5. 优化空状态和结果计数。
+
+### 第三阶段：账户与后台效率
+
+1. 账户首页改 dashboard。
+2. 交易、订单、兑换、通知统一 list/table/card 响应式模式。
+3. 后台组件去内联样式，抽 admin class。
+4. 批量兑换码与积分调整增加预览、确认和成功反馈。
+
+### 第四阶段：视觉精修
+
+1. 分层调整标题尺度。
+2. 降低阅读页装饰强度。
+3. 优化动效节奏，只保留有意义的 motion。
+4. 做 375、768、1024、1440 四档视觉 QA。
 
 ## 验证记录
 
-- 已创建 worktree：`.worktrees/layout-ux-system-review`
-- 已创建分支：`design/layout-ux-system-review`
+- worktree：`.worktrees/layout-ux-system-review`
+- 分支：`design/layout-ux-system-review`
 - 已运行：`pnpm install --frozen-lockfile`
 - 已运行：`pnpm exec tsc --noEmit`，通过。
-- 已启动 Next dev server：`http://localhost:3017`
-- 运行时页面验证受阻：前台 `/zh` 与后台 `/admin/login` 因缺少 `DATABASE_POOLED_URI` 或 `DATABASE_URI` 无法完整渲染。
-- Next dev server 还提示主仓库与 worktree 均存在 lockfile，选择了主仓库 `pnpm-lock.yaml`。后续若继续在 worktree 中运行页面，建议确认包管理器 lockfile 选择是否符合预期。
+- 已修复：UI/UX Pro Max 的 `scripts/` 与 `data/`。
+- 已验证：`search.py --design-system`、`--domain product`、`--domain ux`、`--domain style`、`--domain landing` 均可运行。
+- 已尝试本地页面：Next dev server 可启动，但 `/zh` 与 `/admin/login` 因缺少 `DATABASE_POOLED_URI` 或 `DATABASE_URI` 无法完整渲染。
+- 运行时视觉截图未完成，原因是当前 worktree 只有 `.env.example`，没有可用数据库连接。
 
-## UI/UX Pro Max 使用说明
+## 建议下一步
 
-本次已加载 UI/UX Pro Max 的规则库，并按其高优先级检查点进行审视：可访问性、触控与交互、性能与 CLS、风格一致性、响应式布局、字体与颜色、表单反馈、导航模式和数据展示。技能说明中引用的 `scripts/search.py` 在当前安装路径中不可用，未能运行自动 design-system 检索；本报告使用已加载的规则清单和项目源码审视结果生成。
+优先做一张实施任务拆分表，从 P0 开始：
+
+1. 编码与文案修复。
+2. token/focus/z-index 基础层。
+3. 首页搜索和宏列表筛选重构。
+4. 账户中心 dashboard。
+5. 后台运营组件系统化。
