@@ -168,12 +168,12 @@ export const ScriptVersions: CollectionConfig = {
         const versionId = docData.id as number | string
 
         if (!scriptId || !versionId) {
-          try { revalidateTag('script-versions') } catch { /* ignore */ }
+          try { revalidateTag('script-versions', 'max') } catch { /* ignore */ }
           return
         }
 
         if (req.context?.scriptVersionInternalUpdate) {
-          try { revalidateTag('script-versions') } catch { /* ignore */ }
+          try { revalidateTag('script-versions', 'max') } catch { /* ignore */ }
           return
         }
 
@@ -268,8 +268,8 @@ export const ScriptVersions: CollectionConfig = {
           }
         }
 
-        try { revalidateTag('script-versions') } catch { /* ignore */ }
-        try { revalidateTag('scripts') } catch { /* ignore */ }
+        try { revalidateTag('script-versions', 'max') } catch { /* ignore */ }
+        try { revalidateTag('scripts', 'max') } catch { /* ignore */ }
       },
     ],
     afterDelete: [
@@ -359,8 +359,8 @@ export const ScriptVersions: CollectionConfig = {
           }
         }
 
-        try { revalidateTag('script-versions') } catch { /* ignore */ }
-        try { revalidateTag('scripts') } catch { /* ignore */ }
+        try { revalidateTag('script-versions', 'max') } catch { /* ignore */ }
+        try { revalidateTag('scripts', 'max') } catch { /* ignore */ }
       },
     ],
   },

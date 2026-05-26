@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { isStaff, isSuperAdmin } from '../lib/access'
+import { isStaff, isStaffField, isSuperAdmin } from '../lib/access'
+
+const normalizeTicketOwnerId = (owner: number | string | { id?: number | string } | null | undefined) =>
+  typeof owner === 'object' ? owner?.id : owner
 
 const richTextToPreview = (body: unknown, limit = 40): string => {
   try {
@@ -54,7 +57,10 @@ export const TicketMessages: CollectionConfig = {
       if (!ticketId) return false
       try {
         const ticket = await payload.findByID({ collection: 'tickets', id: ticketId, depth: 0 })
-        return (ticket as { user?: number | string | { id: number | string } } | null)?.user === user.id
+        const ownerId = normalizeTicketOwnerId(
+          (ticket as { user?: number | string | { id?: number | string } } | null)?.user,
+        )
+        return String(ownerId) === String(user.id)
       } catch {
         return false
       }
@@ -88,7 +94,7 @@ export const TicketMessages: CollectionConfig = {
       required: true,
       label: '发送者',
       defaultValue: ({ user }) => user?.id,
-      access: { update: () => false },
+      access: { create: () => false, update: () => false },
     },
     {
       name: 'senderType',
@@ -100,6 +106,10 @@ export const TicketMessages: CollectionConfig = {
         { label: '用户', value: 'user' },
         { label: '客服', value: 'staff' },
       ],
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
     },
     {
       name: 'body',
@@ -119,11 +129,30 @@ export const TicketMessages: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       label: '⚠️ 内部备注（用户不可见）',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       admin: {
         description: '⚠️ 警告：勾选后该消息只有客服之间可见，绝不会发送给提交工单的用户。请仔细确认！',
         position: 'sidebar',
       },
     },
   ],
+  hooks: {
+    beforeChange: [
+      ({ req, data }) => {
+        const user = req.user as { id?: number | string; role?: string } | null
+        if (!user || user.role === 'admin' || user.role === 'operator') return data
+
+        return {
+          ...data,
+          sender: user.id,
+          senderType: 'user',
+          isInternalNote: false,
+        }
+      },
+    ],
+  },
   timestamps: true,
 }

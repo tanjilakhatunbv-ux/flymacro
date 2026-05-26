@@ -230,7 +230,6 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json(success({
       user: safeUser,
-      token,
       message: '登录成功',
     }))
 

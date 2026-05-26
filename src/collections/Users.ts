@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isAdminField } from '../lib/access'
+import { isAdminField, isStaffField } from '../lib/access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -93,6 +93,7 @@ export const Users: CollectionConfig = {
         { label: '普通用户', value: 'user' },
       ],
       access: {
+        create: isAdminField,
         update: isAdminField,
       },
       admin: {
@@ -104,6 +105,10 @@ export const Users: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'active',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: '账号状态',
       options: [
         { label: '正常', value: 'active' },
@@ -123,6 +128,10 @@ export const Users: CollectionConfig = {
       type: 'number',
       defaultValue: 20,
       min: 0,
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: '当前积分',
       admin: {
         position: 'sidebar',
@@ -135,6 +144,10 @@ export const Users: CollectionConfig = {
     {
       name: 'lastLoginAt',
       type: 'date',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: '最后登录时间',
       admin: {
         position: 'sidebar',
@@ -146,12 +159,20 @@ export const Users: CollectionConfig = {
       name: 'loginCount',
       type: 'number',
       defaultValue: 0,
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: '登录次数',
       admin: { position: 'sidebar', readOnly: true },
     },
     {
       name: 'staffNote',
       type: 'textarea',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: '客服备注',
       admin: {
         description: '仅后台可见，不对用户展示',
@@ -160,6 +181,10 @@ export const Users: CollectionConfig = {
     {
       name: 'oauthProvider',
       type: 'select',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: 'OAuth 提供商',
       options: [
         { label: 'Google', value: 'google' },
@@ -170,6 +195,10 @@ export const Users: CollectionConfig = {
     {
       name: 'oauthId',
       type: 'text',
+      access: {
+        create: isStaffField,
+        update: isStaffField,
+      },
       label: 'OAuth ID',
       admin: { readOnly: true, position: 'sidebar' },
     },
