@@ -25,6 +25,38 @@ function timingSafeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(bufA, bufB)
 }
 
+function extractId(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value && typeof value === 'object' && 'id' in value) {
+    const id = (value as { id?: unknown }).id
+    return typeof id === 'string' ? id : ''
+  }
+  return ''
+}
+
+function assertWebhookMatchesPackage(params: {
+  pkg: { amount?: number | null; currency?: string | null; creemProductId?: string | null }
+  rawAmount: number
+  currency: string
+  productId: string
+}) {
+  const { pkg, rawAmount, currency, productId } = params
+  const expectedProductId = pkg.creemProductId ?? ''
+  if (!expectedProductId || productId !== expectedProductId) {
+    throw new InvalidWebhookPayloadError('product-mismatch')
+  }
+
+  const expectedCurrency = (pkg.currency || 'CNY').toUpperCase()
+  if (currency !== expectedCurrency) {
+    throw new InvalidWebhookPayloadError('currency-mismatch')
+  }
+
+  const expectedMinorAmount = Math.round(Number(pkg.amount ?? 0) * 100)
+  if (!Number.isFinite(rawAmount) || rawAmount <= 0 || rawAmount !== expectedMinorAmount) {
+    throw new InvalidWebhookPayloadError('amount-mismatch')
+  }
+}
+
 export async function POST(req: Request) {
   const ip = getClientIP(req)
   const limit = rateLimit(`webhook:${ip}`, { max: 20, windowMs: 60_000 })
@@ -83,14 +115,21 @@ export async function POST(req: Request) {
   const currency = ((order.currency as string) || 'CNY').toUpperCase() as 'CNY' | 'USD'
 
   const checkoutId = (obj.id as string) || ''
+  const productId = extractId(obj.product) || extractId(order.product)
+
+  if (!checkoutId || !productId) {
+    return badRequest('Missing required checkout fields', 'missing-checkout-fields')
+  }
 
   try {
     const result = await handlePaymentSuccess({
       userId: Number(userId),
       packageId: Number(packageId),
       amount,
+      rawAmount,
       currency,
       checkoutId,
+      productId,
       meta: evt,
     })
 
@@ -98,6 +137,9 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof DuplicateWebhookError) {
       return NextResponse.json(success({ received: true, duplicate: true }))
+    }
+    if (err instanceof InvalidWebhookPayloadError) {
+      return badRequest('Invalid checkout payload', err.code)
     }
     return internalError('Failed to process payment')
   }
@@ -110,17 +152,29 @@ class DuplicateWebhookError extends Error {
   }
 }
 
+class InvalidWebhookPayloadError extends Error {
+  code: string
+
+  constructor(code: string) {
+    super(code)
+    this.name = 'InvalidWebhookPayloadError'
+    this.code = code
+  }
+}
+
 interface PaymentSuccessParams {
   userId: number
   packageId: number
   amount: number
+  rawAmount: number
   currency: 'CNY' | 'USD'
   checkoutId: string
+  productId: string
   meta: Record<string, unknown>
 }
 
 async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ orderId: number }> {
-  const { userId, packageId, amount, currency, checkoutId, meta } = params
+  const { userId, packageId, amount, rawAmount, currency, checkoutId, productId, meta } = params
   const payload = await getPayload()
 
   const pkg = await payload
@@ -130,6 +184,12 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
       depth: 0,
     })
     .catch(() => null)
+
+  if (!pkg || !pkg.enabled) {
+    throw new InvalidWebhookPayloadError('package-not-found')
+  }
+
+  assertWebhookMatchesPackage({ pkg, rawAmount, currency, productId })
 
   const creditsGranted = pkg?.creditsGranted ?? Math.floor(amount)
 
@@ -150,6 +210,15 @@ async function handlePaymentSuccess(params: PaymentSuccessParams): Promise<{ ord
         await payload.db.drizzle.execute(sql`ROLLBACK`)
         throw new DuplicateWebhookError()
       }
+    }
+
+    const userRes = await payload.db.drizzle.execute(
+      sql`SELECT id FROM users WHERE id = ${userId} LIMIT 1`
+    )
+    const userRows = userRes.rows as Array<{ id: number }> | undefined
+    if (!userRows || userRows.length === 0) {
+      await payload.db.drizzle.execute(sql`ROLLBACK`)
+      throw new InvalidWebhookPayloadError('user-not-found')
     }
 
     // Create order via payload (within transaction)
