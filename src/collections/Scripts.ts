@@ -161,12 +161,12 @@ export const Scripts: CollectionConfig = {
     ],
     afterChange: [
       async () => {
-        try { revalidateTag('scripts') } catch { /* ignore */ }
+        try { revalidateTag('scripts', 'max') } catch { /* ignore */ }
       },
     ],
     afterDelete: [
       async () => {
-        try { revalidateTag('scripts') } catch { /* ignore */ }
+        try { revalidateTag('scripts', 'max') } catch { /* ignore */ }
       },
     ],
   },

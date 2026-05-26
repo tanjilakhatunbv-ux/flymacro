@@ -11,6 +11,7 @@ import { getPayload } from '../../../../../lib/payload'
 import { signJwt } from '../../../../../lib/jwt'
 import { rateLimit, getClientIP } from '../../../../../lib/rate-limit'
 import { grantRegisterBonus } from '../../../../../lib/register-bonus'
+import { sanitizeReturnUrl } from '../../../../../lib/return-url'
 import { setAuthCookie } from '../../../../../lib/session'
 import type { User } from '../../../../../payload-types'
 
@@ -225,7 +226,7 @@ export async function GET(req: Request) {
   )
 
   const response = NextResponse.redirect(
-    new URL(parsedState.returnUrl, req.url),
+    new URL(sanitizeReturnUrl(parsedState.returnUrl), req.url),
   )
 
   setAuthCookie(response, jwtToken)

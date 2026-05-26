@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authLoginUrl } from '../../../../../lib/auth-urls'
 import { isGitHubOAuthConfigured, generateState, getGitHubAuthUrl } from '../../../../../lib/oauth'
 import { rateLimit, getClientIP } from '../../../../../lib/rate-limit'
+import { sanitizeReturnUrl } from '../../../../../lib/return-url'
 
 export async function GET(req: Request) {
   if (!isGitHubOAuthConfigured()) {
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
   }
 
   const { searchParams } = new URL(req.url)
-  const returnUrl = searchParams.get('return') || '/account'
+  const returnUrl = sanitizeReturnUrl(searchParams.get('return'))
 
   const state = generateState()
   const statePayload = JSON.stringify({ state, returnUrl })

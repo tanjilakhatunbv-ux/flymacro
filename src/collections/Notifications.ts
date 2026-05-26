@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isOperatorOrAbove, isSuperAdmin } from '../lib/access'
+import { isOperatorOrAbove, isStaffField, isSuperAdmin } from '../lib/access'
 
 export const Notifications: CollectionConfig = {
   slug: 'notifications',
@@ -33,10 +33,11 @@ export const Notifications: CollectionConfig = {
       required: true,
       index: true,
       label: '接收用户',
+      access: { create: isStaffField, update: isStaffField },
     },
-    { name: 'title', type: 'text', required: true, label: '标题' },
-    { name: 'body', type: 'textarea', label: '内容' },
-    { name: 'link', type: 'text', label: '跳转链接', admin: { description: '点击通知后跳转的站内链接' } },
+    { name: 'title', type: 'text', required: true, label: '标题', access: { create: isStaffField, update: isStaffField } },
+    { name: 'body', type: 'textarea', label: '内容', access: { create: isStaffField, update: isStaffField } },
+    { name: 'link', type: 'text', label: '跳转链接', access: { create: isStaffField, update: isStaffField }, admin: { description: '点击通知后跳转的站内链接' } },
     {
       name: 'category',
       type: 'select',
@@ -48,6 +49,7 @@ export const Notifications: CollectionConfig = {
         { label: '工单回复', value: 'ticket' },
         { label: '促销', value: 'promotion' },
       ],
+      access: { create: isStaffField, update: isStaffField },
     },
     { name: 'read', type: 'checkbox', defaultValue: false, label: '已读', index: true },
     { name: 'readAt', type: 'date', label: '阅读时间' },

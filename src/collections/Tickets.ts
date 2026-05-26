@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, isOwnerOrStaff, isAdmin } from '../lib/access'
+import { isAuthenticated, isOwnerOrStaff, isAdmin, isStaffField } from '../lib/access'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -48,6 +48,7 @@ export const Tickets: CollectionConfig = {
         { label: '已关闭', value: 'closed' },
       ],
       index: true,
+      access: { update: isStaffField },
     },
     {
       name: 'priority',
@@ -60,6 +61,7 @@ export const Tickets: CollectionConfig = {
         { label: '高', value: 'high' },
         { label: '紧急', value: 'urgent' },
       ],
+      access: { update: isStaffField },
     },
     {
       name: 'category',
@@ -84,6 +86,7 @@ export const Tickets: CollectionConfig = {
       type: 'relationship',
       relationTo: 'credit-orders',
       label: '相关订单',
+      access: { update: isStaffField },
     },
     {
       name: 'assignee',
@@ -94,8 +97,7 @@ export const Tickets: CollectionConfig = {
         role: { in: ['admin', 'operator'] },
       }),
       access: {
-        update: ({ req: { user } }) =>
-          !!user && (user.role === 'admin' || user.role === 'operator'),
+        update: isStaffField,
       },
     },
     {
@@ -103,7 +105,7 @@ export const Tickets: CollectionConfig = {
       type: 'date',
       label: '关闭时间',
       admin: { position: 'sidebar' },
-      access: { update: () => true, create: () => false },
+      access: { update: isStaffField, create: () => false },
     },
   ],
   timestamps: true,
