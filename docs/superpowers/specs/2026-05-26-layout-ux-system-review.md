@@ -361,6 +361,30 @@ UI/UX Pro Max 将 Focus States 和 Touch Target Size 标为高优先级。当前
 3. 优化动效节奏，只保留有意义的 motion。
 4. 做 375、768、1024、1440 四档视觉 QA。
 
+## Playwright 实测补充
+
+测试日期：2026-05-27
+测试方式：使用临时安装在 `%TEMP%` 的 `playwright-core`，驱动本机 Chrome `C:\Users\Administrator\AppData\Local\Google\Chrome\Bin\chrome.exe`。开发服务器运行在 `http://localhost:3018`，通过主工作区 `.env` 注入运行时环境变量，未复制或输出密钥。
+
+测试页面：
+
+| 页面 | 桌面端 | 移动端 | 结论 |
+| --- | ---: | ---: | --- |
+| `/zh` | 200 / 5.1s | 200 / 4.6s | 中文在截图中正常；无横向溢出；首屏没有 marketplace 搜索入口。 |
+| `/zh/macros` | 200 / 5.5s | 200 / 5.4s | 无横向溢出；移动端筛选区过密，页面高度约 12316px，浏览成本高。 |
+| `/zh/auth?mode=login` | 200 / 3.7s | 200 / 3.0s | 登录页可用，但有 React hydration mismatch，需要修复 SSR/客户端结构差异。 |
+| `/admin/login` | 200 / 10.3s | 200 / 10.4s | Payload 登录页可渲染；视觉与前台完全割裂是合理的，但加载等待较长。 |
+
+截图与 JSON 证据保存在 `docs/superpowers/specs/playwright-runtime/`。
+
+实测后修正：
+
+- 前台截图中中文显示正常，终端/JSON 中出现的乱码主要来自 Windows 控制台编码，不应作为用户端乱码证据。
+- 后台源码和部分生成文件仍存在编码显示风险，尤其涉及高风险操作文案时，仍建议专项检查源文件编码和保存格式。
+- `/zh` 会重定向到 `/`，`/zh/macros` 会重定向到 `/macros`，语言通过 `NEXT_LOCALE=zh` cookie 保持；这对分享链接和 SEO 需要单独确认是否符合预期。
+- 首次冷启动更慢：日志记录 `/[locale]/macros` 编译 22.3s，`/admin/login` 编译 26.7s。开发态可接受，但说明页面/后台包体和开发体验有优化空间。
+- Playwright 检测到宏列表页有 LCP 图片 priority 警告，登录页有 hydration mismatch。下一步优化应把 hydration mismatch 放在视觉改版前处理，否则交互状态可能被客户端重建打断。
+
 ## 验证记录
 
 - worktree：`.worktrees/layout-ux-system-review`
@@ -369,15 +393,16 @@ UI/UX Pro Max 将 Focus States 和 Touch Target Size 标为高优先级。当前
 - 已运行：`pnpm exec tsc --noEmit`，通过。
 - 已修复：UI/UX Pro Max 的 `scripts/` 与 `data/`。
 - 已验证：`search.py --design-system`、`--domain product`、`--domain ux`、`--domain style`、`--domain landing` 均可运行。
-- 已尝试本地页面：Next dev server 可启动，但 `/zh` 与 `/admin/login` 因缺少 `DATABASE_POOLED_URI` 或 `DATABASE_URI` 无法完整渲染。
-- 运行时视觉截图未完成，原因是当前 worktree 只有 `.env.example`，没有可用数据库连接。
+- 已启动本地页面：使用主工作区 `.env` 注入环境变量，Next dev server 在 `http://localhost:3018` 可完整渲染。
+- 已运行 Playwright + 本机 Chrome：覆盖 `/zh`、`/zh/macros`、`/zh/auth?mode=login`、`/admin/login` 的桌面端和移动端截图。
+- 已记录运行时证据：`docs/superpowers/specs/playwright-runtime/runtime-audit.json` 与对应截图。
 
 ## 建议下一步
 
 优先做一张实施任务拆分表，从 P0 开始：
 
-1. 编码与文案修复。
-2. token/focus/z-index 基础层。
+1. 修复登录页 hydration mismatch。
+2. 做 token/focus/z-index 基础层。
 3. 首页搜索和宏列表筛选重构。
 4. 账户中心 dashboard。
 5. 后台运营组件系统化。
