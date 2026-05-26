@@ -1,0 +1,309 @@
+{
+  "generatedAt": "2026-05-26T17:31:40.797Z",
+  "base": "http://localhost:3018",
+  "chromePath": "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\Bin\\chrome.exe",
+  "results": [
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "page": "home-zh",
+      "url": "http://localhost:3018/zh",
+      "finalUrl": "http://localhost:3018/",
+      "status": 200,
+      "ms": 5117,
+      "title": "FlyMacro — 魔兽世界插件与宏代码服务",
+      "h1s": [
+        "魔兽世界插件与宏代码服务"
+      ],
+      "h2s": [
+        "精选宏包",
+        "新手入门"
+      ],
+      "buttons": 0,
+      "links": 26,
+      "inputs": 0,
+      "visibleFocusables": 26,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "bodyHeight": 3241,
+      "bodyChildren": 39,
+      "rootHtmlLength": 77562,
+      "landmarks": {
+        "header": 1,
+        "main": 1,
+        "nav": 1,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 魔兽世界插件与宏代码服务 免费下载插件，在游戏中获得动作技能推荐；学习宏代码教程，使用免费基础宏，也可以用点券兑换宏脚本。 进入宏库 精选宏包 潜行者 刺杀 V时光服 普通宏 时光服毁伤贼全自动神器 无缝续毒药 连击点智能把控 专为魔兽时光服毁伤盗贼量身打造全自动输出软件，完美适配版本标准输出循环。 ✅自动维持双武器毒药效果，无缝补致命、速效毒药，全程不断 DOT 伤害； ✅智能把控连击点与能量回复，精准衔接毁伤、割裂、剔骨，单体",
+      "consoleIssues": [],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/home-zh-desktop.png",
+      "error": null
+    },
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "page": "macros-zh",
+      "url": "http://localhost:3018/zh/macros",
+      "finalUrl": "http://localhost:3018/macros",
+      "status": 200,
+      "ms": 5549,
+      "title": "宏库 — FlyMacro",
+      "h1s": [
+        "宏 库"
+      ],
+      "h2s": [],
+      "buttons": 17,
+      "links": 58,
+      "inputs": 1,
+      "visibleFocusables": 76,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "bodyHeight": 4958,
+      "bodyChildren": 99,
+      "rootHtmlLength": 209141,
+      "landmarks": {
+        "header": 1,
+        "main": 1,
+        "nav": 1,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 宏 库 搜索 全部 普通 高级 职业 全部 战士 圣骑士 猎人 潜行者 牧师 萨满祭司 法师 术士 德鲁伊 死亡骑士 版本 全部 时光服 共 23 个宏 潜行者 刺杀 V时光服 普通宏 时光服毁伤贼全自动神器 无缝续毒药 连击点智能把控 专为魔兽时光服毁伤盗贼量身打造全自动输出软件，完美适配版本标准输出循环。 ✅自动维持双武器毒药效果，无缝补致命、速效毒药，全程不断 DOT 伤害； ✅智能把控连击点与能量回复，精准衔接毁伤、割裂、",
+      "consoleIssues": [
+        "warning: Image with src \"/images/macro-fallback.svg\" was detected as the Largest Contentful Paint (LCP). Please add the \"priority\" property if this image is above the fold.\nRead more: https://nextjs.org/docs/api-reference/next/image#priority"
+      ],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/macros-zh-desktop.png",
+      "error": null
+    },
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "page": "auth-zh",
+      "url": "http://localhost:3018/zh/auth?mode=login",
+      "finalUrl": "http://localhost:3018/auth?mode=login",
+      "status": 200,
+      "ms": 3710,
+      "title": "账号入口 - FlyMacro",
+      "h1s": [
+        "登 录"
+      ],
+      "h2s": [],
+      "buttons": 1,
+      "links": 17,
+      "inputs": 2,
+      "visibleFocusables": 20,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "bodyHeight": 1098,
+      "bodyChildren": 29,
+      "rootHtmlLength": 50335,
+      "landmarks": {
+        "header": 2,
+        "main": 1,
+        "nav": 2,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 登 录 欢迎回到 FlyMacro 登录 注册 邮箱 密码 登 录 忘记密码？ · 没有账号？立即注册 管理员账号请前往/admin. 联系方式 © 2026 FlyMacro",
+      "consoleIssues": [
+        "pageerror: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RenderFromTemplateContext>\n      <ScrollAndFocusHandler segmentPath={[...]}>\n        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>\n          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n            <LoadingBoundary loading={null}>\n              <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n                <RedirectBoundary>\n                  <RedirectErrorBoundary router={{...}}>\n                    <InnerLayoutRouter url=\"/auth?mode...\" tree={[...]} cacheNode={{lazyData:null, ...}} ...>\n                      <AuthPage>\n                        <div className=\"container-...\">\n                          <article className=\"auth-card\">\n                            <header>\n                            <div className=\"auth-body\">\n                              <nav>\n                              <AuthForm>\n                              <OAuthButtons>\n+                             <p className=\"auth-help\">\n-                             <div\n-                               style={{display:\"flex\",align-items:\"center\",row-gap:\"0.75rem\",column-gap:\"0.75rem\",margin-top:\"1.25rem\", ...}}\n-                             >\n                      ...\n"
+      ],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/auth-zh-desktop.png",
+      "error": null
+    },
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "page": "admin-login",
+      "url": "http://localhost:3018/admin/login",
+      "finalUrl": "http://localhost:3018/admin/login",
+      "status": 200,
+      "ms": 10295,
+      "title": "登录 — FlyMacro 后台",
+      "h1s": [],
+      "h2s": [],
+      "buttons": 1,
+      "links": 1,
+      "inputs": 2,
+      "visibleFocusables": 4,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "bodyHeight": 1000,
+      "bodyChildren": 118,
+      "rootHtmlLength": 243542,
+      "landmarks": {
+        "header": 0,
+        "main": 0,
+        "nav": 0,
+        "footer": 0,
+        "aside": 0
+      },
+      "bodySample": "电子邮件 * 密码 * 忘记密码？ 登录",
+      "consoleIssues": [
+        "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "warning: The resource http://localhost:3018/_next/static/css/app/(frontend)/%5Blocale%5D/layout.css?v=1779816668584 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+      ],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/admin-login-desktop.png",
+      "error": null
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "page": "home-zh",
+      "url": "http://localhost:3018/zh",
+      "finalUrl": "http://localhost:3018/",
+      "status": 200,
+      "ms": 4626,
+      "title": "FlyMacro — 魔兽世界插件与宏代码服务",
+      "h1s": [
+        "魔兽世界插件与宏代码服务"
+      ],
+      "h2s": [
+        "精选宏包",
+        "新手入门"
+      ],
+      "buttons": 0,
+      "links": 26,
+      "inputs": 0,
+      "visibleFocusables": 26,
+      "overflowX": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "bodyHeight": 5534,
+      "bodyChildren": 39,
+      "rootHtmlLength": 77562,
+      "landmarks": {
+        "header": 1,
+        "main": 1,
+        "nav": 1,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 魔兽世界插件与宏代码服务 免费下载插件，在游戏中获得动作技能推荐；学习宏代码教程，使用免费基础宏，也可以用点券兑换宏脚本。 进入宏库 精选宏包 潜行者 刺杀 V时光服 普通宏 时光服毁伤贼全自动神器 无缝续毒药 连击点智能把控 专为魔兽时光服毁伤盗贼量身打造全自动输出软件，完美适配版本标准输出循环。 ✅自动维持双武器毒药效果，无缝补致命、速效毒药，全程不断 DOT 伤害； ✅智能把控连击点与能量回复，精准衔接毁伤、割裂、剔骨，单体",
+      "consoleIssues": [],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/home-zh-mobile.png",
+      "error": null
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "page": "macros-zh",
+      "url": "http://localhost:3018/zh/macros",
+      "finalUrl": "http://localhost:3018/macros",
+      "status": 200,
+      "ms": 5365,
+      "title": "宏库 — FlyMacro",
+      "h1s": [
+        "宏 库"
+      ],
+      "h2s": [],
+      "buttons": 17,
+      "links": 58,
+      "inputs": 1,
+      "visibleFocusables": 76,
+      "overflowX": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "bodyHeight": 12316,
+      "bodyChildren": 98,
+      "rootHtmlLength": 215636,
+      "landmarks": {
+        "header": 1,
+        "main": 1,
+        "nav": 1,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 宏 库 搜索 全部 普通 高级 职业 全部 战士 圣骑士 猎人 潜行者 牧师 萨满祭司 法师 术士 德鲁伊 死亡骑士 版本 全部 时光服 共 23 个宏 潜行者 刺杀 V时光服 普通宏 时光服毁伤贼全自动神器 无缝续毒药 连击点智能把控 专为魔兽时光服毁伤盗贼量身打造全自动输出软件，完美适配版本标准输出循环。 ✅自动维持双武器毒药效果，无缝补致命、速效毒药，全程不断 DOT 伤害； ✅智能把控连击点与能量回复，精准衔接毁伤、割裂、",
+      "consoleIssues": [
+        "warning: Image with src \"https://media.flymacro.qzz.io/media/img003.jpg\" was detected as the Largest Contentful Paint (LCP). Please add the \"priority\" property if this image is above the fold.\nRead more: https://nextjs.org/docs/api-reference/next/image#priority",
+        "warning: Image with src \"/images/macro-fallback.svg\" was detected as the Largest Contentful Paint (LCP). Please add the \"priority\" property if this image is above the fold.\nRead more: https://nextjs.org/docs/api-reference/next/image#priority"
+      ],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/macros-zh-mobile.png",
+      "error": null
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "page": "auth-zh",
+      "url": "http://localhost:3018/zh/auth?mode=login",
+      "finalUrl": "http://localhost:3018/auth?mode=login",
+      "status": 200,
+      "ms": 3031,
+      "title": "账号入口 - FlyMacro",
+      "h1s": [
+        "登 录"
+      ],
+      "h2s": [],
+      "buttons": 1,
+      "links": 17,
+      "inputs": 2,
+      "visibleFocusables": 20,
+      "overflowX": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "bodyHeight": 1029,
+      "bodyChildren": 29,
+      "rootHtmlLength": 50335,
+      "landmarks": {
+        "header": 2,
+        "main": 1,
+        "nav": 2,
+        "footer": 1,
+        "aside": 0
+      },
+      "bodySample": "FLYMACRO 首页 宏库 脚本 教程 新闻 关于 联系方式 中文 登录 / 注册 登 录 欢迎回到 FlyMacro 登录 注册 邮箱 密码 登 录 忘记密码？ · 没有账号？立即注册 管理员账号请前往/admin. 联系方式 © 2026 FlyMacro",
+      "consoleIssues": [
+        "pageerror: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\nhttps://react.dev/link/hydration-mismatch\n\n  ...\n    <RenderFromTemplateContext>\n      <ScrollAndFocusHandler segmentPath={[...]}>\n        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>\n          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n            <LoadingBoundary loading={null}>\n              <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n                <RedirectBoundary>\n                  <RedirectErrorBoundary router={{...}}>\n                    <InnerLayoutRouter url=\"/auth?mode...\" tree={[...]} cacheNode={{lazyData:null, ...}} ...>\n                      <AuthPage>\n                        <div className=\"container-...\">\n                          <article className=\"auth-card\">\n                            <header>\n                            <div className=\"auth-body\">\n                              <nav>\n                              <AuthForm>\n                              <OAuthButtons>\n+                             <p className=\"auth-help\">\n-                             <div\n-                               style={{display:\"flex\",align-items:\"center\",row-gap:\"0.75rem\",column-gap:\"0.75rem\",margin-top:\"1.25rem\", ...}}\n-                             >\n                      ...\n"
+      ],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/auth-zh-mobile.png",
+      "error": null
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "page": "admin-login",
+      "url": "http://localhost:3018/admin/login",
+      "finalUrl": "http://localhost:3018/admin/login",
+      "status": 200,
+      "ms": 10386,
+      "title": "登录 — FlyMacro 后台",
+      "h1s": [],
+      "h2s": [],
+      "buttons": 1,
+      "links": 1,
+      "inputs": 2,
+      "visibleFocusables": 4,
+      "overflowX": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "bodyHeight": 844,
+      "bodyChildren": 118,
+      "rootHtmlLength": 243543,
+      "landmarks": {
+        "header": 0,
+        "main": 0,
+        "nav": 0,
+        "footer": 0,
+        "aside": 0
+      },
+      "bodySample": "电子邮件 * 密码 * 忘记密码？ 登录",
+      "consoleIssues": [],
+      "screenshot": "docs/superpowers/specs/playwright-runtime/admin-login-mobile.png",
+      "error": null
+    }
+  ]
+}
