@@ -5,7 +5,7 @@ const root = process.cwd()
 const zh = JSON.parse(readFileSync(join(root, 'src/messages/zh.json'), 'utf8')) as Record<string, any>
 const en = JSON.parse(readFileSync(join(root, 'src/messages/en.json'), 'utf8')) as Record<string, any>
 const aboutPage = readFileSync(join(root, 'src/app/(frontend)/[locale]/about/page.tsx'), 'utf8')
-const creditsPage = readFileSync(join(root, 'src/app/(frontend)/[locale]/credits/page.tsx'), 'utf8')
+const creditPurchaseContent = readFileSync(join(root, 'src/components/CreditPurchaseContent.tsx'), 'utf8')
 const creditPackages = readFileSync(join(root, 'src/components/CreditPackages.tsx'), 'utf8')
 
 const requiredAboutKeys = [
@@ -73,7 +73,7 @@ if (!enNotice.includes('redeem macro scripts')) {
   process.exit(1)
 }
 
-if (!creditsPage.includes("locale === 'zh'") || !creditsPage.includes('hasCreditBalanceLabel')) {
+if (!creditPurchaseContent.includes("locale === 'zh'") || !creditPurchaseContent.includes('hasCreditBalanceLabel')) {
   console.error('Credits page must avoid applying Chinese CMS copy to every locale and must use stable balance-label detection.')
   process.exit(1)
 }

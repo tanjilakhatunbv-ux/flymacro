@@ -7,7 +7,7 @@ const users = readFileSync(join(root, 'src/collections/Users.ts'), 'utf8')
 const transactions = readFileSync(join(root, 'src/collections/CreditTransactions.ts'), 'utf8')
 const transactionPage = readFileSync(join(root, 'src/app/(frontend)/[locale]/account/transactions/page.tsx'), 'utf8')
 const accountNav = readFileSync(join(root, 'src/components/AccountSideNav.tsx'), 'utf8')
-const creditsPage = readFileSync(join(root, 'src/app/(frontend)/[locale]/credits/page.tsx'), 'utf8')
+const creditPurchaseContent = readFileSync(join(root, 'src/components/CreditPurchaseContent.tsx'), 'utf8')
 const zh = JSON.parse(readFileSync(join(root, 'src/messages/zh.json'), 'utf8')) as Record<string, any>
 const en = JSON.parse(readFileSync(join(root, 'src/messages/en.json'), 'utf8')) as Record<string, any>
 
@@ -38,7 +38,7 @@ if (!accountNav.includes('/account/redeem') || !accountNav.includes("labelKey: '
   process.exit(1)
 }
 
-if (!creditsPage.includes('RedeemCodeForm')) {
+if (!creditPurchaseContent.includes('RedeemCodeForm')) {
   console.error('Credits page must show the redeem code form above credit packages.')
   process.exit(1)
 }
