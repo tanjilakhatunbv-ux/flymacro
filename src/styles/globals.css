@@ -97,6 +97,7 @@ main { min-height: calc(100vh - 200px); }
   display: flex;
   align-items: center;
   gap: 0.65rem;
+  flex-shrink: 0;
   font-family: var(--font-hero);
   font-size: 1.55rem;
   font-weight: 900;
@@ -104,6 +105,7 @@ main { min-height: calc(100vh - 200px); }
   color: var(--gold-bright);
   text-shadow: 0 0 12px rgba(255, 209, 0, 0.4), 0 2px 0 rgba(0,0,0,0.6);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .site-logo::before {
@@ -126,15 +128,25 @@ main { min-height: calc(100vh - 200px); }
 
 .site-nav a {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: 44px;
+  min-width: 3.6rem;
   padding: 0.5rem 1.1rem;
   font-family: var(--font-display);
   font-size: 0.92rem;
   font-weight: 500;
   letter-spacing: 0.12em;
+  line-height: 1;
   text-transform: uppercase;
   color: var(--text-muted);
   border: 1px solid transparent;
   transition: all 0.25s;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .site-nav a:hover {
@@ -170,7 +182,7 @@ main { min-height: calc(100vh - 200px); }
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
-  min-width: max-content;
+  min-width: 0;
 }
 
 .header-auth-link {
@@ -864,7 +876,7 @@ main { min-height: calc(100vh - 200px); }
 /* ============================================================
    Page List
    ============================================================ */
-.page-list { padding: 3.5rem 0 4rem; }
+.page-list { padding-block: 3.5rem 4rem; }
 
 .page-list h1 {
   font-family: var(--font-hero);
@@ -999,7 +1011,7 @@ main { min-height: calc(100vh - 200px); }
 /* ============================================================
    Detail Page
    ============================================================ */
-.page-single { padding: 3.5rem 0 4rem; }
+.page-single { padding-block: 3.5rem 4rem; }
 
 .back-link-wrap { margin-bottom: 1.25rem; }
 .back-link {
@@ -1498,7 +1510,7 @@ main { min-height: calc(100vh - 200px); }
 /* ============================================================
    Responsive
    ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   .site-header .container-page {
     grid-template-columns: 1fr auto;
     height: auto;
@@ -1512,17 +1524,27 @@ main { min-height: calc(100vh - 200px); }
     justify-content: flex-start;
     gap: 0.1rem;
     overflow-x: auto;
-    padding-bottom: 0.1rem;
+    max-width: 100%;
+    padding-bottom: 0.2rem;
     scrollbar-width: none;
+    scroll-padding-inline: 1.5rem;
+    -webkit-overflow-scrolling: touch;
   }
   .site-nav::-webkit-scrollbar { display: none; }
   .site-nav a {
     flex: 0 0 auto;
+    min-width: 3.65rem;
     padding: 0.45rem 0.75rem;
     font-size: 0.82rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
   }
-  .site-actions { grid-column: 2; grid-row: 1; gap: 0.4rem; }
+  .site-actions {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 0.4rem;
+    max-width: min(46vw, 28rem);
+  }
+  .user-display { max-width: clamp(4.5rem, 14vw, 8rem); }
   .hero { padding: 4rem 0 3rem; }
 }
 
@@ -1543,6 +1565,7 @@ main { min-height: calc(100vh - 200px); }
     grid-row: 2;
     justify-self: stretch;
     justify-content: center;
+    max-width: 100%;
   }
   .site-nav {
     grid-row: 3;
@@ -1550,8 +1573,10 @@ main { min-height: calc(100vh - 200px); }
     padding: 0 1rem 0.15rem;
   }
   .site-nav a {
+    min-width: 3.3rem;
     padding: 0.42rem 0.68rem;
     font-size: 0.78rem;
+    letter-spacing: 0.02em;
   }
   .header-auth-link,
   .lang-switcher {
@@ -1559,6 +1584,15 @@ main { min-height: calc(100vh - 200px); }
   }
   .header-auth-link {
     padding-inline: 0.9rem;
+  }
+  .user-menu {
+    max-width: 100%;
+  }
+  .user-menu-trigger {
+    max-width: min(100%, 24rem);
+  }
+  .user-display {
+    max-width: min(38vw, 9rem);
   }
   .language-menu-pop {
     right: auto;
@@ -1805,6 +1839,7 @@ main { min-height: calc(100vh - 200px); }
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  max-width: 100%;
   padding: 0.35rem 0.62rem 0.35rem 0.4rem;
   background: rgba(212, 175, 55, 0.06);
   border: 1px solid rgba(212, 175, 55, 0.25);
@@ -1814,6 +1849,7 @@ main { min-height: calc(100vh - 200px); }
   font-size: 0.78rem;
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
 }
 .user-menu-trigger:hover {
   background: rgba(212, 175, 55, 0.14);
@@ -1834,8 +1870,17 @@ main { min-height: calc(100vh - 200px); }
 }
 .user-display {
   max-width: 8rem;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-credit-pill {
+  flex: 0 0 auto;
+  margin-left: 0.25rem;
+  color: var(--gold-bright);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .user-menu-chevron {
