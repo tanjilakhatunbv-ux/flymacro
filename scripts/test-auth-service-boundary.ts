@@ -26,6 +26,7 @@ for (const exportName of [
   'sendPasswordResetEmail',
   'resetPasswordWithReuseCheck',
   'sendVerificationEmail',
+  'resolveOAuthUser',
 ]) {
   assert(
     service.includes(`export async function ${exportName}`) || service.includes(`export function ${exportName}`),
@@ -65,15 +66,25 @@ for (const routePath of [
   'src/app/api/auth/forgot-password/route.ts',
   'src/app/api/auth/reset-password/route.ts',
   'src/app/api/auth/resend-verification/route.ts',
+  'src/app/api/auth/callback/google/route.ts',
+  'src/app/api/auth/callback/github/route.ts',
 ]) {
   const route = read(routePath)
   assert(
-    route.includes("from '../../../../lib/auth-service'"),
+    route.includes('lib/auth-service'),
     `${routePath} must use auth-service helpers for Payload auth business logic.`,
   )
   assert(
     !route.includes("import { getPayload } from '../../../../lib/payload'"),
     `${routePath} must not import getPayload directly after auth-service extraction.`,
+  )
+  assert(
+    !route.includes("import { getPayload } from '../../../../../lib/payload'"),
+    `${routePath} must not import getPayload directly after auth-service extraction.`,
+  )
+  assert(
+    !route.includes("import { signJwt } from '../../../../../lib/jwt'"),
+    `${routePath} must not sign JWTs directly after auth-service extraction.`,
   )
 }
 

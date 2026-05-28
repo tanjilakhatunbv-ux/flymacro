@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { sql } from '@payloadcms/db-postgres'
 import { getPayload } from './payload'
 import { signJwt } from './jwt'
+import { grantRegisterBonus } from './register-bonus'
 import type { AuditLog, User } from '../payload-types'
 
 type Payload = Awaited<ReturnType<typeof getPayload>>
@@ -231,4 +232,83 @@ export async function sendVerificationEmail(user: User, ip: string, payload?: Pa
     '\u7528\u6237\u8bf7\u6c42\u91cd\u53d1\u9a8c\u8bc1\u90ae\u4ef6',
     payloadClient,
   )
+}
+
+export async function resolveOAuthUser(
+  data: {
+    provider: 'google' | 'github'
+    oauthId: string
+    email: string
+    name?: string
+    ip: string
+    auditReason: string
+  },
+  payload?: Payload,
+): Promise<{ user: User; token: string } | { error: 'user_creation_failed' | 'account_suspended' | 'account_banned' }> {
+  const payloadClient = payload ?? await getPayload()
+  const email = data.email.toLowerCase()
+  let user: User | null = null
+
+  const byOAuth = await payloadClient.find({
+    collection: 'users',
+    where: {
+      and: [
+        { oauthProvider: { equals: data.provider } },
+        { oauthId: { equals: data.oauthId } },
+      ],
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  if (byOAuth.docs.length > 0) {
+    user = byOAuth.docs[0] as User
+  } else {
+    const byEmail = await payloadClient.find({
+      collection: 'users',
+      where: { email: { equals: email } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    if (byEmail.docs.length > 0) {
+      user = byEmail.docs[0] as User
+      await payloadClient.update({
+        collection: 'users',
+        id: user.id,
+        data: {
+          oauthProvider: data.provider,
+          oauthId: data.oauthId,
+          _verified: true,
+        } as never,
+        overrideAccess: true,
+      })
+    } else {
+      user = await payloadClient.create({
+        collection: 'users',
+        data: {
+          email,
+          name: data.name || undefined,
+          role: 'user',
+          oauthProvider: data.provider,
+          oauthId: data.oauthId,
+          _verified: true,
+        } as never,
+        overrideAccess: true,
+      }) as User
+      await grantRegisterBonus(user)
+    }
+  }
+
+  if (!user) return { error: 'user_creation_failed' }
+  if (user.status === 'suspended') return { error: 'account_suspended' }
+  if (user.status === 'banned') return { error: 'account_banned' }
+
+  await updateLoginMetadata(user, payloadClient)
+  await writeUserAuditLog('login_success', user, data.ip, data.auditReason, payloadClient)
+
+  const token = await signAuthToken(user, payloadClient)
+  return { user, token }
 }
