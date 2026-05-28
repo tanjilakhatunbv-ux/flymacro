@@ -2,9 +2,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
+import { getAccountMacroExchanges } from '../../../../../lib/account-data'
 import { ExchangeRenewButton } from '../../../../../components/ExchangeRenewButton'
-import type { MacroExchange } from '../../../../../payload-types'
 
 type Params = Promise<{ locale: string }>
 
@@ -20,16 +19,7 @@ export default async function ExchangesPage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'macro-exchanges',
-    where: { user: { equals: user.id } },
-    sort: '-createdAt',
-    limit: 50,
-    depth: 1,
-    overrideAccess: true,
-  })
-  const exchanges = r.docs as MacroExchange[]
+  const exchanges = await getAccountMacroExchanges(user.id)
 
   const now = new Date()
 

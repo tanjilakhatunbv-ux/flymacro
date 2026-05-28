@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
+import { getAccountSummary } from '../../../../lib/account-data'
 
 type Params = Promise<{ locale: string }>
 
@@ -18,31 +18,7 @@ export default async function AccountHome({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const [exchanges, creditOrders, openTickets, unreadNotifs] = await Promise.all([
-    payload.count({
-      collection: 'macro-exchanges',
-      where: { user: { equals: user.id } },
-      overrideAccess: true,
-    }),
-    payload.count({
-      collection: 'credit-orders',
-      where: { user: { equals: user.id } },
-      overrideAccess: true,
-    }),
-    payload.count({
-      collection: 'tickets',
-      where: {
-        and: [{ user: { equals: user.id } }, { status: { in: ['open', 'in-progress'] } }],
-      },
-      overrideAccess: true,
-    }),
-    payload.count({
-      collection: 'notifications',
-      where: { and: [{ recipient: { equals: user.id } }, { read: { equals: false } }] },
-      overrideAccess: true,
-    }),
-  ])
+  const summary = await getAccountSummary(user.id)
 
   const display = user.name || user.email.split('@')[0]
   const verified = (user as { _verified?: boolean })._verified !== false
@@ -68,19 +44,19 @@ export default async function AccountHome({ params }: { params: Params }) {
         </div>
         <div className="account-card">
           <h4>{t('exchangedMacros')}</h4>
-          <div className="num">{exchanges.totalDocs}</div>
+          <div className="num">{summary.exchanges}</div>
         </div>
         <div className="account-card">
           <h4>{t('paymentOrders')}</h4>
-          <div className="num">{creditOrders.totalDocs}</div>
+          <div className="num">{summary.creditOrders}</div>
         </div>
         <div className="account-card">
           <h4>{t('activeTickets')}</h4>
-          <div className="num">{openTickets.totalDocs}</div>
+          <div className="num">{summary.openTickets}</div>
         </div>
         <div className="account-card">
           <h4>{t('unreadNotifications')}</h4>
-          <div className="num">{unreadNotifs.totalDocs}</div>
+          <div className="num">{summary.unreadNotifications}</div>
         </div>
       </section>
 

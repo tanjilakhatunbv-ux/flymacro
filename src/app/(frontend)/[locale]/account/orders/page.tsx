@@ -2,8 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
-import type { CreditOrder } from '../../../../../payload-types'
+import { getAccountCreditOrders } from '../../../../../lib/account-data'
 
 type Params = Promise<{ locale: string }>
 
@@ -19,16 +18,7 @@ export default async function OrdersPage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'credit-orders',
-    where: { user: { equals: user.id } },
-    sort: '-createdAt',
-    limit: 50,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const orders = r.docs as CreditOrder[]
+  const orders = await getAccountCreditOrders(user.id)
 
   return (
     <>

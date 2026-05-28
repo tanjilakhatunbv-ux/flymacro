@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
-import type { CreditTransaction } from '../../../../../payload-types'
+import { getAccountCreditTransactions } from '../../../../../lib/account-data'
 
 type Params = Promise<{ locale: string }>
 
@@ -18,16 +17,7 @@ export default async function TransactionsPage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'credit-transactions',
-    where: { user: { equals: user.id } },
-    sort: '-createdAt',
-    limit: 100,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const transactions = r.docs as CreditTransaction[]
+  const transactions = await getAccountCreditTransactions(user.id)
 
   return (
     <>

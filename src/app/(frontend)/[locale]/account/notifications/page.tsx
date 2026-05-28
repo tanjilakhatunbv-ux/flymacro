@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
+import { getAccountNotifications } from '../../../../../lib/account-data'
 import { MarkAllReadButton } from '../../../../../components/NotificationButtons'
 import { MarkNotificationReadForm } from '../../../../../components/MarkNotificationReadForm'
 import type { Notification } from '../../../../../payload-types'
@@ -21,16 +21,7 @@ export default async function NotificationsPage({ params }: { params: Params }) 
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'notifications',
-    where: { recipient: { equals: user.id } },
-    sort: '-createdAt',
-    limit: 100,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const notifications = r.docs as Notification[]
+  const notifications = await getAccountNotifications(user.id)
 
   return (
     <>
