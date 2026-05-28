@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
-import { creemFetch, isCreemConfigured, type CreemCheckoutSession } from '../../../../lib/creem'
+import { isCreemConfigured } from '../../../../lib/creem'
 import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
 import { parseParam, IdParam } from '../../../../lib/validation'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
+import { createCheckoutSessionForUser } from '../../../../lib/payment-service'
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -14,13 +14,13 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', code: 'rate_limited' },
       { status: 429 },
     )
   }
 
   if (!isCreemConfigured()) {
-    return internalError('支付系统尚未配置', 'payment-not-configured')
+    return internalError('\u652f\u4ed8\u7cfb\u7edf\u5c1a\u672a\u914d\u7f6e', 'payment-not-configured')
   }
 
   const user = await getCurrentUser()
@@ -28,58 +28,31 @@ export async function POST(req: Request) {
     return unauthorized('unauthenticated')
   }
 
-  const payload = await getPayload()
-
   let body: { packageId?: number | string }
   try {
     body = (await req.json()) as typeof body
   } catch {
-    return badRequest('请求体格式错误', 'invalid-body')
+    return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid-body')
   }
 
   const { packageId } = body
   if (!packageId) {
-    return badRequest('请选择点券包', 'missing-package')
+    return badRequest('\u8bf7\u9009\u62e9\u70b9\u5238\u5305', 'missing-package')
   }
 
   const parsed = parseParam(IdParam, packageId)
   if (!parsed.ok) {
-    return badRequest('无效的点券包 ID', 'invalid-package-id')
+    return badRequest('\u65e0\u6548\u7684\u70b9\u5238\u5305 ID', 'invalid-package-id')
   }
-
-  const pkg = await payload
-    .findByID({
-      collection: 'credit-packages',
-      id: parsed.data,
-      depth: 0,
-    })
-    .catch(() => null)
-
-  if (!pkg || !pkg.enabled) {
-    return notFound('点券包不存在或已下架', 'package-not-found')
-  }
-
-  const successUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}/credits?paid=success`
 
   try {
-    const session = await creemFetch<CreemCheckoutSession>('/checkouts', {
-      method: 'POST',
-      body: {
-        product_id: pkg.creemProductId,
-        success_url: successUrl,
-        customer: {
-          email: user.email,
-        },
-        metadata: {
-          userId: String(user.id),
-          packageId: String(parsed.data),
-        },
-      },
-    })
-
-    return NextResponse.json(success({ checkoutUrl: session.checkout_url, sessionId: session.id }))
+    const result = await createCheckoutSessionForUser({ user, packageId: parsed.data })
+    if ('error' in result) {
+      return notFound('\u70b9\u5238\u5305\u4e0d\u5b58\u5728\u6216\u5df2\u4e0b\u67b6', result.error)
+    }
+    return NextResponse.json(success({ checkoutUrl: result.checkoutUrl, sessionId: result.sessionId }))
   } catch (err) {
-    const msg = err instanceof Error ? err.message : '创建支付会话失败'
-    return internalError(msg, 'checkout-failed')
+    const message = err instanceof Error ? err.message : '\u521b\u5efa\u652f\u4ed8\u4f1a\u8bdd\u5931\u8d25'
+    return internalError(message, 'checkout-failed')
   }
 }

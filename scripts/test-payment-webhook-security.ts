@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 const root = process.cwd()
 const webhook = readFileSync(join(root, 'src/app/api/payment/webhook/route.ts'), 'utf8')
+const paymentService = readFileSync(join(root, 'src/lib/payment-service.ts'), 'utf8')
 const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
   scripts?: Record<string, string>
 }
@@ -11,9 +12,21 @@ const canary = readFileSync(join(root, 'scripts/security-canary-prod.mjs'), 'utf
 const requiredWebhookChecks = [
   'verifyCreemSignature',
   'timingSafeEqual',
+  'missing-checkout-fields',
   'DuplicateWebhookError',
   'InvalidWebhookPayloadError',
-  'missing-checkout-fields',
+]
+
+for (const required of requiredWebhookChecks) {
+  if (!webhook.includes(required)) {
+    console.error(`Payment webhook must include security guard: ${required}.`)
+    process.exit(1)
+  }
+}
+
+const requiredServiceChecks = [
+  'DuplicateWebhookError',
+  'InvalidWebhookPayloadError',
   'product-mismatch',
   'currency-mismatch',
   'amount-mismatch',
@@ -23,9 +36,9 @@ const requiredWebhookChecks = [
   'UPDATE users SET credits = credits +',
 ]
 
-for (const required of requiredWebhookChecks) {
-  if (!webhook.includes(required)) {
-    console.error(`Payment webhook must include security guard: ${required}.`)
+for (const required of requiredServiceChecks) {
+  if (!paymentService.includes(required)) {
+    console.error(`Payment service must include security guard: ${required}.`)
     process.exit(1)
   }
 }
