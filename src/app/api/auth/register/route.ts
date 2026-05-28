@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { success, badRequest, conflict, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
 import { verifyTurnstile } from '../../../../lib/turnstile'
-import { signJwt } from '../../../../lib/jwt'
 import { setAuthCookie } from '../../../../lib/session'
+import {
+  createPasswordUser,
+  findUserByEmail,
+  signAuthToken,
+  writeUserAuditLog,
+} from '../../../../lib/auth-service'
+import type { User } from '../../../../payload-types'
 
 type RegisterBody = {
   email?: string
@@ -77,63 +82,32 @@ export async function POST(req: Request) {
     }
   }
 
-  const payload = await getPayload()
-
-  const existing = await payload.find({
-    collection: 'users',
-    where: { email: { equals: email } },
-    limit: 1,
-    depth: 0,
-  })
-  if (existing.docs.length > 0) {
-    return conflict('该邮箱已注册，请直接登录或使用「忘记密码」', 'email_exists')
+  const existing = await findUserByEmail(email)
+  if (existing) {
+    return conflict('\u8be5\u90ae\u7bb1\u5df2\u6ce8\u518c\uff0c\u8bf7\u76f4\u63a5\u767b\u5f55\u6216\u4f7f\u7528\u300c\u5fd8\u8bb0\u5bc6\u7801\u300d', 'email_exists')
   }
 
-  let user: { id: number; email: string; name?: string | null }
+  let user: User
   try {
-    user = await payload.create({
-      collection: 'users',
-      data: {
-        email,
-        password,
-        name: name || undefined,
-        role: 'user',
-        _verified: false,
-      } as never,
-      overrideAccess: true,
-    })
+    user = await createPasswordUser({ email, password, name })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : '注册失败'
+    const msg = err instanceof Error ? err.message : '\u6ce8\u518c\u5931\u8d25'
     return internalError(msg)
   }
 
   // Auto-login: sign JWT directly to bypass Payload's verify gate.
   // Users can use the full site without email verification.
-  const payloadSecret = (payload as { secret?: string }).secret ?? ''
-  const token = signJwt(
-    { id: user.id, email: user.email, collection: 'users' },
-    payloadSecret,
-    { expiresInSeconds: 60 * 60 * 24 * 7 },
-  )
+  const token = await signAuthToken(user)
 
   // Audit log for registration
-  try {
-    await payload.create({
-      collection: 'audit-logs',
-      data: {
-        action: 'register',
-        collection: 'users',
-        docId: String(user.id),
-        operator: user.id,
-        ip,
-        reason: '注册并自动登录，等待邮箱验证',
-        metadata: { email },
-      },
-      overrideAccess: true,
-    })
-  } catch {
-    /* audit log failure must not block registration */
-  }
+  await writeUserAuditLog(
+    'register',
+    user,
+    ip,
+    '\u6ce8\u518c\u5e76\u81ea\u52a8\u767b\u5f55\uff0c\u7b49\u5f85\u90ae\u7bb1\u9a8c\u8bc1',
+    undefined,
+    { email },
+  )
 
   const response = NextResponse.json(success({
     ok: true,

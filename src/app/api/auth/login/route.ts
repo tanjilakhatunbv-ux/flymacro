@@ -1,33 +1,19 @@
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
-import { getPayload } from '../../../../lib/payload'
 import { rateLimitWithFallback, getClientIP, getCount, incr, del } from '../../../../lib/rate-limit'
 import { success, badRequest, unauthorized, forbidden, internalError } from '../../../../lib/api-response'
 import { verifyTurnstile } from '../../../../lib/turnstile'
-import { signJwt } from '../../../../lib/jwt'
 import { setAuthCookie } from '../../../../lib/session'
-import { sql } from '@payloadcms/db-postgres'
+import {
+  findUserByEmail,
+  signAuthToken,
+  updateLoginMetadata,
+  verifyPasswordForUser,
+  writeUserAuditLog,
+} from '../../../../lib/auth-service'
 import type { User } from '../../../../payload-types'
 
 const FAIL_THRESHOLD = 2
 const FAIL_TTL = 600 // 10 minutes
-
-async function verifyPassword(password: string, hash: string, salt: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    crypto.pbkdf2(password, salt, 25000, 512, 'sha256', (err, hashBuffer) => {
-      if (err) {
-        resolve(false)
-        return
-      }
-      const storedHashBuffer = Buffer.from(hash, 'hex')
-      if (hashBuffer.length === storedHashBuffer.length && crypto.timingSafeEqual(hashBuffer, storedHashBuffer)) {
-        resolve(true)
-      } else {
-        resolve(false)
-      }
-    })
-  })
-}
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -78,86 +64,31 @@ export async function POST(req: Request) {
     }
   }
 
-  const payload = await getPayload()
-
   try {
     // Look up user first for status checks
-    const userRes = await payload.find({
-      collection: 'users',
-      where: { email: { equals: normalizedEmail } },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
+    const user = await findUserByEmail(normalizedEmail)
 
-    if (userRes.docs.length === 0) {
+    if (!user) {
       await incr(ipFailKey, FAIL_TTL)
       await incr(emailFailKey, FAIL_TTL)
       return unauthorized('invalid_credentials')
     }
 
-    const user = userRes.docs[0] as User
+    // Payload returns a token for verified users; unverified users need direct password verification.
+    const passwordResult = await verifyPasswordForUser(user, password)
+    let token = passwordResult.token
 
-    // Try payload.login() first — works for verified users
-    let token: string | null = null
-    let passwordCorrect = false
-    try {
-      const result = await payload.login({
-        collection: 'users',
-        data: { email: normalizedEmail, password },
-        depth: 0,
-      })
-      if (result?.token) {
-        token = result.token
-        passwordCorrect = true
-      }
-    } catch {
-      // payload.login() throws for unverified users even with correct password.
-      // Verify password directly using pbkdf2 against the DB-stored hash/salt.
-    }
-
-    if (!passwordCorrect) {
-      // Fetch hash and salt directly from DB (not returned by payload.find)
-      try {
-        const hashResult = await payload.db.drizzle.execute(
-          sql`SELECT hash, salt FROM users WHERE id = ${user.id}`
-        )
-        const rows = hashResult.rows as Array<{ hash: string; salt: string }> | undefined
-        const row = rows?.[0]
-        if (row?.hash && row?.salt) {
-          passwordCorrect = await verifyPassword(password, row.hash, row.salt)
-        }
-      } catch {
-        // DB query failed — treat as wrong password
-      }
-    }
-
-    if (!passwordCorrect) {
+    if (!passwordResult.valid) {
       await incr(ipFailKey, FAIL_TTL)
       await incr(emailFailKey, FAIL_TTL)
 
-      try {
-        await payload.create({
-          collection: 'audit-logs',
-          data: {
-            action: 'login_failed',
-            collection: 'users',
-            docId: String(user.id),
-            operator: user.id,
-            ip,
-            reason: '密码错误',
-          },
-          overrideAccess: true,
-        })
-      } catch {
-        /* ignore */
-      }
+      await writeUserAuditLog('login_failed', user, ip, '\u5bc6\u7801\u9519\u8bef')
 
       const newIpFails = ipFails + 1
       const newEmailFails = emailFails + 1
       if (newIpFails >= FAIL_THRESHOLD || newEmailFails >= FAIL_THRESHOLD) {
         return NextResponse.json(
-          { success: false, error: '邮箱或密码错误，请完成人机验证后重试', code: 'captcha_required' },
+          { success: false, error: '\u90ae\u7bb1\u6216\u5bc6\u7801\u9519\u8bef\uff0c\u8bf7\u5b8c\u6210\u4eba\u673a\u9a8c\u8bc1\u540e\u91cd\u8bd5', code: 'captcha_required' },
           { status: 401 },
         )
       }
@@ -166,57 +97,26 @@ export async function POST(req: Request) {
 
     // Check account status (suspended/banned users cannot log in)
     if (user.status === 'suspended') {
-      return forbidden('账号已被停用，请联系客服', 'account_suspended')
+      return forbidden('\u8d26\u53f7\u5df2\u88ab\u505c\u7528\uff0c\u8bf7\u8054\u7cfb\u5ba2\u670d', 'account_suspended')
     }
     if (user.status === 'banned') {
-      return forbidden('账号已被封禁，请联系客服', 'account_banned')
+      return forbidden('\u8d26\u53f7\u5df2\u88ab\u5c01\u7981\uff0c\u8bf7\u8054\u7cfb\u5ba2\u670d', 'account_banned')
     }
 
     // Clear failure counters on success
     await del(ipFailKey, emailFailKey)
 
-    // Update login metadata
-    try {
-      await payload.update({
-        collection: 'users',
-        id: user.id,
-        data: {
-          lastLoginAt: new Date().toISOString(),
-          loginCount: ((user.loginCount ?? 0) as number) + 1,
-        } as never,
-        overrideAccess: true,
-      })
-    } catch {
-      /* ignore metadata update failures */
-    }
+    await updateLoginMetadata(user)
+    await writeUserAuditLog(
+      'login_success',
+      user,
+      ip,
+      user._verified ? '\u767b\u5f55\u6210\u529f' : '\u767b\u5f55\u6210\u529f\uff08\u672a\u9a8c\u8bc1\u90ae\u7bb1\uff09',
+    )
 
-    // Audit log for successful login
-    try {
-      await payload.create({
-        collection: 'audit-logs',
-        data: {
-          action: 'login_success',
-          collection: 'users',
-          docId: String(user.id),
-          operator: user.id,
-          ip,
-          reason: user._verified ? '登录成功' : '登录成功（未验证邮箱）',
-        },
-        overrideAccess: true,
-      })
-    } catch {
-      /* ignore */
-    }
-
-    // If payload.login() returned a token (verified user), use it.
-    // Otherwise sign JWT directly to bypass Payload's verify gate.
+    // If Payload did not return a token, sign one directly to bypass Payload's verify gate.
     if (!token) {
-      const payloadSecret = (payload as { secret?: string }).secret ?? ''
-      token = signJwt(
-        { id: user.id, email: user.email, collection: 'users' },
-        payloadSecret,
-        { expiresInSeconds: 60 * 60 * 24 * 7 },
-      )
+      token = await signAuthToken(user)
     }
 
     // Strip sensitive fields from response

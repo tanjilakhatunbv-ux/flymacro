@@ -117,7 +117,15 @@ assert(successStart !== -1, 'Login route must build a success response.')
 assert(!successBody.includes('token'), 'Login response body must not expose the JWT token.')
 
 const register = read('src/app/api/auth/register/route.ts')
-assert(register.includes('overrideAccess: true'), 'Custom register route must use overrideAccess after collection create is staff-only.')
-assert(register.includes("role: 'user'"), 'Custom register route must force new registrations to role user.')
+const authService = read('src/lib/auth-service.ts')
+assert(
+  register.includes('createPasswordUser'),
+  'Custom register route must create users through the auth service boundary.',
+)
+assert(
+  authService.includes('overrideAccess: true'),
+  'Auth service user creation must use overrideAccess after collection create is staff-only.',
+)
+assert(authService.includes("role: 'user'"), 'Auth service must force new registrations to role user.')
 
 console.log('Prelaunch security hardening checks passed.')
