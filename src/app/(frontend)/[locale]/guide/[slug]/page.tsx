@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { unstable_cache } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
-import { getPayload } from '../../../../../lib/payload'
+import {
+  getPublishedGuideBySlug,
+  getPublishedGuideStaticParams,
+} from '../../../../../lib/content-data'
 import { RichText } from '../../../../../components/RichText'
 import { BackLink } from '../../../../../components/BackLink'
 import { FALLBACK_GUIDES } from '../../../../../lib/guide-fallbacks'
-import type { Guide } from '../../../../../payload-types'
 
 type Params = Promise<{ slug: string }>
 
@@ -14,34 +16,14 @@ export const revalidate = 300
 
 const findGuideCached = unstable_cache(
   async (slug: string) => {
-    const payload = await getPayload()
-    const r = await payload.find({
-      collection: 'guides',
-      where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
-      limit: 1,
-      depth: 1,
-      overrideAccess: true,
-    })
-    return (r.docs[0] as Guide | undefined) ?? null
+    return await getPublishedGuideBySlug(slug)
   },
   ['guide-by-slug'],
   { revalidate: 300, tags: ['guides'] }
 )
 
 export async function generateStaticParams() {
-  try {
-    const payload = await getPayload()
-    const result = await payload.find({
-      collection: 'guides',
-      where: { _status: { equals: 'published' } },
-      limit: 200,
-      depth: 0,
-      overrideAccess: true,
-    })
-    return result.docs.map((g: { slug: string }) => ({ slug: g.slug }))
-  } catch {
-    return []
-  }
+  return await getPublishedGuideStaticParams()
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { unstable_cache } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
-import { getPayload } from '../../../../../lib/payload'
+import {
+  getPublishedArticleBySlug,
+  getPublishedArticleStaticParams,
+} from '../../../../../lib/content-data'
 import { RichText } from '../../../../../components/RichText'
 import { BackLink } from '../../../../../components/BackLink'
-import type { Article } from '../../../../../payload-types'
 
 type Params = Promise<{ slug: string; locale: string }>
 
@@ -13,15 +15,7 @@ export const revalidate = 300
 
 const findArticleCached = unstable_cache(
   async (slug: string) => {
-    const payload = await getPayload()
-    const r = await payload.find({
-      collection: 'articles',
-      where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
-      limit: 1,
-      depth: 1,
-      overrideAccess: true,
-    })
-    return (r.docs[0] as Article | undefined) ?? null
+    return await getPublishedArticleBySlug(slug)
   },
   ['article-by-slug'],
   { revalidate: 300, tags: ['articles'] }
@@ -29,15 +23,7 @@ const findArticleCached = unstable_cache(
 
 export async function generateStaticParams() {
   try {
-    const payload = await getPayload()
-    const result = await payload.find({
-      collection: 'articles',
-      where: { _status: { equals: 'published' } },
-      limit: 200,
-      depth: 0,
-      overrideAccess: true,
-    })
-    return result.docs.map((a: { slug: string }) => ({ slug: a.slug }))
+    return await getPublishedArticleStaticParams()
   } catch {
     return []
   }

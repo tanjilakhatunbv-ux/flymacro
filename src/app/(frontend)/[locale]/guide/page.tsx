@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
-import { getPayload } from '../../../../lib/payload'
+import { getPublishedGuides } from '../../../../lib/content-data'
 import { FALLBACK_GUIDES } from '../../../../lib/guide-fallbacks'
 import type { Guide } from '../../../../payload-types'
 
@@ -18,16 +18,7 @@ export const revalidate = 300
 
 export default async function GuideListPage() {
   const t = await getTranslations('guide')
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'guides',
-    where: { _status: { equals: 'published' } },
-    sort: ['weight', '-publishedAt'],
-    limit: 100,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const dbGuides = result.docs as Guide[]
+  const dbGuides = await getPublishedGuides()
 
   const dbSlugs = new Set(dbGuides.map((g) => g.slug))
   const fallbackEntries = Object.entries(FALLBACK_GUIDES)

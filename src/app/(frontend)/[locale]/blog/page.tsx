@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
-import { getPayload } from '../../../../lib/payload'
-import type { Article } from '../../../../payload-types'
+import { getPublishedArticles } from '../../../../lib/content-data'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -17,16 +16,7 @@ export const revalidate = 300
 
 export default async function BlogListPage() {
   const t = await getTranslations('blog')
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'articles',
-    where: { _status: { equals: 'published' } },
-    sort: ['-pinned', '-publishedAt'],
-    limit: 100,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const articles = result.docs as Article[]
+  const articles = await getPublishedArticles()
 
   return (
     <div className="container-page page-list">

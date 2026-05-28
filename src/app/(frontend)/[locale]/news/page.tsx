@@ -2,7 +2,7 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
-import { getPayload } from '../../../../lib/payload'
+import { getPublishedNewsItems, type NewsItem } from '../../../../lib/content-data'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -13,18 +13,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   }
 }
 
-type NewsItem = {
-  id: string
-  title: string
-  slug: string
-  summary?: string
-  category?: string
-  author?: string
-  pinned?: boolean
-  publishedAt?: string
-  cover?: unknown
-}
-
 export const revalidate = 300
 
 export default async function NewsListPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -32,16 +20,7 @@ export default async function NewsListPage({ params }: { params: Promise<{ local
   const t = await getTranslations('news')
   let articles: NewsItem[] = []
   try {
-    const payload = await getPayload()
-    const result = await payload.find({
-      collection: 'news' as never,
-      where: { _status: { equals: 'published' } },
-      sort: ['-pinned', '-publishedAt'],
-      limit: 100,
-      depth: 1,
-      overrideAccess: true,
-    })
-    articles = result.docs as NewsItem[]
+    articles = await getPublishedNewsItems()
   } catch {
     articles = []
   }
