@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
 import { success, unauthorized, badRequest, notFound, forbidden, conflict, internalError } from '../../../../lib/api-response'
-import { writeAuditLog } from '../../../../lib/audit'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
-import type { Macro } from '../../../../payload-types'
-import { sql } from '@payloadcms/db-postgres'
+import { MacroExchangeError, exchangeMacroForUser } from '../../../../lib/macro-exchange-service'
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -15,7 +12,7 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', code: 'rate_limited' },
       { status: 429 },
     )
   }
@@ -26,143 +23,32 @@ export async function POST(req: Request) {
       return unauthorized('unauthenticated')
     }
 
-    const payload = await getPayload()
-
     let body: { macroSlug?: string }
     try {
       body = (await req.json()) as typeof body
     } catch {
-      return badRequest('请求体格式错误', 'invalid-body')
+      return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid-body')
     }
 
     const { macroSlug } = body
     if (!macroSlug) {
-      return badRequest('缺少宏标识', 'missing-macro')
+      return badRequest('\u7f3a\u5c11\u5b8f\u6807\u8bc6', 'missing-macro')
     }
 
-    const macroRes = await payload.find({
-      collection: 'macros',
-      where: { slug: { equals: macroSlug } },
-      limit: 1,
-      depth: 0,
-    })
-    const macro = macroRes.docs[0] as Macro | undefined
-
-    if (!macro) {
-      return notFound('macro-not-found')
-    }
-
-    const price = macro.price ?? 0
-
-    if (price === 0) {
-      return badRequest('该宏无法兑换', 'invalid-macro')
-    }
-
-    // Wrap duplicate check + credit deduction in a transaction to close the race window
-    let newCredits: number
-    let exchangeAlreadyExists: boolean
-
-    await payload.db.drizzle.execute(
-      sql`BEGIN`
-    )
-
-    try {
-      // Check for existing active exchange within transaction
-      const existingRes = await payload.db.drizzle.execute(
-        sql`SELECT id FROM macro_exchanges WHERE user_id = ${user.id} AND macro_id = ${macro.id} AND (expires_at IS NULL OR expires_at >= NOW()) LIMIT 1`
-      )
-      const existingRows = existingRes.rows as Array<{ id: number }> | undefined
-      exchangeAlreadyExists = !!(existingRows && existingRows.length > 0)
-
-      if (exchangeAlreadyExists) {
-        await payload.db.drizzle.execute(sql`ROLLBACK`)
-        return conflict('你已经兑换过此宏，且仍在有效期内', 'already-exchanged')
+    const result = await exchangeMacroForUser({ user, macroSlug, ip })
+    return NextResponse.json(success(result))
+  } catch (err) {
+    if (err instanceof MacroExchangeError) {
+      if (err.code === 'macro-not-found') return notFound('macro-not-found')
+      if (err.code === 'invalid-macro') return badRequest('\u8be5\u5b8f\u65e0\u6cd5\u5151\u6362', 'invalid-macro')
+      if (err.code === 'already-exchanged') {
+        return conflict('\u4f60\u5df2\u7ecf\u5151\u6362\u8fc7\u6b64\u5b8f\uff0c\u4e14\u4ecd\u5728\u6709\u6548\u671f\u5185', 'already-exchanged')
       }
-
-      // Atomic credit deduction
-      const result = await payload.db.drizzle.execute(
-        sql`UPDATE users SET credits = credits - ${price} WHERE id = ${user.id} AND credits >= ${price} RETURNING credits`
-      )
-      const rows = result.rows as Array<{ credits: number }> | undefined
-      if (!rows || rows.length === 0) {
-        await payload.db.drizzle.execute(sql`ROLLBACK`)
-        return forbidden(
-          `点券不足，需要 ${price} 点券`,
-          'insufficient-credits',
-        )
+      if (err.code === 'insufficient-credits') {
+        const price = typeof err.metadata?.price === 'number' ? err.metadata.price : 0
+        return forbidden(`\u70b9\u5238\u4e0d\u8db3\uff0c\u9700\u8981 ${price} \u70b9\u5238`, 'insufficient-credits')
       }
-      newCredits = rows[0].credits
-
-      await payload.db.drizzle.execute(sql`COMMIT`)
-    } catch (txErr) {
-      await payload.db.drizzle.execute(sql`ROLLBACK`).catch(() => {})
-      throw txErr
     }
-
-    const now = new Date()
-    const durationDays = macro.durationDays ?? 0
-    const expiresAt = durationDays > 0
-      ? new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString()
-      : null
-
-    // Create exchange record
-    const exchange = await payload.create({
-      collection: 'macro-exchanges',
-      data: {
-        user: user.id,
-        macro: macro.id,
-        creditsSpent: price,
-        grantedAt: now.toISOString(),
-        expiresAt,
-        autoRenew: macro.autoRenewable ?? false,
-      },
-      overrideAccess: true,
-    })
-
-    // Create credit transaction
-    await payload.create({
-      collection: 'credit-transactions',
-      data: {
-        user: user.id,
-        amount: -price,
-        balanceAfter: newCredits,
-        type: 'exchange',
-        relatedExchange: exchange.id,
-        reason: `兑换「${macro.title}」`,
-      },
-      overrideAccess: true,
-    })
-
-    // Create notification
-    await payload.create({
-      collection: 'notifications',
-      data: {
-        recipient: user.id,
-        title: '兑换成功',
-        body: `你已成功兑换「${macro.title}」，花费 ${price} 点券。${expiresAt ? '有效期至 ' + expiresAt.slice(0, 10) : '永久有效'}。`,
-        link: `/macros/${macroSlug}`,
-        category: 'order',
-        read: false,
-      },
-      overrideAccess: true,
-    })
-
-    writeAuditLog({
-      action: 'exchange',
-      collection: 'macros',
-      docId: String(macro.id),
-      operator: user.id,
-      ip: getClientIP(req),
-      reason: `兑换「${macro.title}」花费 ${price} 点券`,
-      metadata: { credits: newCredits, exchangeId: exchange.id },
-    })
-
-    return NextResponse.json(success({
-      credits: newCredits,
-      expiresAt,
-      autoRenew: macro.autoRenewable ?? false,
-    }))
-  } catch (_err) {
-    return internalError('服务器内部错误')
+    return internalError('\u670d\u52a1\u5668\u5185\u90e8\u9519\u8bef')
   }
 }
