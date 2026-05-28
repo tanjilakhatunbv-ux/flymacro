@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getCurrentUser, isStaffRole } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
+import { getCurrentUser } from '../../../../lib/auth'
+import { getAccessibleMacroCode } from '../../../../lib/macro-access'
 import { unauthorized, badRequest, notFound, forbidden, success } from '../../../../lib/api-response'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
-import type { Macro } from '../../../../payload-types'
 
 export async function GET(req: Request) {
   const ip = getClientIP(req)
@@ -12,7 +11,7 @@ export async function GET(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', code: 'rate_limited' },
       { status: 429 },
     )
   }
@@ -26,72 +25,21 @@ export async function GET(req: Request) {
   const macroId = searchParams.get('macroId')
 
   if (!macroId) {
-    return badRequest('缺少宏 ID', 'missing-macro-id')
+    return badRequest('\u7f3a\u5c11\u5b8f ID', 'missing-macro-id')
   }
 
   const id = Number(macroId)
   if (!id || id <= 0) {
-    return badRequest('无效的宏 ID', 'invalid-macro-id')
+    return badRequest('\u65e0\u6548\u7684\u5b8f ID', 'invalid-macro-id')
   }
 
-  const payload = await getPayload()
-
-  // Build a minimal req so the afterRead hook on codeContent sees the current user
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mockReq = { user, payload } as any
-
-  // Staff can always see code
-  if (isStaffRole(user)) {
-    const macro = await payload
-      .findByID({
-        collection: 'macros',
-        id,
-        depth: 0,
-        req: mockReq,
-      })
-      .catch(() => null) as Macro | null
-    if (!macro) {
-      return notFound('macro-not-found')
-    }
-    return NextResponse.json(success({ code: macro.codeContent ?? null }))
+  const result = await getAccessibleMacroCode(user, id)
+  if (result.forbidden) {
+    return forbidden('\u672a\u5151\u6362\u6b64\u5b8f', 'no-exchange')
   }
-
-  // Check active exchange
-  const now = new Date().toISOString()
-  const exchange = await payload.find({
-    collection: 'macro-exchanges',
-    where: {
-      and: [
-        { user: { equals: user.id } },
-        { macro: { equals: id } },
-        {
-          or: [
-            { expiresAt: { exists: false } },
-            { expiresAt: { greater_than_equal: now } },
-          ],
-        },
-      ],
-    },
-    limit: 1,
-    depth: 0,
-  })
-
-  if (exchange.docs.length === 0) {
-    return forbidden('未兑换此宏', 'no-exchange')
-  }
-
-  const macro = await payload
-    .findByID({
-      collection: 'macros',
-      id,
-      depth: 0,
-      req: mockReq,
-    })
-    .catch(() => null) as Macro | null
-
-  if (!macro) {
+  if (result.missing) {
     return notFound('macro-not-found')
   }
 
-  return NextResponse.json(success({ code: macro.codeContent ?? null }))
+  return NextResponse.json(success({ code: result.code }))
 }
