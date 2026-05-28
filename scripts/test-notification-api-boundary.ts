@@ -26,6 +26,15 @@ for (const exportName of [
   )
 }
 
+const cachePath = 'src/lib/notification-cache.ts'
+assert(existsSync(join(process.cwd(), cachePath)), 'Notification cache module must exist.')
+
+const cache = read(cachePath)
+assert(
+  cache.includes('export const getCachedUnreadCount'),
+  'Notification cache must export getCachedUnreadCount.',
+)
+
 for (const route of [
   'src/app/api/notifications/mark-read/route.ts',
   'src/app/api/notifications/mark-all-read/route.ts',
@@ -38,6 +47,19 @@ for (const route of [
   assert(
     source.includes('notification-actions'),
     `${route} must import notification mutation helpers from notification-actions.`,
+  )
+}
+
+{
+  const route = 'src/app/api/auth/unread-count/route.ts'
+  const source = read(route)
+  assert(
+    !source.includes('/lib/payload') && !source.includes('getPayload'),
+    `${route} must use notification-cache instead of importing getPayload directly.`,
+  )
+  assert(
+    source.includes('notification-cache'),
+    `${route} must import unread count helper from notification-cache.`,
   )
 }
 
