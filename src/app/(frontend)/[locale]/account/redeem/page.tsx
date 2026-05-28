@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
+import { getAccountRedeemCodeRedemptions } from '../../../../../lib/redeem-code-data'
 import { RedeemCodeForm } from '../../../../../components/RedeemCodeForm'
-import type { RedeemCodeRedemption } from '../../../../../payload-types'
 
 type Params = Promise<{ locale: string }>
 
@@ -19,16 +18,7 @@ export default async function RedeemCodePage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const result = await payload.find({
-    collection: 'redeem-code-redemptions',
-    where: { user: { equals: user.id } },
-    sort: '-createdAt',
-    limit: 100,
-    depth: 1,
-    overrideAccess: true,
-  })
-  const redemptions = result.docs as RedeemCodeRedemption[]
+  const redemptions = await getAccountRedeemCodeRedemptions(user.id)
 
   return (
     <>

@@ -1,27 +1,10 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@payloadcms/db-postgres'
 import { getCurrentUser } from '../../../lib/auth'
-import { getPayload } from '../../../lib/payload'
 import { badRequest, conflict, internalError, notFound, success, unauthorized } from '../../../lib/api-response'
-import {
-  assertRedeemCodeMatchesCredits,
-  normalizeRedeemCode,
-} from '../../../lib/redeem-code-rules'
+import { normalizeRedeemCode } from '../../../lib/redeem-code-rules'
+import { RedeemCodeError, redeemCodeForUser } from '../../../lib/redeem-code-service'
 import { getClientIP, rateLimitWithFallback } from '../../../lib/rate-limit'
 import { writeAuditLog } from '../../../lib/audit'
-
-type RedeemCodeRow = {
-  id: number
-  code: string
-  credits_granted: string | number
-  max_redemptions: string | number
-  redeemed_count: string | number
-  enabled: boolean
-}
-
-type UserCreditRow = {
-  credits: number
-}
 
 export async function POST(req: Request) {
   const ip = getClientIP(req)
@@ -31,131 +14,57 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', code: 'rate_limited' },
       { status: 429 },
     )
   }
 
   const user = await getCurrentUser()
-  if (!user) return unauthorized('请先登录', 'unauthenticated')
+  if (!user) return unauthorized('\u8bf7\u5148\u767b\u5f55', 'unauthenticated')
 
   let body: { code?: string }
   try {
     body = await req.json()
   } catch {
-    return badRequest('请求体格式错误', 'invalid_body')
+    return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid_body')
   }
 
   const code = normalizeRedeemCode(body.code ?? '')
-  if (!code) return badRequest('请输入兑换码', 'missing_redeem_code')
+  if (!code) return badRequest('\u8bf7\u8f93\u5165\u5151\u6362\u7801', 'missing_redeem_code')
 
-  const payload = await getPayload()
-  let redemptionId: number | string | null = null
-  let redeemCodeId: number | null = null
-  let creditsGranted = 0
-  let balanceBefore = Number(user.credits ?? 0)
-  let balanceAfter = balanceBefore
-
-  await payload.db.drizzle.execute(sql`BEGIN`)
-
+  let result: Awaited<ReturnType<typeof redeemCodeForUser>>
   try {
-    const codeResult = await payload.db.drizzle.execute(sql`
-      SELECT id, code, credits_granted, max_redemptions, redeemed_count, enabled
-      FROM redeem_codes
-      WHERE code = ${code}
-      FOR UPDATE
-      LIMIT 1
-    `)
-    const rows = codeResult.rows as RedeemCodeRow[] | undefined
-    const redeemCode = rows?.[0]
-
-    if (!redeemCode) {
-      await payload.db.drizzle.execute(sql`ROLLBACK`)
-      return notFound('兑换码不存在', 'redeem_code_not_found')
-    }
-
-    if (!redeemCode.enabled) {
-      await payload.db.drizzle.execute(sql`ROLLBACK`)
-      return conflict('兑换码已停用', 'redeem_code_disabled')
-    }
-
-    creditsGranted = Number(redeemCode.credits_granted)
-    assertRedeemCodeMatchesCredits(redeemCode.code, creditsGranted)
-
-    const maxRedemptions = Number(redeemCode.max_redemptions)
-    const redeemedCount = Number(redeemCode.redeemed_count)
-    if (redeemedCount >= maxRedemptions) {
-      await payload.db.drizzle.execute(sql`ROLLBACK`)
-      return conflict('兑换码已用完', 'redeem_code_exhausted')
-    }
-
-    const userResult = await payload.db.drizzle.execute(sql`
-      SELECT credits
-      FROM users
-      WHERE id = ${user.id}
-      FOR UPDATE
-      LIMIT 1
-    `)
-    const userRows = userResult.rows as UserCreditRow[] | undefined
-    balanceBefore = Number(userRows?.[0]?.credits ?? user.credits ?? 0)
-
-    const creditResult = await payload.db.drizzle.execute(sql`
-      UPDATE users
-      SET credits = credits + ${creditsGranted}
-      WHERE id = ${user.id}
-      RETURNING credits
-    `)
-    const creditRows = creditResult.rows as UserCreditRow[] | undefined
-    balanceAfter = Number(creditRows?.[0]?.credits ?? balanceBefore + creditsGranted)
-
-    await payload.db.drizzle.execute(sql`
-      UPDATE redeem_codes
-      SET redeemed_count = redeemed_count + 1, updated_at = now()
-      WHERE id = ${redeemCode.id}
-    `)
-
-    const redemption = await payload.create({
-      collection: 'redeem-code-redemptions',
-      data: {
-        user: user.id,
-        redeemCode: redeemCode.id,
-        creditsGranted,
-        balanceBefore,
-        balanceAfter,
-      },
-      overrideAccess: true,
-    })
-    redemptionId = redemption.id
-    redeemCodeId = redeemCode.id
-
-    await payload.create({
-      collection: 'credit-transactions',
-      data: {
-        user: user.id,
-        amount: creditsGranted,
-        balanceAfter,
-        type: 'redeem_code',
-        reason: `兑换码 ${code} 兑换 ${creditsGranted} 点券`,
-      },
-      overrideAccess: true,
-    })
-
-    await payload.db.drizzle.execute(sql`COMMIT`)
+    result = await redeemCodeForUser(user, code)
   } catch (err) {
-    await payload.db.drizzle.execute(sql`ROLLBACK`).catch(() => {})
-    const message = err instanceof Error ? err.message : '兑换失败'
-    return internalError(message, 'redeem_code_failed')
+    if (err instanceof RedeemCodeError) {
+      if (err.code === 'redeem_code_not_found') return notFound(err.message, err.code)
+      if (err.code === 'redeem_code_disabled' || err.code === 'redeem_code_exhausted') {
+        return conflict(err.message, err.code)
+      }
+      return internalError(err.message, err.code)
+    }
+
+    return internalError('\u5151\u6362\u5931\u8d25', 'redeem_code_failed')
   }
 
   writeAuditLog({
     action: 'other',
     collection: 'redeem-codes',
-    docId: redeemCodeId ? String(redeemCodeId) : undefined,
+    docId: result.redeemCodeId ? String(result.redeemCodeId) : undefined,
     operator: user.id,
     ip,
-    reason: `兑换码兑换 ${creditsGranted} 点券`,
-    metadata: { redemptionId, creditsGranted, balanceBefore, balanceAfter },
+    reason: `\u5151\u6362\u7801\u5151\u6362 ${result.creditsGranted} \u70b9\u5238`,
+    metadata: {
+      redemptionId: result.redemptionId,
+      creditsGranted: result.creditsGranted,
+      balanceBefore: result.balanceBefore,
+      balanceAfter: result.balanceAfter,
+    },
   })
 
-  return NextResponse.json(success({ creditsGranted, balanceBefore, balanceAfter }))
+  return NextResponse.json(success({
+    creditsGranted: result.creditsGranted,
+    balanceBefore: result.balanceBefore,
+    balanceAfter: result.balanceAfter,
+  }))
 }
