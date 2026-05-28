@@ -27,6 +27,8 @@ for (const exportName of [
   'resetPasswordWithReuseCheck',
   'sendVerificationEmail',
   'resolveOAuthUser',
+  'claimVerificationBonus',
+  'getAuthDebugInfo',
 ]) {
   assert(
     service.includes(`export async function ${exportName}`) || service.includes(`export function ${exportName}`),
@@ -68,6 +70,8 @@ for (const routePath of [
   'src/app/api/auth/resend-verification/route.ts',
   'src/app/api/auth/callback/google/route.ts',
   'src/app/api/auth/callback/github/route.ts',
+  'src/app/api/auth/claim-bonus/route.ts',
+  'src/app/api/auth/debug/route.ts',
 ]) {
   const route = read(routePath)
   assert(

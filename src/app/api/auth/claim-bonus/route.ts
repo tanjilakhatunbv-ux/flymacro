@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from '../../../../lib/payload'
-import { grantRegisterBonus } from '../../../../lib/register-bonus'
+import { claimVerificationBonus } from '../../../../lib/auth-service'
 import { success, badRequest } from '../../../../lib/api-response'
-import { writeAuditLog } from '../../../../lib/audit'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 
 /**
@@ -16,7 +14,7 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', code: 'rate_limited' },
       { status: 429 },
     )
   }
@@ -25,50 +23,21 @@ export async function POST(req: Request) {
   try {
     body = await req.json()
   } catch {
-    return badRequest('请求体格式错误', 'invalid_json')
+    return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid_json')
   }
 
   const token = body.token
   if (!token) {
-    return badRequest('缺少 token', 'missing_token')
+    return badRequest('\u7f3a\u5c11 token', 'missing_token')
   }
 
-  const payload = await getPayload()
-
-  // Token-only lookup — ensures caller actually completed email verification
-  const byToken = await payload.find({
-    collection: 'users',
-    where: {
-      _verificationToken: { equals: token },
-      _verified: { equals: true },
-    },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  if (byToken.docs.length === 0) {
-    return badRequest('无效的验证信息', 'invalid_token')
+  const result = await claimVerificationBonus({ token, ip })
+  if (result.status === 'invalid_token') {
+    return badRequest('\u65e0\u6548\u7684\u9a8c\u8bc1\u4fe1\u606f', 'invalid_token')
   }
-
-  const user = byToken.docs[0]
-
-  // Already has credits — already claimed or set at registration
-  if ((user.credits ?? 0) > 0) {
+  if (result.status === 'already_claimed') {
     return NextResponse.json(success({ ok: true, message: 'already_claimed' }))
   }
 
-  // Award registration bonus
-  await grantRegisterBonus(user)
-
-  writeAuditLog({
-    action: 'claim_bonus',
-    collection: 'users',
-    docId: String(user.id),
-    operator: user.id,
-    ip: getClientIP(req),
-    reason: '邮箱验证后领取注册奖励',
-  })
-
-  return NextResponse.json(success({ ok: true, credits: 20 }))
+  return NextResponse.json(success({ ok: true, credits: result.credits }))
 }

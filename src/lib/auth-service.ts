@@ -312,3 +312,69 @@ export async function resolveOAuthUser(
   const token = await signAuthToken(user, payloadClient)
   return { user, token }
 }
+
+export async function claimVerificationBonus(
+  data: { token: string; ip: string },
+  payload?: Payload,
+): Promise<{ status: 'claimed'; credits: number } | { status: 'already_claimed' } | { status: 'invalid_token' }> {
+  const payloadClient = payload ?? await getPayload()
+  const byToken = await payloadClient.find({
+    collection: 'users',
+    where: {
+      _verificationToken: { equals: data.token },
+      _verified: { equals: true },
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const user = byToken.docs[0] as User | undefined
+  if (!user) return { status: 'invalid_token' }
+
+  if ((user.credits ?? 0) > 0) {
+    return { status: 'already_claimed' }
+  }
+
+  await grantRegisterBonus(user)
+  await writeUserAuditLog(
+    'claim_bonus',
+    user,
+    data.ip,
+    '\u90ae\u7bb1\u9a8c\u8bc1\u540e\u9886\u53d6\u6ce8\u518c\u5956\u52b1',
+    payloadClient,
+  )
+
+  return { status: 'claimed', credits: 20 }
+}
+
+export async function getAuthDebugInfo(
+  data: { requestHeaders: Headers; tokenCookie?: string },
+  payload?: Payload,
+): Promise<{
+  method1: { source: 'req.headers'; user: { id: number } | null }
+  method2: { source: 'cookies() API'; user: { id: number } | null }
+  diagnostics: { hasCookieHeader: boolean; hasCookieApi: boolean; env: string | undefined }
+}> {
+  const payloadClient = payload ?? await getPayload()
+  const auth1 = await payloadClient.auth({ headers: data.requestHeaders })
+  const h2 = new Headers()
+  if (data.tokenCookie) h2.set('cookie', `payload-token=${data.tokenCookie}`)
+  const auth2 = data.tokenCookie ? await payloadClient.auth({ headers: h2 }) : { user: null }
+
+  return {
+    method1: {
+      source: 'req.headers',
+      user: auth1.user ? { id: (auth1.user as User).id } : null,
+    },
+    method2: {
+      source: 'cookies() API',
+      user: auth2.user ? { id: (auth2.user as User).id } : null,
+    },
+    diagnostics: {
+      hasCookieHeader: (data.requestHeaders.get('cookie') ?? '').includes('payload-token'),
+      hasCookieApi: !!data.tokenCookie,
+      env: process.env.NODE_ENV,
+    },
+  }
+}
