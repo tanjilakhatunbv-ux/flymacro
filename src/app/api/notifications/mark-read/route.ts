@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
+import { markNotificationReadForUser } from '../../../../lib/notification-actions'
 import { success, unauthorized, badRequest, notFound, internalError } from '../../../../lib/api-response'
 
 export async function POST(req: Request) {
@@ -21,24 +21,9 @@ export async function POST(req: Request) {
     return badRequest('缺少通知标识', 'missing-id')
   }
 
-  const payload = await getPayload()
-
   try {
-    const result = await payload.update({
-      collection: 'notifications',
-      where: {
-        and: [
-          { id: { equals: Number(id) } },
-          { recipient: { equals: user.id } },
-        ],
-      },
-      data: { read: true, readAt: new Date().toISOString() },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
-
-    if (!result.docs.length) {
+    const updated = await markNotificationReadForUser(user.id, Number(id))
+    if (!updated) {
       return notFound('notification-not-found')
     }
 

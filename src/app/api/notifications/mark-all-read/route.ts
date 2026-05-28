@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '../../../../lib/auth'
-import { getPayload } from '../../../../lib/payload'
+import { markAllNotificationsReadForUser } from '../../../../lib/notification-actions'
 import { success, unauthorized, internalError } from '../../../../lib/api-response'
 
 export async function POST(_req: Request) {
@@ -9,19 +9,8 @@ export async function POST(_req: Request) {
     return unauthorized('unauthenticated')
   }
 
-  const payload = await getPayload()
-
   try {
-    await payload.update({
-      collection: 'notifications',
-      where: {
-        recipient: { equals: user.id },
-        read: { not_equals: true },
-      },
-      data: { read: true, readAt: new Date().toISOString() },
-      depth: 0,
-      overrideAccess: true,
-    })
+    await markAllNotificationsReadForUser(user.id)
 
     return NextResponse.json(success({ ok: true }))
   } catch {
