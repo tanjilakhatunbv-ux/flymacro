@@ -23,6 +23,9 @@ for (const exportName of [
   'updateLoginMetadata',
   'writeUserAuditLog',
   'createPasswordUser',
+  'sendPasswordResetEmail',
+  'resetPasswordWithReuseCheck',
+  'sendVerificationEmail',
 ]) {
   assert(
     service.includes(`export async function ${exportName}`) || service.includes(`export function ${exportName}`),
@@ -57,5 +60,21 @@ assert(
   !registerRoute.includes("import { signJwt } from '../../../../lib/jwt'"),
   'Register route must not sign JWTs directly after auth-service extraction.',
 )
+
+for (const routePath of [
+  'src/app/api/auth/forgot-password/route.ts',
+  'src/app/api/auth/reset-password/route.ts',
+  'src/app/api/auth/resend-verification/route.ts',
+]) {
+  const route = read(routePath)
+  assert(
+    route.includes("from '../../../../lib/auth-service'"),
+    `${routePath} must use auth-service helpers for Payload auth business logic.`,
+  )
+  assert(
+    !route.includes("import { getPayload } from '../../../../lib/payload'"),
+    `${routePath} must not import getPayload directly after auth-service extraction.`,
+  )
+}
 
 console.log('Auth service boundary keeps login/register Payload business logic out of route handlers.')

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from '../../../../lib/payload'
+import { sendPasswordResetEmail } from '../../../../lib/auth-service'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { badRequest } from '../../../../lib/api-response'
 
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁，请稍后再试', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u518d\u8bd5', code: 'rate_limited' },
       { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } },
     )
   }
@@ -19,24 +19,19 @@ export async function POST(req: Request) {
   try {
     body = await req.json()
   } catch {
-    return badRequest('请求体格式错误', 'invalid_json')
+    return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid_json')
   }
 
   const email = (body.email ?? '').trim().toLowerCase()
   if (!email) {
-    return badRequest('请输入邮箱', 'missing_email')
+    return badRequest('\u8bf7\u8f93\u5165\u90ae\u7bb1', 'missing_email')
   }
 
   try {
-    const payload = await getPayload()
-    await payload.forgotPassword({
-      collection: 'users',
-      data: { email },
-    })
-  } catch (_err) {
-    // Silently ignore — do not reveal whether email exists
+    await sendPasswordResetEmail(email)
+  } catch {
+    // Do not reveal whether the email exists.
   }
 
-  // Always return success to prevent email enumeration
   return NextResponse.json({ success: true, data: { ok: true } })
 }

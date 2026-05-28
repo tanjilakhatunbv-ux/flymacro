@@ -140,3 +140,95 @@ export async function createPasswordUser(
     overrideAccess: true,
   }) as User
 }
+
+export async function sendPasswordResetEmail(email: string, payload?: Payload): Promise<void> {
+  const payloadClient = payload ?? await getPayload()
+
+  await payloadClient.forgotPassword({
+    collection: 'users',
+    data: { email: email.toLowerCase().trim() },
+  })
+}
+
+export async function resetPasswordWithReuseCheck(
+  data: { token: string; password: string; ip: string },
+  payload?: Payload,
+): Promise<'ok' | 'invalid_token' | 'password_reuse'> {
+  const payloadClient = payload ?? await getPayload()
+  const now = new Date().toISOString()
+  const users = await payloadClient.find({
+    collection: 'users',
+    where: {
+      resetPasswordToken: { equals: data.token },
+      resetPasswordExpiration: { greater_than: now },
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const user = users.docs[0] as User | undefined
+  if (!user) return 'invalid_token'
+
+  if (user.hash && user.salt && await verifyPasswordHash(data.password, user.hash, user.salt)) {
+    return 'password_reuse'
+  }
+
+  try {
+    await payloadClient.resetPassword({
+      collection: 'users',
+      data: { token: data.token, password: data.password },
+      overrideAccess: true,
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : ''
+    if (message.includes('invalid') || message.includes('expired') || message.includes('Token')) {
+      return 'invalid_token'
+    }
+    throw err
+  }
+
+  await writeUserAuditLog(
+    'reset_password',
+    user,
+    data.ip,
+    '\u7528\u6237\u81ea\u52a9\u91cd\u7f6e\u5bc6\u7801',
+    payloadClient,
+  )
+
+  return 'ok'
+}
+
+export async function sendVerificationEmail(user: User, ip: string, payload?: Payload): Promise<void> {
+  const payloadClient = payload ?? await getPayload()
+  const token = crypto.randomBytes(32).toString('hex')
+
+  await payloadClient.update({
+    collection: 'users',
+    id: user.id,
+    data: {
+      _verificationToken: token,
+    } as never,
+    overrideAccess: true,
+  })
+
+  const verifyUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-email?token=${token}`
+
+  await payloadClient.sendEmail({
+    from: process.env.RESEND_FROM_EMAIL || 'noreply@flymacro.qzz.io',
+    to: user.email,
+    subject: '\u9a8c\u8bc1\u4f60\u7684\u90ae\u7bb1\u5730\u5740',
+    html: `<p>\u4f60\u597d ${user.email ?? ''}\uff0c</p>
+<p>\u8bf7\u70b9\u51fb\u4e0b\u65b9\u94fe\u63a5\u9a8c\u8bc1\u4f60\u7684\u90ae\u7bb1\uff1a</p>
+<p><a href="${verifyUrl}">${verifyUrl}</a></p>
+<p>\u8be5\u94fe\u63a5 24 \u5c0f\u65f6\u5185\u6709\u6548\u3002</p>`,
+  })
+
+  await writeUserAuditLog(
+    'resend_verification',
+    user,
+    ip,
+    '\u7528\u6237\u8bf7\u6c42\u91cd\u53d1\u9a8c\u8bc1\u90ae\u4ef6',
+    payloadClient,
+  )
+}

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
-import { getPayload } from '../../../../lib/payload'
+import { resetPasswordWithReuseCheck } from '../../../../lib/auth-service'
 import { rateLimitWithFallback, getClientIP } from '../../../../lib/rate-limit'
 import { badRequest, internalError } from '../../../../lib/api-response'
 import { validatePasswordStrength } from '../../../../lib/validation'
@@ -12,7 +11,7 @@ export async function POST(req: Request) {
   ])
   if (!limit.allowed) {
     return NextResponse.json(
-      { success: false, error: '请求过于频繁，请稍后再试', code: 'rate_limited' },
+      { success: false, error: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u518d\u8bd5', code: 'rate_limited' },
       { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.resetAt - Date.now()) / 1000)) } },
     )
   }
@@ -21,12 +20,12 @@ export async function POST(req: Request) {
   try {
     body = await req.json()
   } catch {
-    return badRequest('请求体格式错误', 'invalid_json')
+    return badRequest('\u8bf7\u6c42\u4f53\u683c\u5f0f\u9519\u8bef', 'invalid_json')
   }
 
   const { token, password } = body
   if (!token || !password) {
-    return badRequest('缺少必要参数', 'missing_params')
+    return badRequest('\u7f3a\u5c11\u5fc5\u8981\u53c2\u6570', 'missing_params')
   }
 
   const strength = validatePasswordStrength(password)
@@ -34,71 +33,17 @@ export async function POST(req: Request) {
     return badRequest(strength.error, 'password_weak')
   }
 
-  const payload = await getPayload()
-
-  // Find the user by reset token to check password reuse
-  const now = new Date().toISOString()
-  const users = await payload.find({
-    collection: 'users',
-    where: {
-      resetPasswordToken: { equals: token },
-      resetPasswordExpiration: { greater_than: now },
-    },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  if (users.docs.length === 0) {
-    return badRequest('Token 无效或已过期', 'invalid_token')
-  }
-
-  const user = users.docs[0] as { id: number; email: string; hash?: string; salt?: string }
-
-  // Check if new password matches the old one (using pbkdf2 to match Payload's KDF)
-  if (user.hash && user.salt) {
-    const derivedKey = await new Promise<Buffer>((resolve) => {
-      crypto.pbkdf2(password, user.salt as string, 25000, 512, 'sha256', (err, key) => {
-        if (err) resolve(Buffer.alloc(0))
-        else resolve(key)
-      })
-    })
-    if (derivedKey.length > 0 && derivedKey.toString('hex') === user.hash) {
-      return badRequest('新密码不能与当前密码相同', 'password_reuse')
-    }
-  }
-
-  // Perform the actual reset via Payload
   try {
-    await payload.resetPassword({
-      collection: 'users',
-      data: { token, password },
-      overrideAccess: true,
-    })
+    const result = await resetPasswordWithReuseCheck({ token, password, ip })
+    if (result === 'invalid_token') {
+      return badRequest('Token \u65e0\u6548\u6216\u5df2\u8fc7\u671f', 'invalid_token')
+    }
+    if (result === 'password_reuse') {
+      return badRequest('\u65b0\u5bc6\u7801\u4e0d\u80fd\u4e0e\u5f53\u524d\u5bc6\u7801\u76f8\u540c', 'password_reuse')
+    }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : '密码重置失败'
-    if (msg.includes('invalid') || msg.includes('expired') || msg.includes('Token')) {
-      return badRequest('Token 无效或已过期', 'invalid_token')
-    }
-    return internalError(msg)
-  }
-
-  // Audit log for self-service password reset
-  try {
-    await payload.create({
-      collection: 'audit-logs',
-      data: {
-        action: 'reset_password',
-        collection: 'users',
-        docId: String(user.id),
-        operator: user.id,
-        ip,
-        reason: '用户自助重置密码',
-      },
-      overrideAccess: true,
-    })
-  } catch {
-    /* audit log failure must not block password reset */
+    const message = err instanceof Error ? err.message : '\u5bc6\u7801\u91cd\u7f6e\u5931\u8d25'
+    return internalError(message)
   }
 
   return NextResponse.json({ success: true, data: { ok: true } })
