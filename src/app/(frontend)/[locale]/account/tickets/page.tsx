@@ -2,8 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../lib/auth'
-import { getPayload } from '../../../../../lib/payload'
-import type { Ticket } from '../../../../../payload-types'
+import { getAccountTickets } from '../../../../../lib/ticket-data'
 
 type Params = Promise<{ locale: string }>
 
@@ -19,16 +18,7 @@ export default async function TicketsPage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-  const r = await payload.find({
-    collection: 'tickets',
-    where: { user: { equals: user.id } },
-    sort: '-updatedAt',
-    limit: 50,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const tickets = r.docs as Ticket[]
+  const tickets = await getAccountTickets(user.id)
 
   return (
     <>

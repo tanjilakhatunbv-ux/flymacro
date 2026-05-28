@@ -2,11 +2,10 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUser } from '../../../../../../lib/auth'
-import { getPayload } from '../../../../../../lib/payload'
+import { getAccountTicketDetail } from '../../../../../../lib/ticket-data'
 import { RichText } from '../../../../../../components/RichText'
 import { BackLink } from '../../../../../../components/BackLink'
 import { TicketReplyForm } from '../../../../../../components/TicketForms'
-import type { Ticket, TicketMessage } from '../../../../../../payload-types'
 
 type Params = Promise<{ id: string; locale: string }>
 
@@ -22,37 +21,9 @@ export default async function TicketDetailPage({ params }: { params: Params }) {
   const user = await getCurrentUser()
   if (!user) return null
 
-  const payload = await getPayload()
-
-  let ticket: Ticket | null = null
-  try {
-    ticket = (await payload.findByID({
-      collection: 'tickets',
-      id,
-      overrideAccess: true,
-      depth: 0,
-    })) as Ticket | null
-  } catch {
-    ticket = null
-  }
-  if (!ticket) notFound()
-  const ownerId = typeof ticket.user === 'object' ? ticket.user?.id : ticket.user
-  if (String(ownerId) !== String(user.id)) notFound()
-
-  const msgsRes = await payload.find({
-    collection: 'ticket-messages',
-    where: {
-      and: [
-        { ticket: { equals: id } },
-        { isInternalNote: { not_equals: true } },
-      ],
-    },
-    sort: 'createdAt',
-    limit: 200,
-    depth: 0,
-    overrideAccess: true,
-  })
-  const messages = msgsRes.docs as TicketMessage[]
+  const detail = await getAccountTicketDetail(user.id, id)
+  if (!detail) notFound()
+  const { ticket, messages } = detail
 
   return (
     <>
