@@ -47,4 +47,5 @@ src/payload-generated-schema.ts
 .gstack/
 .claude/
 .worktrees/
+graphify-out/
 script-versions-create-fixed.png
