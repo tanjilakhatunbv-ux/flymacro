@@ -96,7 +96,7 @@ const findMacros = unstable_cache(
 )
 
 const getCachedUserExchangedIds = unstable_cache(
-  async (userId: number): Promise<Set<number | string>> => {
+  async (userId: number): Promise<Array<number | string>> => {
     const payload = await getPayload()
     const exRes = await payload.find({
       collection: 'macro-exchanges',
@@ -115,12 +115,12 @@ const getCachedUserExchangedIds = unstable_cache(
       depth: 0,
       overrideAccess: true,
     })
-    return new Set(
-      exRes.docs.map((e) => {
+    return exRes.docs
+      .map((e) => {
         const doc = e as { macro?: number | { id?: number | string } }
         return typeof doc.macro === 'object' ? doc.macro?.id : doc.macro
-      }).filter((id): id is number | string => id != null),
-    )
+      })
+      .filter((id): id is number | string => id != null)
   },
   ['user-exchanged-ids'],
   { revalidate: 30, tags: ['macro-exchanges'] },
@@ -183,7 +183,7 @@ export default async function MacrosListPage({ searchParams }: { searchParams: P
   let exchangedIds = new Set<number | string>()
   if (user) {
     try {
-      exchangedIds = await getCachedUserExchangedIds(Number(user.id))
+      exchangedIds = new Set(await getCachedUserExchangedIds(Number(user.id)))
     } catch {
       // ignore
     }
