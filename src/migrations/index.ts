@@ -23,6 +23,7 @@ import * as migration_20260523_update_credit_copy_to_points from './20260523_upd
 import * as migration_20260523_update_credit_page_notice_copy from './20260523_update_credit_page_notice_copy';
 import * as migration_20260525_add_redeem_codes from './20260525_add_redeem_codes';
 import * as migration_20260525_add_contact_page_settings from './20260525_add_contact_page_settings';
+import * as migration_20260529_repair_credit_package_labels from './20260529_repair_credit_package_labels';
 
 export const migrations = [
   {
@@ -149,5 +150,10 @@ export const migrations = [
     up: migration_20260525_add_contact_page_settings.up,
     down: migration_20260525_add_contact_page_settings.down,
     name: '20260525_add_contact_page_settings'
+  },
+  {
+    up: migration_20260529_repair_credit_package_labels.up,
+    down: migration_20260529_repair_credit_package_labels.down,
+    name: '20260529_repair_credit_package_labels'
   },
 ];

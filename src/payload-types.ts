@@ -746,7 +746,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 点券包配置。可设置原价、优惠标签和角标，用于前台营销展示。
+ * 点券包配置。点券数固定，价格通过原价和优惠价展示，Creem 商品由运营后台维护。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "credit-packages".
@@ -759,11 +759,11 @@ export interface CreditPackage {
   label: string;
   amount: number;
   /**
-   * 划线显示的原价，需大于实际售价才有效果
+   * 划线显示的原价，仅用于前台展示；需大于优惠价才会显示
    */
   originalAmount?: number | null;
   /**
-   * 例如购买 100 点券包加赠 10 点券，则填 110
+   * 固定为 10 / 20 / 50 / 100 / 200 / 500 之一，不随优惠价变化
    */
   creditsGranted: number;
   /**
