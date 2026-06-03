@@ -175,9 +175,26 @@ async function waitForStablePage(send, timeoutMs) {
   return state
 }
 
+async function waitForPageSignal(send, assertion, timeoutMs) {
+  const deadline = Date.now() + timeoutMs
+  let hasSignal = false
+
+  while (Date.now() < deadline) {
+    const result = await send('Runtime.evaluate', {
+      expression: `Boolean(${assertion})`,
+      returnByValue: true,
+    })
+    hasSignal = Boolean(result.result?.result?.value)
+    if (hasSignal) return true
+    await sleep(300)
+  }
+
+  return hasSignal
+}
+
 function summarizeEvent(event) {
   if (event.method === 'Runtime.exceptionThrown') {
-    return event.params?.exceptionDetails?.text || event.params?.exceptionDetails?.exception?.description || 'runtime exception'
+    return event.params?.exceptionDetails?.exception?.description || event.params?.exceptionDetails?.text || 'runtime exception'
   }
   if (event.method === 'Runtime.consoleAPICalled') {
     const type = event.params?.type
@@ -233,11 +250,7 @@ async function runPageCheck(page) {
     await session.send('Page.navigate', { url })
     const response = await Promise.race([responsePromise, sleep(chromeTimeoutMs).then(() => null)])
     const state = await waitForStablePage(session.send, chromeTimeoutMs)
-    const assertion = await session.send('Runtime.evaluate', {
-      expression: `Boolean(${page.assertion})`,
-      returnByValue: true,
-    })
-    const hasSignal = Boolean(assertion.result?.result?.value)
+    const hasSignal = await waitForPageSignal(session.send, page.assertion, chromeTimeoutMs)
     const errors = session.events.filter(isRelevantFailure).map(summarizeEvent)
     const bodyText = state?.bodyText || ''
     const hasErrorPage = /Application error|Internal Server Error|This page could not be found|404: This page|500: Internal/i.test(bodyText)

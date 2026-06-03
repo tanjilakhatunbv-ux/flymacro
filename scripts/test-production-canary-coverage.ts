@@ -25,6 +25,8 @@ for (const required of [
   '.skeleton-pulse',
   'Application error',
   'remote-debugging-port',
+  'waitForPageSignal',
+  'exception?.description',
   'findChrome',
   'prod-canary-latest.json',
 ]) {
