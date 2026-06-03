@@ -1,12 +1,17 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { isGoogleOAuthConfigured, isGitHubOAuthConfigured } from '../lib/oauth'
 
-export function OAuthButtons({ returnUrl = '/account' }: { returnUrl?: string }) {
+export function OAuthButtons({
+  returnUrl = '/account',
+  hasGoogle,
+  hasGitHub,
+}: {
+  returnUrl?: string
+  hasGoogle: boolean
+  hasGitHub: boolean
+}) {
   const t = useTranslations('oauth')
-  const hasGoogle = isGoogleOAuthConfigured()
-  const hasGitHub = isGitHubOAuthConfigured()
 
   if (!hasGoogle && !hasGitHub) return null
 

@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing'
 import { AuthForm } from '../../../../components/AuthForm'
 import { OAuthButtons } from '../../../../components/OAuthButtons'
 import { getCurrentUser } from '../../../../lib/auth'
+import { isGitHubOAuthConfigured, isGoogleOAuthConfigured } from '../../../../lib/oauth'
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
@@ -29,6 +30,8 @@ export default async function AuthPage({ params, searchParams }: { params: Promi
   const oauthError = sp.error === 'oauth' ? sp.message : undefined
   const user = await getCurrentUser()
   if (user) redirect(returnUrl)
+  const hasGoogleOAuth = isGoogleOAuthConfigured()
+  const hasGitHubOAuth = isGitHubOAuthConfigured()
 
   return (
     <div className="container-page page-single">
@@ -45,7 +48,7 @@ export default async function AuthPage({ params, searchParams }: { params: Promi
             </div>
           )}
           <AuthForm mode={mode} returnUrl={returnUrl} turnstileSiteKey={turnstileSiteKey} />
-          <OAuthButtons returnUrl={returnUrl} />
+          <OAuthButtons returnUrl={returnUrl} hasGoogle={hasGoogleOAuth} hasGitHub={hasGitHubOAuth} />
           {mode === 'login' ? (
             <p className="auth-help">
               {t('adminLink')}
