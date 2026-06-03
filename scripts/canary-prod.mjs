@@ -7,6 +7,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const baseUrl = (process.env.CANARY_BASE_URL || 'https://flymacro.qzz.io').replace(/\/$/, '')
 const reportDir = join(root, '.gstack/canary-reports')
 const chromeTimeoutMs = Number(process.env.CANARY_TIMEOUT_MS || 45_000)
+const retryCount = Number(process.env.CANARY_RETRIES || 1)
 
 const pages = [
   {
@@ -297,7 +298,16 @@ mkdirSync(reportDir, { recursive: true })
 
 const checks = []
 for (const page of pages) {
-  checks.push(await runPageCheck(page))
+  let check = await runPageCheck(page)
+  for (let attempt = 1; !check.ok && attempt <= retryCount; attempt += 1) {
+    const retry = await runPageCheck(page)
+    if (retry.ok) {
+      check = { ...retry, retried: true, firstAttemptErrors: check.errors }
+      break
+    }
+    check = { ...retry, retried: true, firstAttemptErrors: check.errors }
+  }
+  checks.push(check)
 }
 
 const failed = checks.filter((check) => !check.ok)
@@ -321,10 +331,10 @@ writeFileSync(
     `Target: ${baseUrl}`,
     `Status: ${report.status}`,
     '',
-    '| Page | Status | HTTP | Console/Runtime Errors | Skeletons | Total | Signal |',
-    '| --- | --- | --- | --- | --- | --- | --- |',
+    '| Page | Status | HTTP | Console/Runtime Errors | Skeletons | Total | Retry | Signal |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
     ...checks.map((check) => (
-      `| ${check.path} | ${check.ok ? 'HEALTHY' : 'DEGRADED'} | ${check.status ?? 'unknown'} | ${check.errors.length} | ${check.skeletons ?? 'unknown'} | ${check.totalMs}ms | ${check.hasSignal ? 'found' : 'missing'}: ${check.signal} |`
+      `| ${check.path} | ${check.ok ? 'HEALTHY' : 'DEGRADED'} | ${check.status ?? 'unknown'} | ${check.errors.length} | ${check.skeletons ?? 'unknown'} | ${check.totalMs}ms | ${check.retried ? 'yes' : 'no'} | ${check.hasSignal ? 'found' : 'missing'}: ${check.signal} |`
     )),
     '',
   ].join('\n'),

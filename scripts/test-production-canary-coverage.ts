@@ -27,6 +27,7 @@ for (const required of [
   'remote-debugging-port',
   'waitForPageSignal',
   'exception?.description',
+  'CANARY_RETRIES',
   'findChrome',
   'prod-canary-latest.json',
 ]) {
